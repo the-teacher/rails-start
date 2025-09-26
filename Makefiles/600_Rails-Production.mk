@@ -68,7 +68,7 @@ rails-production-bash:
 	docker compose -f $(COMPOSE_FILE) exec rails_app bash
 
 # Help for Production Rails commands
-help-rails-production:
+rails-production-help:
 	@echo "=============================================================="
 	@echo "Production Rails commands:"
 	@echo "=============================================================="

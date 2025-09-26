@@ -3,7 +3,7 @@ COMPOSE_FILE := ./docker/docker-compose.yml
 
 # Start containers
 start:
-	make setup-project-structure
+	make project-setup-structure
 	docker compose -f $(COMPOSE_FILE) up -d
 
 # Start containers
@@ -31,18 +31,20 @@ build:
 rebuild:
 	docker compose -f $(COMPOSE_FILE) build --no-cache
 
+# Open shell in rails_app container as root user
 root-shell:
 	docker compose -f $(COMPOSE_FILE) exec --user root rails_app bash
+
 # Open shell in rails_app container
 shell:
 	docker compose -f $(COMPOSE_FILE) exec rails_app bash
 
-setup-project-structure:
+project-setup-structure:
 	mkdir -p tmp
 	touch tmp/.bash_history
 
 # Help for Project management commands
-help-project:
+project-help:
 	@echo "=============================================================="
 	@echo "Project management commands:"
 	@echo "=============================================================="

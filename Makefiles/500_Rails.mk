@@ -32,7 +32,7 @@ rails-start:
 	docker compose -f $(COMPOSE_FILE) exec rails_app bash -c "bundle exec rails s -b 0.0.0.0 -p 3000"
 
 # Help for Rails commands
-help-rails:
+rails-help:
 	@echo "=============================================================="
 	@echo "Rails development commands:"
 	@echo "=============================================================="
