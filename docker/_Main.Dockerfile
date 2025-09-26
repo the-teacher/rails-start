@@ -13,6 +13,7 @@ ENV RUBYOPT="--yjit"
 USER root
 
 # Install essential packages:
+# sqlite3 and libsqlite3-dev - for SQLite database support
 # less - for viewing files
 # ufw - for basic security
 # fail2ban - intrusion prevention system
@@ -26,10 +27,10 @@ USER root
 # logrotate - log rotation utility
 # curl - for downloading files
 # gnupg - for GPG keys
-# ca-certificates - for HTTPS
 # lsb-release - for distribution information
 # make - build automation tool
-# sqlite3 and libsqlite3-dev - for SQLite database support
+# ca-certificates - for HTTPS
+# ffmpeg - for handling multimedia files
 
 RUN apt-get update && apt-get install -y \
     sqlite3 \
@@ -51,6 +52,7 @@ RUN apt-get update && apt-get install -y \
     lsb-release \
     make \
     ca-certificates && \
+    apt-get install -y ffmpeg && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Update gem system to the latest version as root (requires system permissions)

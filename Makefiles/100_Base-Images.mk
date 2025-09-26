@@ -1,5 +1,5 @@
 # Variables for building images
-DOCKERFILE = docker/_Base.Dockerfile
+BASE_DOCKERFILE = docker/_Base.Dockerfile
 IMAGE_NAME = iamteacher/rails-start.base
 
 # Ruby version and OS version for the base image
@@ -10,7 +10,7 @@ RUBY_VERSION = 3.4.6-bookworm
 base-image-arm64-build:
 	docker build \
 		-t $(IMAGE_NAME):arm64 \
-		-f $(DOCKERFILE) \
+		-f $(BASE_DOCKERFILE) \
 		--build-arg BUILDPLATFORM="linux/arm64" \
 		--build-arg TARGETARCH="arm64" \
 		--build-arg RUBY_VERSION="$(RUBY_VERSION)" \
@@ -20,7 +20,7 @@ base-image-arm64-build:
 base-image-amd64-build:
 	docker build \
 		-t $(IMAGE_NAME):amd64 \
-		-f $(DOCKERFILE) \
+		-f $(BASE_DOCKERFILE) \
 		--build-arg BUILDPLATFORM="linux/amd64" \
 		--build-arg TARGETARCH="amd64" \
 		--build-arg RUBY_VERSION="$(RUBY_VERSION)" \
@@ -125,7 +125,53 @@ base-images-clean:
 	-docker image prune -af
 	@echo "Base images cleanup completed!"
 
+# ===============================================================
+# Buildx commands (modern multi-architecture approach)
+# ===============================================================
 
+# Setup buildx builder for multi-platform builds
+base-images-buildx-setup:
+	docker buildx create --name rails-start-builder --driver docker-container --bootstrap --use || true
+	docker buildx use rails-start-builder
+
+# Check buildx builder status
+base-images-buildx-status:
+	docker buildx ls
+	docker buildx inspect rails-start-builder
+
+# Remove buildx builder
+base-images-buildx-cleanup:
+	@echo "Removing buildx builder..."
+	-docker buildx rm rails-start-builder
+	@echo "Buildx builder cleanup completed!"
+
+# Build multi-architecture base image using buildx (local only)
+base-images-buildx:
+	make base-images-buildx-setup
+	docker buildx build \
+		--builder rails-start-builder \
+		-f $(BASE_DOCKERFILE) \
+		--platform linux/arm64,linux/amd64 \
+		--build-arg RUBY_VERSION="$(RUBY_VERSION)" \
+		-t $(IMAGE_NAME):latest \
+		.
+
+# Build and push multi-architecture base image using buildx
+base-images-buildx-push:
+	make base-images-buildx-setup
+	docker buildx build \
+		--builder rails-start-builder \
+		-f $(BASE_DOCKERFILE) \
+		--platform linux/arm64,linux/amd64 \
+		--build-arg RUBY_VERSION="$(RUBY_VERSION)" \
+		-t $(IMAGE_NAME):latest \
+		--push \
+		.
+
+# Complete buildx workflow: build and push multi-architecture base image
+base-images-buildx-update:
+	make base-images-buildx-push
+	@echo "Multi-architecture base image built and pushed successfully!"
 
 # Help for base image building commands
 base-images-help:
@@ -153,6 +199,15 @@ base-images-help:
 	@echo "  make base-images-clean              - Remove all base project images"
 	@echo "  make base-images-show-all           - Show all Docker images"
 	@echo ""
+	@echo "Buildx commands (modern multi-architecture approach):"
+	@echo "  make base-images-buildx-setup       - Setup buildx builder for multi-platform builds"
+	@echo "  make base-images-buildx-status      - Check buildx builder status and details"
+	@echo "  make base-images-buildx-cleanup     - Remove buildx builder"
+	@echo "  make base-images-buildx             - Build multi-arch base image with buildx (local)"
+	@echo "  make base-images-buildx-push        - Build and push multi-arch base image with buildx"
+	@echo "  make base-images-buildx-update      - Complete buildx workflow (build and push)"
+	@echo ""
 	@echo "Complete workflow:"
-	@echo "  make base-images-update             - Build, push images and manifest"
+	@echo "  make base-images-update             - Build, push images and manifest (traditional)"
+	@echo "  make base-images-buildx-update      - Build and push with buildx (modern)"
 	@echo "=============================================================="

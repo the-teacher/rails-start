@@ -114,6 +114,52 @@ main-images-pull:
 	docker pull $(MAIN_IMAGE_NAME):latest
 	@echo "Main images pulled successfully!"
 
+# ===============================================================
+# Buildx commands (modern multi-architecture approach)
+# ===============================================================
+
+# Setup buildx builder for multi-platform builds
+main-images-buildx-setup:
+	docker buildx create --name rails-start-builder --driver docker-container --bootstrap --use || true
+	docker buildx use rails-start-builder
+
+# Check buildx builder status
+main-images-buildx-status:
+	docker buildx ls
+	docker buildx inspect rails-start-builder
+
+# Remove buildx builder
+main-images-buildx-cleanup:
+	@echo "Removing buildx builder..."
+	-docker buildx rm rails-start-builder
+	@echo "Buildx builder cleanup completed!"
+
+# Build multi-architecture image using buildx (local only)
+main-images-buildx:
+	make main-images-buildx-setup
+	docker buildx build \
+		--builder rails-start-builder \
+		-f $(MAIN_DOCKERFILE) \
+		--platform linux/arm64,linux/amd64 \
+		-t $(MAIN_IMAGE_NAME):latest \
+		.
+
+# Build and push multi-architecture image using buildx
+main-images-buildx-push:
+	make main-images-buildx-setup
+	docker buildx build \
+		--builder rails-start-builder \
+		-f $(MAIN_DOCKERFILE) \
+		--platform linux/arm64,linux/amd64 \
+		-t $(MAIN_IMAGE_NAME):latest \
+		--push \
+		.
+
+# Complete buildx workflow: build and push multi-architecture image
+main-images-buildx-update:
+	make main-images-buildx-push
+	@echo "Multi-architecture main image built and pushed successfully!"
+
 # Help for main image building commands
 main-images-help:
 	@echo "=============================================================="
@@ -136,6 +182,15 @@ main-images-help:
 	@echo "  make main-images-manifest-push      - Push manifest to Docker Hub"
 	@echo "  make main-images-clean              - Remove all main project images"
 	@echo ""
+	@echo "Buildx commands (modern multi-arch approach):"
+	@echo "  make main-images-buildx-setup       - Setup buildx builder for multi-platform builds"
+	@echo "  make main-images-buildx-status      - Check buildx builder status and details"
+	@echo "  make main-images-buildx-cleanup     - Remove buildx builder"
+	@echo "  make main-images-buildx             - Build multi-arch image using buildx (local)"
+	@echo "  make main-images-buildx-push        - Build and push multi-arch image using buildx"
+	@echo "  make main-images-buildx-update      - Complete buildx workflow (build and push)"
+	@echo ""
 	@echo "Complete workflow:"
-	@echo "  make main-images-update             - Build, push images and manifest"
+	@echo "  make main-images-update             - Build, push images and manifest (classic)"
+	@echo "  make main-images-buildx-update      - Build and push multi-arch image (modern)"
 	@echo "=============================================================="
