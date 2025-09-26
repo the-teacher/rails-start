@@ -3,7 +3,7 @@ include Makefiles/200_Main-Images.mk
 include Makefiles/300_Common.mk
 include Makefiles/400_Project.mk
 include Makefiles/500_Rails.mk
-include Makefiles/600_Production-Rails.mk
+include Makefiles/600_Rails-Production.mk
 
 # Main help command
 help:

@@ -109,6 +109,11 @@ main-images-clean:
 	-docker rmi $(MAIN_IMAGE_NAME):arm64 $(MAIN_IMAGE_NAME):amd64 $(MAIN_IMAGE_NAME):latest
 	@echo "Main images cleanup completed!" 
 
+main-images-pull:
+	@echo "Pulling latest main image from Docker Hub..."
+	docker pull $(MAIN_IMAGE_NAME):latest
+	@echo "Main images pulled successfully!"
+
 # Help for main image building commands
 main-images-help:
 	@echo "=============================================================="

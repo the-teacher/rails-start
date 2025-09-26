@@ -53,14 +53,17 @@ RUN apt-get update && apt-get install -y \
     ca-certificates && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Rails user is already created in the base image and has access to the /app directory
-USER rails:rails
-
-# Update gem system to the latest version
+# Update gem system to the latest version as root (requires system permissions)
 # https://rubygems.org/gems/rubygems-update/versions
 RUN gem update --system 3.7.2
 
-# Installing required gems for the blog
+# Give rails user access to bundle directory
+RUN chown -R rails:rails /usr/local/bundle
+
+# Switch to rails user
+USER rails:rails
+
+# Installing required gems
 RUN gem install rails
 
 WORKDIR /home/rails/app

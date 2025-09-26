@@ -1,8 +1,9 @@
 services:
   rails_app:
-    build:
-      context: ..
-      dockerfile: ./docker/_Main.Dockerfile
+    # build:
+    #   context: ..
+    #   dockerfile: ./docker/_Main.Dockerfile
+    image: iamteacher/rails-start.main:latest
 
     tty: true
     stdin_open: true
@@ -15,10 +16,7 @@ services:
       - "3000:3000"
 
     volumes:
-      - ../:/rails/app
-      - ./tmp/bundle:/usr/local/bundle
-      - ./tmp/node_modules:/home/rails/app/node_modules
-      - ./tmp/.bash_history:/home/rails/app/tmp/.bash_history
+      - ../:/home/rails/app
 
     working_dir: /home/rails/app
     command: sleep infinity

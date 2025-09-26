@@ -31,12 +31,15 @@ build:
 rebuild:
 	docker compose -f $(COMPOSE_FILE) build --no-cache
 
+root-shell:
+	docker compose -f $(COMPOSE_FILE) exec --user root rails_app bash
 # Open shell in rails_app container
 shell:
 	docker compose -f $(COMPOSE_FILE) exec rails_app bash
 
 setup-project-structure:
-	touch blog_15min/tmp/.bash_history
+	mkdir -p tmp
+	touch tmp/.bash_history
 
 # Help for Project management commands
 help-project:
