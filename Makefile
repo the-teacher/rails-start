@@ -1,9 +1,9 @@
-include Makefiles/BaseImages.mk
-include Makefiles/MainImages.mk
-include Makefiles/Common.mk
-include Makefiles/Project.mk
-include Makefiles/Rails.mk
-include Makefiles/Production-rails.mk
+include Makefiles/100_Base-Images.mk
+include Makefiles/200_Main-Images.mk
+include Makefiles/300_Common.mk
+include Makefiles/400_Project.mk
+include Makefiles/500_Rails.mk
+include Makefiles/600_Production-Rails.mk
 
 # Main help command
 help:
