@@ -1,9 +1,0 @@
-#!/usr/bin/env ruby
-# frozen_string_literal: true
-
-require_relative '../Rails7StartKit/bin/rails7startkit'
-
-method = (ARGV[0] || 'start').strip
-params = ARGV[1..].map { |param| "'#{param}'" }.join(', ')
-
-Rails7StartKit.module_eval("#{method}(#{params})", __FILE__, __LINE__)

@@ -1,1 +1,0 @@
-The asset manifest file is responsible for compiling and serving the assets to the browser. When you run the `rake assets:precompile` command, the asset pipeline compiles and compresses all of the assets listed in the manifest file into a single file for each type of asset.

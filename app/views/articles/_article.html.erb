@@ -1,8 +1,0 @@
-<% @term ||= [''] %>
-
-<article class="card the-search-highlight mb-3" data-search-words="<%= [@term].to_json %>">
-  <div class="card-body">
-    <h3 class="card-title"><%= article.title %></h3>
-    <p class="card-text"><%= raw article.content %></p>
-  </div>
-</article>

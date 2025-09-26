@@ -1,6 +1,0 @@
-<div class="alert alert-danger" role="alert">
-  <p>When caching is turned on this section should be rerendered only once per 1 minute.</p>
-  <p>Currnetly cache is: <b><%= Rails.application.config.cache_store == :null_store ? "OFF" : "ON" %></b>.</p>
-  <p>To toggle cache run in console: <b>bin/exec cache</b></p>
-  <b>Rendered at</b> <%= DateTime.now.strftime('%d.%m.%Y %H.%M.%S') %>
-</div>

@@ -1,3 +1,0 @@
-# web: unset PORT && bin/rails server
-css: yarn build:sass --watch
-js: yarn build:js --watch
