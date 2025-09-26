@@ -1,8 +1,5 @@
 services:
   rails_app:
-    # build:
-    #   context: ..
-    #   dockerfile: ./docker/_Main.Dockerfile
     image: iamteacher/rails-start.main:latest
 
     tty: true
