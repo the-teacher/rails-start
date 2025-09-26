@@ -31,24 +31,7 @@ base-images-build:
 	make base-image-arm64-build
 	make base-image-amd64-build
 
-# Check if images exist locally
-# Show image information
-base-images-check:
-	@echo "Checking if images exist locally..."
-	@docker image inspect $(IMAGE_NAME):arm64 >/dev/null 2>&1 || (echo "Error: Image $(IMAGE_NAME):arm64 not found. Run 'make base-image-arm64-build' first." && exit 1)
-	@docker image inspect $(IMAGE_NAME):amd64 >/dev/null 2>&1 || (echo "Error: Image $(IMAGE_NAME):amd64 not found. Run 'make base-image-amd64-build' first." && exit 1)
-	@echo "All required images exist."
-	@echo "Image $(IMAGE_NAME):arm64:"
-	@docker image inspect $(IMAGE_NAME):arm64 | grep -E '"Id":|"RepoTags":'
-	@echo "Image $(IMAGE_NAME):amd64:"
-	@docker image inspect $(IMAGE_NAME):amd64 | grep -E '"Id":|"RepoTags":'
 
-# Show image sizes
-base-images-sizes:
-	@echo "Checking image sizes..."
-	@echo "=============================================================="
-	@docker images --format "table {{.Repository}}:{{.Tag}}\t{{.Size}}" | grep -E "$(IMAGE_NAME):(arm64|amd64)"
-	@echo "=============================================================="
 
 # Create manifest (local only)
 base-images-manifest-create:
@@ -142,31 +125,34 @@ base-images-clean:
 	-docker image prune -af
 	@echo "Base images cleanup completed!"
 
-# Show all docker images
-base-images-show-all:
-	@echo "All Docker images:"
-	@echo "=============================================================="
-	@docker images
-	@echo "=============================================================="
+
 
 # Help for base image building commands
 base-images-help:
 	@echo "=============================================================="
 	@echo "Base image building commands:"
 	@echo "=============================================================="
+	@echo "Single architecture commands (base-image-*):"
 	@echo "  make base-image-arm64-build         - Build base image for ARM64"
 	@echo "  make base-image-amd64-build         - Build base image for AMD64"
-	@echo "  make base-images-build              - Build base image for all platforms"
-	@echo "  make base-images-manifest-create    - Create manifest for base image"
-	@echo "  make base-images-push               - Push base images to Docker Hub"
-	@echo "  make base-images-manifest-push      - Push manifest to Docker Hub"
-	@echo "  make base-images-update             - Build, push images and manifest"
 	@echo "  make base-image-arm64-shell         - Enter shell of base ARM64 image as rails user"
 	@echo "  make base-image-amd64-shell         - Enter shell of base AMD64 image as rails user"
 	@echo "  make base-image-arm64-root-shell    - Enter shell of base ARM64 image as root user"
 	@echo "  make base-image-amd64-root-shell    - Enter shell of base AMD64 image as root user"
 	@echo "  make base-image-arm64-images-test   - Test image processors on ARM64 image"
 	@echo "  make base-image-amd64-images-test   - Test image processors on AMD64 image"
+	@echo ""
+	@echo "Multi-architecture commands (base-images-*):"
+	@echo "  make base-images-build              - Build base image for all platforms"
+	@echo "  make base-images-check              - Check if base images exist locally"
+	@echo "  make base-images-sizes              - Show base image sizes"
+	@echo "  make base-images-manifest-create    - Create manifest for base image"
+	@echo "  make base-images-push               - Push base images to Docker Hub"
+	@echo "  make base-images-manifest-push      - Push manifest to Docker Hub"
 	@echo "  make base-images-images-test        - Test image processors on both architectures"
 	@echo "  make base-images-clean              - Remove all base project images"
+	@echo "  make base-images-show-all           - Show all Docker images"
+	@echo ""
+	@echo "Complete workflow:"
+	@echo "  make base-images-update             - Build, push images and manifest"
 	@echo "=============================================================="

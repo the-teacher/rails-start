@@ -2,7 +2,7 @@ services:
   rails_app:
     build:
       context: ..
-      dockerfile: ./docker/Dockerfile
+      dockerfile: ./docker/_Main.Dockerfile
 
     tty: true
     stdin_open: true
