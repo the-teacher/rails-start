@@ -1,0 +1,24 @@
+services:
+  rails_app:
+    build:
+      context: ..
+      dockerfile: ./docker/Dockerfile
+
+    tty: true
+    stdin_open: true
+
+    env_file:
+      - ../.env
+      - ../.env.${RAILS_ENV:-development}
+
+    ports:
+      - "3000:3000"
+
+    volumes:
+      - ../:/rails/app
+      - ./tmp/bundle:/usr/local/bundle
+      - ./tmp/node_modules:/home/rails/app/node_modules
+      - ./tmp/.bash_history:/home/rails/app/tmp/.bash_history
+
+    working_dir: /home/rails/app
+    command: sleep infinity

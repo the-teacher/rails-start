@@ -1,0 +1,45 @@
+{
+  "name": "Rails Development",
+
+  "service": "rails_app",
+  "dockerComposeFile": "../docker/docker-compose.yml",
+  "workspaceFolder": "/app",
+
+  "customizations": {
+    "vscode": {
+      "settings": {
+        // "terminal.integrated.profiles.linux": {
+        //   "bash": {
+        //     "name": "Bash (Local)",
+        //     "path": "/bin/bash",
+        //     "icon": "terminal-bash"
+        //   }
+        // },
+        "ruby.useLanguageServer": true,
+        "ruby.lint": {
+          "rubocop": true
+        },
+        "ruby.format": "rubocop",
+        "editor.formatOnSave": true,
+        "editor.tabSize": 2,
+        "editor.insertSpaces": true,
+        "files.insertFinalNewline": true,
+        "editor.codeActionsOnSave": {
+          "source.organizeImports": "always",
+          "source.sortImports": "always",
+          "source.fixAll": "always"
+        }
+      },
+      "extensions": [
+        "kaiwood.endwise",
+        "shopify.ruby-lsp",
+        "misogi.ruby-rubocop",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode"
+      ]
+    }
+  },
+
+  "remoteUser": "rails"
+  // "postCreateCommand": "bundle install",
+}
