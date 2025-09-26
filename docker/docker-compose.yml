@@ -16,7 +16,7 @@ services:
       - "3000:3000"
 
     volumes:
-      - ../:/home/rails/app
+      - ../__RailsApp__:/home/rails/app
 
     working_dir: /home/rails/app
     command: sleep infinity

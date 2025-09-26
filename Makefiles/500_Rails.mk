@@ -25,6 +25,7 @@ rails-status:
 
 # Start containers
 rails-start:
+	make up
 	make rails-bundle
 	make rails-db-create
 	make rails-db-migrate
