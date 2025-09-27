@@ -21,6 +21,18 @@ Rails Start is a project built on the idea of providing a ready-to-use template 
 
 "Rails Start" makes everything explicit and easy to understand, allowing developers to focus on building their applications rather than setting up the environment.
 
+## How to Use
+
+- `git clone https://github.com/the-teacher/rails-start.git`
+- `cd rails-start`
+- `make rails-start`
+
+That is it! Very simple.
+
+Now visit: `http://localhost:3000` in your browser.
+
+<img src="./docs/images/rails-window.png" alt="Rails Start Welcome Page" />
+
 ## Project Status
 
 Project is being remastered to support Rails 8.0 and Ruby 3.3.
