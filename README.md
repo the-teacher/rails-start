@@ -31,7 +31,7 @@ That is it! Very simple.
 
 Now visit: `http://localhost:3000` in your browser.
 
-<img src="./docs/images/rails-window-2.png" alt="Rails Start Welcome Page" />
+<img src="./docs/images/rails-start.png" alt="Rails Start Welcome Page" />
 
 ## How to Use (Windows WSL2)
 
@@ -59,6 +59,8 @@ sudo apt-get install -y make
 That is it! Very simple!
 
 Now visit: `http://localhost:3000` in your browser.
+
+<img src="./docs/images/rails-start-windows.png" alt="Rails Start Welcome Page" />
 
 ## Project Status
 
