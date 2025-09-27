@@ -31,7 +31,7 @@ That is it! Very simple.
 
 Now visit: `http://localhost:3000` in your browser.
 
-<img src="./docs/images/rails-window.png" alt="Rails Start Welcome Page" />
+<img src="./docs/images/rails-window-2.png" alt="Rails Start Welcome Page" />
 
 ## Project Status
 
