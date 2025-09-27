@@ -1,8 +1,15 @@
-# Rails Start
-
 <img src="./docs/images/rails-start-logo.png" alt="Rails Start" />
 
-A starter kit for Ruby on Rails applications with Docker, PostgreSQL, Redis, Sidekiq, RSpec, and more.
+# Rails Start
+
+"Rails Start" is a starter kit for Ruby on Rails applications, designed to help developers quickly set up a new project with essential features and best practices.
+
+This project is a perfect choice for:
+
+- For enterprises looking to standardize their Rails application setup.
+- Freelancers and agencies to kickstart client projects.
+- Online education platforms to start teaching Ruby on Rails.
+- Individual developers who want a solid foundation for their Rails applications.
 
 ## Project Status
 
