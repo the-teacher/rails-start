@@ -1,5 +1,7 @@
 # Rails Start
 
+<img src="./docs/images/rails-start-logo.png" alt="Rails Start" />
+
 A starter kit for Ruby on Rails applications with Docker, PostgreSQL, Redis, Sidekiq, RSpec, and more.
 
 ## Project Status
