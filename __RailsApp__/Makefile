@@ -7,7 +7,6 @@ help:
 	@echo "Rails App - Internal Commands (running inside container):"
 	@echo "=============================================================="
 	@echo "Quick start:"
-	@echo "  make setup               - Complete application setup"
 	@echo "  make start               - Start Rails server"
 	@echo "  make production-start    - Start production server"
 	@echo "=============================================================="

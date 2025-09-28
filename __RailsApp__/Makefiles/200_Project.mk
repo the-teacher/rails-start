@@ -44,6 +44,7 @@ db-reset:
 	@echo "You have 10 seconds to cancel (Ctrl+C)..."
 	@sleep 10
 	bundle exec rails db:reset
+	RAILS_ENV=production bundle exec rails db:reset
 
 db-rollback:
 	bundle exec rails db:rollback
