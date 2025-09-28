@@ -6,20 +6,17 @@
 
 This project is a perfect choice for:
 
-- For enterprises looking to standardize their Rails application setup.
-- Freelancers and agencies to kickstart client projects.
-- Online education platforms to start teaching Ruby on Rails.
-- Individual developers who want a solid foundation for their Rails applications.
+- **Enterprises** looking to standardize their Rails application setup.
+- **Freelancers and agencies** to kickstart client projects.
+- **Online education platforms** to start teaching Ruby on Rails.
+- **Individual developers** who want a solid foundation for their Rails applications.
 
-## The Idea
+## Requirements
 
-Rails Start is a project built on the idea of providing a ready-to-use template that includes:
-
-- Docker and Docker Compose for easy environment setup.
-- Devcontainer support for consistent development environments.
-- Advanced using of "make" and "Makefile" for task automation.
-
-"Rails Start" makes everything explicit and easy to understand, allowing developers to focus on building their applications rather than setting up the environment.
+- `Docker` and `Docker Compose` installed on your machine.
+- `git` installed (usually comes pre-installed on MacOS and Linux).
+- `make` utility installed (usually comes pre-installed on MacOS and Linux).
+- `WSL2` (For Windows users) with a Linux distribution (like Ubuntu) is recommended.
 
 ## How to Use (MacOS / Linux)
 
@@ -27,7 +24,7 @@ Rails Start is a project built on the idea of providing a ready-to-use template 
 - `cd rails-start`
 - `make rails-start`
 
-That is it! Very simple.
+That is it! Very simple!
 
 Now visit: `http://localhost:3000` in your browser.
 
@@ -45,9 +42,9 @@ wsl --set-default-version 2
 wsl --install -d Ubuntu
 ```
 
-Run WSL and install `make`:
+Run `WSL` and install `make`:
 
-```
+```powershell
 wsl
 sudo apt-get install -y make
 ```
@@ -61,6 +58,14 @@ That is it! Very simple!
 Now visit: `http://localhost:3000` in your browser.
 
 <img src="./docs/images/rails-start-windows-2.png" alt="Rails Start Welcome Page" />
+
+## The Idea
+
+This project uses power of `Docker` and `Makefiles` to automate the setup and management of a Rails application.
+
+The `Makefile` commands abstract away the complexity of Docker commands, allowing developers to focus on coding rather than environment setup.
+
+`make rails-start` command does everything needed to get you started.
 
 ## Project Status
 
