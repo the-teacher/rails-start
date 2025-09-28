@@ -1,5 +1,5 @@
-include ./Makefiles/100_Rails.mk
-include ./Makefiles/200_Project.mk
+include ./Makefiles/100_Project.mk
+include ./Makefiles/200_Rails.mk
 include ./Makefiles/300_Production.mk
 
 # Main help command for internal commands

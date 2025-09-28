@@ -11,7 +11,7 @@ Documentation for all make commands in `__RailsApp__/Makefiles` directory (execu
 | `make start`            | Start Rails server         |
 | `make production-start` | Start production server    |
 
-## Rails Commands (100_Rails.mk)
+## Rails Commands (200_Rails.mk)
 
 ### Setup and Server
 
@@ -39,7 +39,7 @@ Documentation for all make commands in `__RailsApp__/Makefiles` directory (execu
 | `make rails-help`          | Show Rails commands help         |
 | `make rails-internal-help` | Show Rails commands help (alias) |
 
-## Project Commands (200_Project.mk)
+## Project Commands (100_Project.mk)
 
 ### Dependencies
 
