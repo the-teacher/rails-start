@@ -1,3 +1,13 @@
+# =============================================================================
+# Rails Start - Fast Track to Rails Development
+# https://github.com/the-teacher/rails-start
+#
+# Rails Start helps companies, entrepreneurs, and Rails learners get started quickly.
+# Created by Ilya Zykin (https://github.com/the-teacher)
+#
+# ⭐ Support the project - leave your stars on GitHub and tell your colleagues!
+# =============================================================================
+
 # Docker compose commands for Rails application
 COMPOSE_FILE := ./docker/docker-compose.yml
 
