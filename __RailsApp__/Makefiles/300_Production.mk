@@ -5,61 +5,114 @@ MAKEFLAGS += --no-print-directory
 # These commands are for running Rails in production mode locally
 
 # Production setup
-prod-setup:
-	RAILS_ENV=production bundle install --without development test
-	RAILS_ENV=production bundle exec rails db:create
-	RAILS_ENV=production bundle exec rails db:migrate
-	RAILS_ENV=production bundle exec rails assets:precompile
+production-setup:
+	make production-bundle
+	make production-db-create
+	make production-db-migrate
+	make production-assets-precompile
 
 # Production assets
-assets-precompile:
+production-assets-precompile:
 	RAILS_ENV=production bundle exec rails assets:precompile
 
-precompile:
-	make assets-precompile
+production-precompile:
+	make production-assets-precompile
 
 # Production server
-server-production:
-	RAILS_ENV=production bundle exec rails server -b 0.0.0.0 -p 3000
+production-server:
+	make production-bundle
+	make production-db-create
+	make production-db-migrate
+	make production-assets-clean
+	make production-assets-precompile
+	RAILS_ENV=production bundle exec puma -b tcp://0.0.0.0:3000 --pidfile tmp/pids/production-server.pid > log/production-puma.log 2>&1 &
 
-prod:
-	make server-production
+production-start:
+	make production-server
+
+# Gracefully stop the production server
+production-stop:
+	kill -TERM $$(cat tmp/pids/production-server.pid) && rm -f tmp/pids/production-server.pid
 
 # Production console
-console-production:
+production-console:
 	RAILS_ENV=production bundle exec rails console
 
 # Production logs
-log-tail-production:
+production-log-tail:
 	tail -f -n 100 log/production.log
 
-logs-production:
-	make log-tail-production
+production-logs:
+	make production-log-tail
 
-log-clear-production:
+production-log-clear:
 	> log/production.log
 
+# Production dependencies
+production-bundle:
+	bundle config set --local without 'development test'
+	RAILS_ENV=production bundle install
+
+# Reset bundle configuration (for switching back to development)
+production-bundle-reset:
+	bundle config unset --local without
+	bundle install
+
+# Production database commands
+production-db-create:
+	RAILS_ENV=production bundle exec rails db:create
+
+production-db-migrate:
+	RAILS_ENV=production bundle exec rails db:migrate
+
+production-db-seed:
+	RAILS_ENV=production bundle exec rails db:seed
+
+production-db-reset:
+	@echo "Resetting the production database (drop, create, migrate, seed)..."
+	@echo "You have 10 seconds to cancel (Ctrl+C)..."
+	@sleep 10
+	RAILS_ENV=production bundle exec rails db:reset
+
+production-db-rollback:
+	RAILS_ENV=production bundle exec rails db:rollback
+
+# Production assets cleanup
+production-assets-clean:
+	RAILS_ENV=production bundle exec rails assets:clobber
+
 # Help for production Rails commands
-rails-prod-help:
+production-help:
 	@echo "=============================================================="
 	@echo "Production Rails commands (run inside container):"
 	@echo "=============================================================="
 	@echo "Setup:"
-	@echo "  make prod-setup          - Setup production environment"
+	@echo "  make production-setup          - Setup production environment"
+	@echo "  make production-bundle         - Install production dependencies"
+	@echo "  make production-bundle-reset   - Reset bundle config (for dev mode)"
+	@echo ""
+	@echo "Database:"
+	@echo "  make production-db-create      - Create production database"
+	@echo "  make production-db-migrate     - Run production database migrations"
+	@echo "  make production-db-seed        - Seed production database"
+	@echo "  make production-db-reset       - Reset production database"
+	@echo "  make production-db-rollback    - Rollback production database migration"
 	@echo ""
 	@echo "Server:"
-	@echo "  make server-production   - Start Rails production server"
-	@echo "  make prod                - Start Rails production server"
+	@echo "  make production-server         - Start Rails production server"
+	@echo "  make production-start          - Start Rails production server"
+	@echo "  make production-stop           - Stop Rails production server"
 	@echo ""
 	@echo "Console:"
-	@echo "  make console-production  - Open Rails production console"
+	@echo "  make production-console        - Open Rails production console"
 	@echo ""
 	@echo "Assets:"
-	@echo "  make assets-precompile   - Precompile assets for production"
-	@echo "  make precompile          - Precompile assets for production"
+	@echo "  make production-assets-precompile - Precompile assets for production"
+	@echo "  make production-precompile     - Precompile assets for production"
+	@echo "  make production-assets-clean   - Clean production assets"
 	@echo ""
 	@echo "Logs:"
-	@echo "  make log-tail-production - Tail production log"
-	@echo "  make logs-production     - Tail production log"
-	@echo "  make log-clear-production- Clear production log"
+	@echo "  make production-log-tail       - Tail production log"
+	@echo "  make production-logs           - Tail production log"
+	@echo "  make production-log-clear      - Clear production log"
 	@echo "=============================================================="

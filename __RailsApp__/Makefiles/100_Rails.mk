@@ -4,19 +4,19 @@ MAKEFLAGS += --no-print-directory
 # Development Rails commands (to be executed inside the container)
 # These commands assume they are running inside the Rails container environment
 
-# Development setup
-dev-setup:
+# Application setup
+setup:
 	make bundle
 	make db-create
 	make db-migrate
 	make db-seed
 
-# Rails development server
+# Rails server
 server:
+	make bundle
+	make db-create
+	make db-migrate
 	bundle exec puma -b tcp://0.0.0.0:3000 --pidfile tmp/pids/server.pid > log/puma.log 2>&1 &
-
-dev:
-	make server
 
 start:
 	make server
@@ -28,11 +28,11 @@ rails-start:
 stop:
 	kill -TERM $$(cat tmp/pids/server.pid) && rm -f tmp/pids/server.pid
 
-# Development Rails console
+# Rails console
 console:
 	bundle exec rails console
 
-# Development logs
+# Application logs
 log-tail:
 	tail -f -n 100 log/development.log
 
@@ -42,25 +42,29 @@ logs:
 log-clear:
 	> log/development.log
 
-# Help for development Rails commands
-rails-dev-help:
+# Alias for rails-help
+rails-internal-help:
+	make rails-help
+
+# Help for Rails commands
+rails-help:
 	@echo "=============================================================="
-	@echo "Development Rails commands (run inside container):"
+	@echo "Rails commands (run inside container):"
 	@echo "=============================================================="
 	@echo "Setup:"
-	@echo "  make dev-setup           - Setup development environment"
+	@echo "  make setup               - Setup application environment"
 	@echo ""
 	@echo "Server:"
-	@echo "  make server              - Start Rails development server"
-	@echo "  make dev                 - Start Rails development server"
-	@echo "  make start               - Start Rails development server"
-	@echo "  make stop                - Stop Rails development server"
+	@echo "  make server              - Start Rails server"
+	@echo "  make start               - Start Rails server"
+	@echo "  make rails-start         - Start Rails server"
+	@echo "  make stop                - Stop Rails server"
 	@echo ""
 	@echo "Console:"
-	@echo "  make console             - Open Rails development console"
+	@echo "  make console             - Open Rails console"
 	@echo ""
 	@echo "Logs:"
-	@echo "  make log-tail            - Tail development log"
-	@echo "  make logs                - Tail development log"
-	@echo "  make log-clear           - Clear development log"
+	@echo "  make log-tail            - Tail application log"
+	@echo "  make logs                - Tail application log"
+	@echo "  make log-clear           - Clear application log"
 	@echo "=============================================================="

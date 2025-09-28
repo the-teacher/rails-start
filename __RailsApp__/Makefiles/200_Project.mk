@@ -5,8 +5,10 @@ MAKEFLAGS += --no-print-directory
 # Common project commands (to be executed inside the container)
 # These commands work for both development and production environments
 
-# Install dependencies
+# Install dependencies (ensure all groups are included)
 bundle:
+	bundle config unset --local without || true
+	cat /usr/local/bundle/config
 	bundle install
 
 update-bundler:
@@ -135,6 +137,10 @@ network:
 	@echo "Listening ports:"
 	@netstat -tlnp 2>/dev/null || ss -tlnp
 
+# Alias for project-help
+project-internal-help:
+	make project-help
+
 # Help for common project commands
 project-help:
 	@echo "=============================================================="
@@ -147,15 +153,21 @@ project-help:
 	@echo "Database:"
 	@echo "  make db-create           - Create database"
 	@echo "  make db-migrate          - Run database migrations"
+	@echo "  make migrate             - Run database migrations (alias)"
 	@echo "  make db-seed             - Seed the database"
+	@echo "  make seed                - Seed the database (alias)"
 	@echo "  make db-drop             - Drop database"
 	@echo "  make db-reset            - Reset database (drop, create, migrate, seed)"
 	@echo "  make db-rollback         - Rollback last migration"
 	@echo ""
 	@echo "Generators:"
 	@echo "  make generate-model name=User       - Generate model"
+	@echo "  make model name=User                - Generate model (alias)"
 	@echo "  make generate-controller name=Users - Generate controller"
+	@echo "  make controller name=Users          - Generate controller (alias)"
 	@echo "  make generate-migration name=add_email_to_users - Generate migration"
+	@echo "  make migration name=add_email_to_users - Generate migration (alias)"
+	@echo "  make generate                       - Show generator usage"
 	@echo ""
 	@echo "Testing:"
 	@echo "  make test                - Run all tests"
