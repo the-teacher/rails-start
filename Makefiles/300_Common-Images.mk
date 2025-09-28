@@ -11,7 +11,7 @@ MAIN_IMAGE_NAME = iamteacher/rails-start.main
 # ===============================================================
 
 # General help for common commands
-common-help:
+common-images-help:
 	@echo "=============================================================="
 	@echo "General commands:"
 	@echo "=============================================================="

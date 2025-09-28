@@ -20,5 +20,5 @@ help:
 	@echo "  make rails-production-help - Production Rails commands"
 	@echo "  make base-images-help    - Base image building commands"
 	@echo "  make main-images-help    - Main image building commands"
-	@echo "  make common-help  		  - General commands"
+	@echo "  make common-images-help   - General images commands"
 	@echo "=============================================================="
