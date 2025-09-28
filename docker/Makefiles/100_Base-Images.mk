@@ -1,5 +1,5 @@
 # Variables for building images
-BASE_DOCKERFILE = docker/_Base.Dockerfile
+BASE_DOCKERFILE = ./_Base.Dockerfile
 IMAGE_NAME = iamteacher/rails-start.base
 
 # Ruby version and OS version for the base image
@@ -30,8 +30,6 @@ base-image-amd64-build:
 base-images-build:
 	make base-image-arm64-build
 	make base-image-amd64-build
-
-
 
 # Create manifest (local only)
 base-images-manifest-create:

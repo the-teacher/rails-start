@@ -1,7 +1,7 @@
 # ===============================================================
 # Main image (using base image)
 # ===============================================================
-MAIN_DOCKERFILE = docker/_Main.Dockerfile
+MAIN_DOCKERFILE = ./_Main.Dockerfile
 MAIN_IMAGE_NAME = iamteacher/rails-start.main
 
 # Build main image for ARM64

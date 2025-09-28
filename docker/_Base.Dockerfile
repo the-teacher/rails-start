@@ -434,13 +434,13 @@ ENV EDITOR="vim"
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 # Copy image processor test script directly to root and rails home directories
-COPY docker/checks/image_processors.sh /root/image_processors.sh
-COPY docker/checks/image_processors.sh /home/rails/image_processors.sh
+COPY checks/image_processors.sh /root/image_processors.sh
+COPY checks/image_processors.sh /home/rails/image_processors.sh
 RUN chown rails:rails /home/rails/image_processors.sh
 
 # copy ruby environment check script
-COPY docker/checks/ruby-env.sh /root/ruby-env.sh
-COPY docker/checks/ruby-env.sh /home/rails/ruby-env.sh
+COPY checks/ruby-env.sh /root/ruby-env.sh
+COPY checks/ruby-env.sh /home/rails/ruby-env.sh
 RUN chown rails:rails /home/rails/ruby-env.sh
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
