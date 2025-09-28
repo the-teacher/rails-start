@@ -1,6 +1,6 @@
 # Rails Makefile Commands
 
-Documentation for all make commands in `Makefiles/500_Rails.mk` (executed from project root).
+Documentation for all make commands in `Makefiles/200_Rails.mk` (executed from project root).
 
 ## Main Commands
 
@@ -162,8 +162,8 @@ docker compose -f $(COMPOSE_FILE) exec rails_app bash -c "command"
 
 ### With Other Makefiles
 
-- Uses `make up` from `400_Project.mk`
-- Uses `make stop` from `400_Project.mk`
+- Uses `make up` from `100_Project.mk`
+- Uses `make stop` from `100_Project.mk`
 - Complements container management commands
 
 ### With Rails Application

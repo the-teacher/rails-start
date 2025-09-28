@@ -1,6 +1,6 @@
 # Rails Production Makefile Commands
 
-Documentation for all make commands in `Makefiles/600_Rails-Production.mk` (executed from project root).
+Documentation for all make commands in `Makefiles/300_Rails-Production.mk` (executed from project root).
 
 ## Main Commands
 

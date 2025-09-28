@@ -1,6 +1,6 @@
-include Makefiles/400_Project.mk
-include Makefiles/500_Rails.mk
-include Makefiles/600_Rails-Production.mk
+include Makefiles/100_Project.mk
+include Makefiles/200_Rails.mk
+include Makefiles/300_Rails-Production.mk
 
 # Main help command
 help:

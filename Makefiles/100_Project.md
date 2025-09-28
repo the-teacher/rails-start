@@ -1,6 +1,6 @@
 # Project Makefile Commands
 
-Documentation for all make commands in `Makefiles/400_Project.mk` (executed from project root).
+Documentation for all make commands in `Makefiles/100_Project.mk` (executed from project root).
 
 ## Main Commands
 
