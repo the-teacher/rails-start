@@ -65,6 +65,10 @@ coverage
 /.env.development.local
 /.env.production.local
 
+# ENV directory - ignore local configs but keep templates and examples
+/ENV/local/*.env*
+!/ENV/local/.gitkeep
+
 /app/assets/builds/*
 !/app/assets/builds/.keep
 

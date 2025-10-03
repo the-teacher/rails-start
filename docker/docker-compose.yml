@@ -4,8 +4,7 @@ services:
     stdin_open: true
     image: iamteacher/rails-start.main:latest
     env_file:
-      - ../.env
-      - ../.env.${RAILS_ENV:-development}
+      - ../ENV/local/.env.${RAILS_ENV:-development}
     environment:
       - HISTFILE=/home/rails/app/tmp/.bash_history
       - HISTSIZE=10000
