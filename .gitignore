@@ -73,3 +73,14 @@ coverage
 !/app/assets/builds/.keep
 
 /node_modules
+
+# __RailsApp__
+
+__RailsApp__/vendor/bundle
+__RailsApp__/log
+__RailsApp__/tmp
+__RailsApp__/storage
+__RailsApp__/public/assets
+__RailsApp__/db/*.sqlite3
+__RailsApp__/db/*.sqlite3-*
+__RailsApp__/config/master.key
