@@ -4,16 +4,28 @@ Simple reference for `Makefiles/100_Project.mk` commands in logical usage order.
 
 ## Available Commands
 
-| Command                        | Description                                   |
-| ------------------------------ | --------------------------------------------- |
-| `make project-help`            | Show project management commands help         |
-| `make build`                   | Build containers                              |
-| `make rebuild`                 | Rebuild containers (no cache)                 |
-| `make start`                   | Start all containers                          |
-| `make up`                      | Start all containers (alias)                  |
-| `make status`                  | Show running containers status                |
-| `make shell`                   | Open shell in rails_app container             |
-| `make root-shell`              | Open shell in rails_app container as root     |
-| `make stop`                    | Stop all containers                           |
-| `make down`                    | Stop all containers (alias)                   |
-| `make project-setup-structure` | Create required project directories and files |
+<table width="100%">
+<tr><th>Command</th><th>Description</th></tr>
+
+<tr><td colspan="2"><strong>Help</strong></td></tr>
+<tr><td><code>make project-help</code></td><td>Show project management commands help</td></tr>
+
+<tr><td colspan="2"><strong>Container Build</strong></td></tr>
+<tr><td><code>make build</code></td><td>Build containers</td></tr>
+<tr><td><code>make rebuild</code></td><td>Rebuild containers (no cache)</td></tr>
+
+<tr><td colspan="2"><strong>Container Lifecycle</strong></td></tr>
+<tr><td><code>make start</code></td><td>Start all containers</td></tr>
+<tr><td><code>make up</code></td><td>Start all containers (alias)</td></tr>
+<tr><td><code>make stop</code></td><td>Stop all containers</td></tr>
+<tr><td><code>make down</code></td><td>Stop all containers (alias)</td></tr>
+
+<tr><td colspan="2"><strong>Container Status & Access</strong></td></tr>
+<tr><td><code>make status</code></td><td>Show running containers status</td></tr>
+<tr><td><code>make shell</code></td><td>Open shell in rails_app container</td></tr>
+<tr><td><code>make root-shell</code></td><td>Open shell in rails_app container as root</td></tr>
+
+<tr><td colspan="2"><strong>Project Setup</strong></td></tr>
+<tr><td><code>make project-setup-structure</code></td><td>Create required project directories and files</td></tr>
+
+</table>

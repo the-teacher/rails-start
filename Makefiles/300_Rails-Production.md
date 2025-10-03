@@ -6,7 +6,7 @@ Simple reference for `Makefiles/300_Rails-Production.mk` commands in logical usa
 
 ## Available Commands
 
-<table style="width: 100%;">
+<table width="100%">
 <tr><th>Command</th><th>Description</th></tr>
 
 <tr><td colspan="2"><strong>Help & Setup</strong></td></tr>
