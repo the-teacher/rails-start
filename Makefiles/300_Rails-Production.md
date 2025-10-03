@@ -6,32 +6,52 @@ Simple reference for `Makefiles/300_Rails-Production.mk` commands in logical usa
 
 ## Available Commands
 
-| Command                               | Description                                         |
-| ------------------------------------- | --------------------------------------------------- |
-| `make rails-production-help`          | Show production Rails commands help                 |
-| `make rails-production-setup`         | Full production setup (delegated)                   |
-| `make rails-production-bundle`        | Install production dependencies                     |
-| `make rails-production-bundle-reset`  | Reset bundle config for development                 |
-| `make rails-production-up`            | Start production containers (detached)              |
-| `make rails-production-db-create`     | Create production database                          |
-| `make rails-production-db-migrate`    | Migrate production database                         |
-| `make rails-production-db-seed`       | Seed production database                            |
-| `make rails-production-db-setup`      | Setup production database (create + migrate + seed) |
-| `make rails-production-db-reset`      | Reset production database (with confirmation)       |
-| `make rails-production-db-rollback`   | Rollback production database migration              |
-| `make rails-production-assets`        | Precompile assets for production                    |
-| `make rails-production-precompile`    | Precompile assets (alias)                           |
-| `make rails-production-assets-clean`  | Clean production assets                             |
-| `make rails-production-server`        | Start Rails server (interactive mode)               |
-| `make rails-production-server-daemon` | Start Rails server (daemon mode)                    |
-| `make rails-production-start`         | Full setup + start server in daemon mode            |
-| `make rails-production-stop`          | Stop Rails production server                        |
-| `make rails-production-console`       | Open production Rails console                       |
-| `make rails-production-log-tail`      | Tail production application log                     |
-| `make rails-production-logs`          | Tail production application log (alias)             |
-| `make rails-production-log-clear`     | Clear production application log                    |
-| `make rails-production-docker-logs`   | View Docker container logs                          |
-| `make rails-production-bash`          | Access bash in production container                 |
-| `make rails-production-down`          | Stop production containers                          |
-| `make rails-production-restart`       | Restart production containers                       |
-| `make rails-production-full-start`    | Complete startup (containers + setup + server)      |
+<table style="width: 100%;">
+<tr><th>Command</th><th>Description</th></tr>
+
+<tr><td colspan="2"><strong>Help & Setup</strong></td></tr>
+<tr><td><code>make rails-production-help</code></td><td>Show production Rails commands help</td></tr>
+<tr><td><code>make rails-production-setup</code></td><td>Full production setup (delegated)</td></tr>
+
+<tr><td colspan="2"><strong>Bundle Management</strong></td></tr>
+<tr><td><code>make rails-production-bundle</code></td><td>Install production dependencies</td></tr>
+<tr><td><code>make rails-production-bundle-reset</code></td><td>Reset bundle config for development</td></tr>
+
+<tr><td colspan="2"><strong>Container Management</strong></td></tr>
+<tr><td><code>make rails-production-up</code></td><td>Start production containers (detached)</td></tr>
+<tr><td><code>make rails-production-down</code></td><td>Stop production containers</td></tr>
+<tr><td><code>make rails-production-restart</code></td><td>Restart production containers</td></tr>
+
+<tr><td colspan="2"><strong>Work with Database</strong></td></tr>
+<tr><td><code>make rails-production-db-create</code></td><td>Create production database</td></tr>
+<tr><td><code>make rails-production-db-migrate</code></td><td>Migrate production database</td></tr>
+<tr><td><code>make rails-production-db-seed</code></td><td>Seed production database</td></tr>
+<tr><td><code>make rails-production-db-setup</code></td><td>Setup production database (create + migrate + seed)</td></tr>
+<tr><td><code>make rails-production-db-reset</code></td><td>Reset production database (with confirmation)</td></tr>
+<tr><td><code>make rails-production-db-rollback</code></td><td>Rollback production database migration</td></tr>
+
+<tr><td colspan="2"><strong>Assets Management</strong></td></tr>
+<tr><td><code>make rails-production-assets</code></td><td>Precompile assets for production</td></tr>
+<tr><td><code>make rails-production-precompile</code></td><td>Precompile assets (alias)</td></tr>
+<tr><td><code>make rails-production-assets-clean</code></td><td>Clean production assets</td></tr>
+
+<tr><td colspan="2"><strong>Server Management</strong></td></tr>
+<tr><td><code>make rails-production-server</code></td><td>Start Rails server (interactive mode)</td></tr>
+<tr><td><code>make rails-production-server-daemon</code></td><td>Start Rails server (daemon mode)</td></tr>
+<tr><td><code>make rails-production-start</code></td><td>Full setup + start server in daemon mode</td></tr>
+<tr><td><code>make rails-production-stop</code></td><td>Stop Rails production server</td></tr>
+
+<tr><td colspan="2"><strong>Console & Access</strong></td></tr>
+<tr><td><code>make rails-production-console</code></td><td>Open production Rails console</td></tr>
+<tr><td><code>make rails-production-bash</code></td><td>Access bash in production container</td></tr>
+
+<tr><td colspan="2"><strong>Logs</strong></td></tr>
+<tr><td><code>make rails-production-log-tail</code></td><td>Tail production application log</td></tr>
+<tr><td><code>make rails-production-logs</code></td><td>Tail production application log (alias)</td></tr>
+<tr><td><code>make rails-production-log-clear</code></td><td>Clear production application log</td></tr>
+<tr><td><code>make rails-production-docker-logs</code></td><td>View Docker container logs</td></tr>
+
+<tr><td colspan="2"><strong>Combined Workflows</strong></td></tr>
+<tr><td><code>make rails-production-full-start</code></td><td>Complete startup (containers + setup + server)</td></tr>
+
+</table>
