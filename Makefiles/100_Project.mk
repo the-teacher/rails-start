@@ -53,6 +53,17 @@ shell:
 project-setup-structure:
 	mkdir -p __RailsApp__/tmp
 	touch __RailsApp__/tmp/.bash_history
+	touch __RailsApp__/tmp/.irb_history
+	make project-setup-irb-config
+	
+project-setup-irb-config:
+	touch __RailsApp__/tmp/.irbrc
+	@echo "" > __RailsApp__/tmp/.irbrc
+	@echo "# IRB Configuration" >> __RailsApp__/tmp/.irbrc
+	@echo "# See ENV: IRBRC" >> __RailsApp__/tmp/.irbrc
+	@echo "IRB.conf[:HISTORY_FILE] = '/home/rails/app/tmp/.irb_history'" >> __RailsApp__/tmp/.irbrc
+	@echo "IRB.conf[:SAVE_HISTORY] = 1000" >> __RailsApp__/tmp/.irbrc
+	@echo "IRB.conf[:AUTO_INDENT] = true" >> __RailsApp__/tmp/.irbrc
 
 # Help for Project management commands
 project-help:
