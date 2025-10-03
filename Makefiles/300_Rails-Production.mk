@@ -69,6 +69,9 @@ rails-production-server-daemon:
 	docker compose -f $(COMPOSE_FILE) exec -d rails_app bash -c "RAILS_ENV=production bundle exec puma -b tcp://0.0.0.0:3000 --pidfile tmp/pids/production-server.pid"
 
 rails-production-start:
+	make env-setup-production
+	make rails-production-up
+	make rails-production-setup
 	docker compose -f $(COMPOSE_FILE) exec rails_app make production-bundle
 	docker compose -f $(COMPOSE_FILE) exec rails_app make production-db-create
 	docker compose -f $(COMPOSE_FILE) exec rails_app make production-db-migrate
@@ -124,6 +127,7 @@ rails-production-bash:
 
 # Full production startup sequence (delegated)
 rails-production-full-start:
+	make env-setup-production
 	make rails-production-up
 	sleep 5
 	make rails-production-setup

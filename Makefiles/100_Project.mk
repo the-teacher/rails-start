@@ -14,6 +14,7 @@ COMPOSE_FILE := ./docker/docker-compose.yml
 # Start containers
 start:
 	make project-setup-structure
+	make env-setup-development
 	docker compose -f $(COMPOSE_FILE) up -d
 
 # Start containers

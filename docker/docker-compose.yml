@@ -6,9 +6,7 @@ services:
     env_file:
       - ../ENV/local/.env.${RAILS_ENV:-development}
     environment:
-      - HISTFILE=/home/rails/app/tmp/.bash_history
-      - HISTSIZE=10000
-      - HISTFILESIZE=20000
+      - RAILS_ENV=${RAILS_ENV:-development}
     ports:
       - "3000:3000"
     volumes:
