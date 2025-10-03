@@ -77,11 +77,10 @@ Now visit: `http://localhost:3000` in your browser.
 
 ## The Idea
 
-This project uses power of `Docker` and `Makefiles` to automate the setup and management of a Rails application.
-
-The `Makefile` commands abstract away the complexity of Docker commands, allowing developers to focus on coding rather than environment setup.
-
-`make rails-start` command does everything needed to get you started.
+- `Docker` and `Docker Compose` for easy environment setup.
+- `Makefiles` to simplify commands and automate tasks.
+- `DevContainer` to make development environment consistent and easy to work with.
+- `make rails-start` the only command you need to start your project.
 
 # License
 
