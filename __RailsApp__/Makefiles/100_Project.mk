@@ -120,6 +120,8 @@ clean:
 
 # Check environment
 env-check:
+	make bundle
+	@echo "=============================================================="
 	@echo "Ruby version: $(shell ruby -v)"
 	@echo "Bundler version: $(shell bundle -v)"
 	@echo "Rails version: $(shell bundle exec rails -v)"
