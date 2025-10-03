@@ -1,19 +1,14 @@
 services:
   rails_app:
-    image: iamteacher/rails-start.main:latest
-
     tty: true
     stdin_open: true
-
+    image: iamteacher/rails-start.main:latest
     env_file:
       - ../.env
       - ../.env.${RAILS_ENV:-development}
-
     ports:
       - "3000:3000"
-
     volumes:
       - ../__RailsApp__:/home/rails/app
-
     working_dir: /home/rails/app
     command: sleep infinity

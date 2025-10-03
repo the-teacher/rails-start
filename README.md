@@ -1,4 +1,4 @@
-<img src="./docs/images/rails-start-logo.png" alt="Rails Start" />
+<img src="./docs/images/rails-start-banner.jpg" alt="Rails Start" />
 
 # Rails Start!
 
@@ -18,46 +18,62 @@ This project is a perfect choice for:
 - `make` utility installed (usually comes pre-installed on MacOS and Linux).
 - `WSL2` (For Windows users) with a Linux distribution (like Ubuntu) is recommended.
 
-## How to Use (MacOS / Linux)
+## How to Use
 
-- `git clone https://github.com/the-teacher/rails-start.git`
-- `cd rails-start`
-- `make rails-start`
+<details>
+<summary><strong>🪟 Windows Requirements (Click to expand)</strong></summary>
 
-That is it! Very simple!
+### Prerequisites for Windows Users
+
+Before proceeding, Windows users need to set up WSL2:
+
+1. **Install WSL2 and Ubuntu** (if not installed yet):
+
+   Open `cmd` or `PowerShell` and run:
+
+   ```powershell
+   wsl --install
+   wsl --set-default-version 2
+   wsl --install -d Ubuntu
+   ```
+
+2. **Install make utility**:
+
+   Run `WSL` and install `make`:
+
+   ```bash
+   wsl
+   sudo apt-get install -y make
+   ```
+
+3. **Continue with the installation steps below** inside your WSL2 Ubuntu terminal.
+
+</details>
+
+### Installation Steps
+
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/the-teacher/rails-start.git
+   ```
+
+2. Navigate to the project directory:
+
+   ```bash
+   cd rails-start
+   ```
+
+3. Start the application:
+   ```bash
+   make rails-start
+   ```
+
+That's it! Very simple!
 
 Now visit: `http://localhost:3000` in your browser.
 
 <img src="./docs/images/rails-start-2.png" alt="Rails Start Welcome Page" />
-
-## How to Use (Windows WSL2)
-
-- Open `cmd` or `PowerShell` and run:
-
-Install WSL2 and Ubuntu (if not installed yet):
-
-```powershell
-wsl --install
-wsl --set-default-version 2
-wsl --install -d Ubuntu
-```
-
-Run `WSL` and install `make`:
-
-```powershell
-wsl
-sudo apt-get install -y make
-```
-
-- `git clone https://github.com/the-teacher/rails-start.git`
-- `cd rails-start`
-- `make rails-start`
-
-That is it! Very simple!
-
-Now visit: `http://localhost:3000` in your browser.
-
-<img src="./docs/images/rails-start-windows-2.png" alt="Rails Start Welcome Page" />
 
 ## The Idea
 
