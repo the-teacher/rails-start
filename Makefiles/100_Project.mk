@@ -50,8 +50,8 @@ shell:
 	docker compose -f $(COMPOSE_FILE) exec rails_app bash
 
 project-setup-structure:
-	mkdir -p tmp
-	touch tmp/.bash_history
+	mkdir -p __RailsApp__/tmp
+	touch __RailsApp__/tmp/.bash_history
 
 # Help for Project management commands
 project-help:
