@@ -65,6 +65,9 @@ project-setup-irb-config:
 	@echo "IRB.conf[:SAVE_HISTORY] = 1000" >> __RailsApp__/tmp/.irbrc
 	@echo "IRB.conf[:AUTO_INDENT] = true" >> __RailsApp__/tmp/.irbrc
 
+reset:
+	rm -rf  ENV/local/.env.*
+
 # Help for Project management commands
 project-help:
 	@echo "=============================================================="
