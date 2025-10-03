@@ -83,13 +83,6 @@ The `Makefile` commands abstract away the complexity of Docker commands, allowin
 
 `make rails-start` command does everything needed to get you started.
 
-## Project Status
-
-Project is being remastered to support Rails 8.0 and Ruby 3.3.
-
-- To use previous version use branch `rails7-startkit`.
-- https://github.com/the-teacher/rails7-startkit/tree/RAILS_7_STARTKIT
-
 # License
 
 [MIT License. 2023-2025. Ilya N. Zykin](./LICENSE.md)
