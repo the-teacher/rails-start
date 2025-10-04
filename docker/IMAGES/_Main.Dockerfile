@@ -13,6 +13,11 @@ WORKDIR /home/rails/app
 ENV RUBY_YJIT_ENABLE=1
 ENV RUBYOPT="--yjit"
 
+# ZJIT is an alternative JIT compiler for Ruby, focused on reducing memory usage
+# Uncomment the following lines to enable ZJIT instead of YJIT
+# ENV RUBY_ZJIT_ENABLE=1
+# ENV RUBYOPT="--zjit"
+
 # Install common packages as root
 USER root
 
