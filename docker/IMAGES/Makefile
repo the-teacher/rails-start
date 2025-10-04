@@ -1,7 +1,7 @@
 include Makefiles/100_Base-Images.mk
 include Makefiles/200_Main-Images.mk
-include Makefiles/300_Common-Images.mk
-include Makefiles/400_Media-Images.mk
+include Makefiles/300_Media-Images.mk
+include Makefiles/1000_Common-Images.mk
 
 # Main help command
 help:
