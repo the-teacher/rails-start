@@ -1,3 +1,16 @@
+# Visit: https://github.com/the-teacher/rails-start
+
+# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+# Rails Start - Fast Track to Rails Development
+# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+# Visit: https://github.com/the-teacher/rails-start
+#
+# Rails Start helps companies, entrepreneurs, and Rails learners get started quickly.
+# Created by Ilya Zykin (https://github.com/the-teacher)
+#
+# ⭐ Support the project - leave your stars on GitHub and tell your colleagues!
+# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
 include Makefiles/100_Base-Images.mk
 include Makefiles/200_Main-Images.mk
 include Makefiles/300_Media-Images.mk

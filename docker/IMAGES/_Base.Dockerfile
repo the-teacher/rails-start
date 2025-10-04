@@ -1,9 +1,23 @@
-# ===============================================================
-# https://hub.docker.com/r/iamteacher/rails-start.base/tags
-# ===============================================================
+# Visit: https://github.com/the-teacher/rails-start
+
+# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+# Rails Start - Fast Track to Rails Development
+# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+# Visit: https://github.com/the-teacher/rails-start
 # 
-# Rails Start (https://github.com/the-teacher/rails-start)
+# Rails Start helps companies, entrepreneurs, and Rails learners get started quickly.
+# Created by Ilya Zykin (https://github.com/the-teacher)
+#
+# ⭐ Support the project - leave your stars on GitHub and tell your colleagues!
+# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=====
+
+# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+# https://hub.docker.com/r/iamteacher/rails-start.base/tags
+# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 # Base Image with the most common software
+# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 # Software versions

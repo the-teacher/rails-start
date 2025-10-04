@@ -1,8 +1,25 @@
-# ===============================================================
-# https://hub.docker.com/r/iamteacher/rails-start.media/tags
-# ===============================================================
+# Visit: https://github.com/the-teacher/rails-start
+
+# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+# Rails Start - Fast Track to Rails Development
+# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+# Visit: https://github.com/the-teacher/rails-start
 # 
-# Rails Start (https://github.com/the-teacher/rails-start)
+# Rails Start helps companies, entrepreneurs, and Rails learners get started quickly.
+# Created by Ilya Zykin (https://github.com/the-teacher)
+#
+# ⭐ Support the project - leave your stars on GitHub and tell your colleagues!
+# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+# https://hub.docker.com/r/iamteacher/rails-start.media/tags
+# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+
+# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+# Media Layer Image
+# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+# Visit: https://github.com/the-teacher/rails-start
 # Media Layer Image
 
 # Ruby version to use
@@ -12,10 +29,11 @@ ARG RUBY_VERSION=3.4.6-bookworm
 # Software versions
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-# SEE: image_optim && image_optim_pack
+# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+# Based on the work https://github.com/toy (image_optim & image_optim_pack)
+# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 # https://github.com/toy/image_optim
-# https://github.com/toy/image_optim_pack/blob/main/Makefile
-# https://github.com/toy/image_optim_pack/blob/main/Dockerfile
+# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 # https://github.com/shssoichiro/oxipng/releases
 ARG OXIPNG_VERSION=9.1.5

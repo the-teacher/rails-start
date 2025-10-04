@@ -8,13 +8,6 @@
   "customizations": {
     "vscode": {
       "settings": {
-        "terminal.integrated.profiles.linux": {
-          "bash": {
-            "name": "✅ Bash (Local)",
-            "path": "/bin/bash",
-            "icon": "terminal-bash"
-          }
-        },
         "ruby.useLanguageServer": true,
         "ruby.lint": {
           "rubocop": true

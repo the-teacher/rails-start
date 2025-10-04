@@ -1,5 +1,19 @@
+# =============================================================================
+# Rails Start - Fast Track to Rails Development
+# https://github.com/the-teacher/rails-start
+#
+# Rails Start helps companies, entrepreneurs, and Rails learners get started quickly.
+# Created by Ilya Zykin (https://github.com/the-teacher)
+#
+# ⭐ Support the project - leave your stars on GitHub and tell your colleagues!
+# =============================================================================
+
 # ===============================================================
-# Media image (using base image)
+# https://hub.docker.com/r/iamteacher/rails-start.media/tags
+# ===============================================================
+
+# ===============================================================
+# Media Image (Using Main Image)
 # ===============================================================
 MEDIA_DOCKERFILE = ./_Media.Dockerfile
 MEDIA_IMAGE_NAME = iamteacher/rails-start.media
