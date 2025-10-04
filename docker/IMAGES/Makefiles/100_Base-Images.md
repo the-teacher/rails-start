@@ -53,14 +53,6 @@ Documentation for all make commands in `Makefiles/100_Base-Images.mk` (executed 
 | `make base-images-manifest-create` | Create manifest for base image |
 | `make base-images-manifest-push`   | Push manifest to Docker Hub    |
 
-### Information
-
-| Command                     | Description                        |
-| --------------------------- | ---------------------------------- |
-| `make base-images-check`    | Check if base images exist locally |
-| `make base-images-sizes`    | Show base image sizes              |
-| `make base-images-show-all` | Show all Docker images             |
-
 ### Testing
 
 | Command                        | Description                                 |
@@ -102,7 +94,7 @@ Documentation for all make commands in `Makefiles/100_Base-Images.mk` (executed 
 
 | Variable          | Default Value                 | Description                 |
 | ----------------- | ----------------------------- | --------------------------- |
-| `BASE_DOCKERFILE` | `docker/_Base.Dockerfile`     | Path to base Dockerfile     |
+| `BASE_DOCKERFILE` | `./_Base.Dockerfile`          | Path to base Dockerfile     |
 | `IMAGE_NAME`      | `iamteacher/rails-start.base` | Docker image name           |
 | `RUBY_VERSION`    | `3.4.6-bookworm`              | Ruby version for base image |
 

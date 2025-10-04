@@ -5,6 +5,7 @@
 # Image names
 BASE_IMAGE_NAME = iamteacher/rails-start.base
 MAIN_IMAGE_NAME = iamteacher/rails-start.main
+MEDIA_IMAGE_NAME = iamteacher/rails-start.media
 
 # ===============================================================
 # Image building commands
@@ -73,7 +74,7 @@ common-images-sizes-main:
 common-images-sizes-all:
 	@echo "Checking all project image sizes..."
 	@echo "=============================================================="
-	@docker images --format "table {{.Repository}}:{{.Tag}}\t{{.Size}}" | grep -E "($(BASE_IMAGE_NAME)|$(MAIN_IMAGE_NAME)):(arm64|amd64)"
+	@docker images --format "table {{.Repository}}:{{.Tag}}\t{{.Size}}" | grep -E "($(BASE_IMAGE_NAME)|$(MAIN_IMAGE_NAME)|$(MEDIA_IMAGE_NAME)):(arm64|amd64)"
 	@echo "=============================================================="
 
 # Show all docker images

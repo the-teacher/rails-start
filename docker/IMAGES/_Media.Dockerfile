@@ -1,5 +1,12 @@
+# ===============================================================
+# https://hub.docker.com/r/iamteacher/rails-start.media/tags
+# ===============================================================
+# 
 # Rails Start (https://github.com/the-teacher/rails-start)
-# Image with the most common software
+# Media Layer Image
+
+# Ruby version to use
+ARG RUBY_VERSION=3.4.6-bookworm
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 # Software versions
@@ -9,16 +16,6 @@
 # https://github.com/toy/image_optim
 # https://github.com/toy/image_optim_pack/blob/main/Makefile
 # https://github.com/toy/image_optim_pack/blob/main/Dockerfile
-
-# Ruby version to use
-ARG RUBY_VERSION=3.4.6-bookworm
-
-# https://nodejs.org/en/download
-ARG NODE_VERSION=22.20.0
-# https://www.npmjs.com/package/npm
-ARG NPM_VERSION=11.6.1
-# https://github.com/nvm-sh/nvm/releases
-ARG NVM_VERSION=0.40.3
 
 # https://github.com/shssoichiro/oxipng/releases
 ARG OXIPNG_VERSION=9.1.5
@@ -300,18 +297,10 @@ RUN cp -R libwebp-${WEBP_VERSION}-linux-x86-64/bin/* /usr/local/bin/
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 # STAGE | MAIN
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-FROM --platform=$BUILDPLATFORM ruby:${RUBY_VERSION}
+FROM iamteacher/rails-start.main:latest
 
-ARG TARGETARCH
-ARG BUILDPLATFORM
-ARG RUBY_VERSION
-ARG NODE_VERSION
-ARG NPM_VERSION
-ARG NVM_VERSION
-
-RUN echo "$BUILDPLATFORM" > /BUILDPLATFORM
-RUN echo "$TARGETARCH" > /TARGETARCH
-RUN echo "$RUBY_VERSION" > /RUBY_VERSION
+# Switch to root for installing packages and copying binaries
+USER root
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 # PRECOMPILED IMG PROCESSORS
@@ -348,40 +337,14 @@ COPY --from=imagemagick /usr/local/include/ImageMagick-7/ /usr/local/include/Ima
 COPY --from=imagemagick /usr/local/etc/ImageMagick-7/ /usr/local/etc/ImageMagick-7/
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-# Install all required packages:
+# Install additional packages for media processing:
 #
-# Build tools:
-#   - build-essential: Essential compilation tools (gcc, make, etc.)
-#
-# Network tools:
-#   - wget: Tool for non-interactive file downloads
-#   - curl: Command line for transferring data with URL syntax
-#   - telnet: Telnet client for network debugging
-#
-# Shell:
-#   - bash: Bourne Again SHell
-#
-# System tools:
-#   - cron: Process scheduling daemon
-#   - vim: Improved vi text editor
-#   - procps: System and process monitoring utilities
-#   - tree: Displays directory structure in a tree-like format
+# Video/Audio tools:
+#   - ffmpeg: Multimedia framework for handling video, audio, and other multimedia files
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    # Build tools
-    build-essential \
-    # Network tools
-    wget \
-    curl \
-    telnet \
-    # Shell
-    bash \
-    # System tools
-    cron \
-    vim \
-    procps \
-    tree \
-    sudo \
+    # Video/Audio tools
+    ffmpeg \
     # Clean up
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
@@ -390,44 +353,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN ldconfig /usr/local/lib
 
 SHELL ["/bin/bash", "--login", "-c"]
-
-# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-# NODE.JS
-# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
-ENV NVM_DIR="/opt/.nvm"
-RUN mkdir -p /opt/.nvm
-RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v${NVM_VERSION}/install.sh | bash
-RUN . "$NVM_DIR/nvm.sh" && nvm install ${NODE_VERSION}
-RUN . "$NVM_DIR/nvm.sh" && nvm use ${NODE_VERSION}
-RUN . "$NVM_DIR/nvm.sh" && npm install -g npm@${NPM_VERSION}
-RUN . "$NVM_DIR/nvm.sh" && npm install -g yarn@latest
-RUN . "$NVM_DIR/nvm.sh" && npm install -g svgo
-
-# Add NVM binaries to PATH
-ENV PATH="/opt/.nvm/versions/node/v${NODE_VERSION}/bin:${PATH}"
-
-# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-# Rails User Setup
-# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
-# Create rails user and group with ID 1000
-RUN groupadd --system --gid 1000 rails && \
-    useradd rails --uid 1000 --gid 1000 --create-home --shell /bin/bash
-
-# Add rails to sudo group and configure passwordless sudo
-# RUN usermod -aG sudo rails && \
-#     echo "rails ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/rails
-
-# Set ownership for Ruby and Node.js
-RUN chown -R rails:rails /usr/local/bundle
-RUN chown -R rails:rails /opt/.nvm
-
-# Create app directory and set ownership
-RUN mkdir -p /app && chown -R rails:rails /app
-
-# Set editor for rails credentials
-ENV EDITOR="vim"
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 # IMG PROCESSORS TEST
@@ -447,7 +372,10 @@ RUN chown rails:rails /home/rails/ruby-env.sh
 # FINAL CONFIGURATION
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-# Switch to rails user
+# Switch back to rails user
 USER rails:rails
-RUN mkdir -p /home/rails/app
 WORKDIR /home/rails/app
+
+# Default command
+CMD ["bash"]
+

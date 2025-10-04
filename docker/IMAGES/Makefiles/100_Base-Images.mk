@@ -1,3 +1,6 @@
+# ===============================================================
+# https://hub.docker.com/r/iamteacher/rails-start.base/tags
+# ===============================================================
 # Variables for building images
 BASE_DOCKERFILE = ./_Base.Dockerfile
 IMAGE_NAME = iamteacher/rails-start.base
@@ -33,7 +36,6 @@ base-images-build:
 
 # Create manifest (local only)
 base-images-manifest-create:
-	make base-images-check
 	docker manifest create \
 		$(IMAGE_NAME):latest \
 		--amend $(IMAGE_NAME):arm64 \
@@ -188,14 +190,11 @@ base-images-help:
 	@echo ""
 	@echo "Multi-architecture commands (base-images-*):"
 	@echo "  make base-images-build              - Build base image for all platforms"
-	@echo "  make base-images-check              - Check if base images exist locally"
-	@echo "  make base-images-sizes              - Show base image sizes"
 	@echo "  make base-images-manifest-create    - Create manifest for base image"
 	@echo "  make base-images-push               - Push base images to Docker Hub"
 	@echo "  make base-images-manifest-push      - Push manifest to Docker Hub"
 	@echo "  make base-images-images-test        - Test image processors on both architectures"
 	@echo "  make base-images-clean              - Remove all base project images"
-	@echo "  make base-images-show-all           - Show all Docker images"
 	@echo ""
 	@echo "Buildx commands (modern multi-architecture approach):"
 	@echo "  make base-images-buildx-setup       - Setup buildx builder for multi-platform builds"
