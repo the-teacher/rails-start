@@ -34,11 +34,17 @@ To run [Rails Start](https://github.com/the-teacher/rails-start), you need only 
 
 If these tools are available on your operating system, you can consider that the **Rails** application will be installed in less than 5 minutes.
 
-## Why do I use **Make** instead of **Ruby** scripts?
+## Why do I use **Make** instead of **Ruby** scripts or **Rake**?
 
 The first version of the project relied on automation and launch scripts based on **Ruby** technologies.
 
 However, to make the process universal for host machines where **Ruby** might not be installed, I switched to using the popular **Make**, which can be used both on the host machine and in a container.
+
+> ⚠️ **Important Note:**
+>
+> Rails Start performs automatic preparation and setup of everything needed to run a Rails application, and does this using the **Make** utility, which automates many actions and processes in a simple and efficient way.
+>
+> **Make** is chosen as the simplest and most widespread tool. **Ruby** scripts or **Rake** commands simply cannot be used at this stage because they may not exist yet. The **Make** utility is already installed on many systems or can be installed with minimal effort.
 
 **Advantages of Make over Ruby scripts:**
 
