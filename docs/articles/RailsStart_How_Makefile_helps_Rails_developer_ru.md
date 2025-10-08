@@ -1,6 +1,6 @@
 # [RailsStart](https://github.com/the-teacher/rails-start): Как Makefile помогает Rails разработчику
 
-<img src="../images/rails-start-banner.jpg" alt="Rails Start" />
+<img src="../images/rails-start-banner-2.webp" alt="Rails Start" />
 
 ## Введение
 
