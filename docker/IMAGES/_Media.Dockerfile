@@ -367,12 +367,12 @@ COPY --from=imagemagick /usr/local/etc/ImageMagick-7/ /usr/local/etc/ImageMagick
 # Video/Audio tools:
 #   - ffmpeg: Multimedia framework for handling video, audio, and other multimedia files
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    # Video/Audio tools
+RUN rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/* && \
+    apt-get update && \
+    apt-get install -y \
     ffmpeg \
-    # Clean up
     && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 
 # Configure dynamic linker to find ImageMagick libraries
 RUN ldconfig /usr/local/lib
