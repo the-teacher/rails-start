@@ -3,10 +3,9 @@
 # Description: Main Rails Image with additional software
 # 
 # Visit: https://github.com/the-teacher/rails-start
-# Dockerhub: https://hub.docker.com/r/iamteacher/rails-start.base/tags
+# Dockerhub: https://hub.docker.com/r/iamteacher/rails-start.main/tags
 # Author: Ilya Zykin (https://github.com/the-teacher)
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 # Rails Start - Fast Track to Rails Development
@@ -22,15 +21,6 @@
 # Using base image instead of Ubuntu
 FROM iamteacher/rails-start.base:latest
 
-# https://nodejs.org/en/download
-ARG NODE_VERSION=22.20.0
-ENV NODE_VERSION=${NODE_VERSION}
-# https://www.npmjs.com/package/npm
-ARG NPM_VERSION=11.6.1
-# https://github.com/nvm-sh/nvm/releases
-ARG NVM_VERSION=0.40.3
-ENV NVM_VERSION=${NVM_VERSION}
-
 # Install common packages as root
 USER root
 
@@ -42,6 +32,18 @@ USER root
 # libpq-dev - PostgreSQL development libraries for pg gem compilation
 # default-mysql-client - MySQL client utilities
 # default-libmysqlclient-dev - MySQL development libraries for mysql2 gem compilation
+# ---------------------------------------------------------------
+# RUBY BUILD DEPENDENCIES
+# ---------------------------------------------------------------
+# libssl-dev - OpenSSL development libraries (required for Ruby compilation)
+# libreadline-dev - Readline development libraries (required for Ruby REPL)
+# zlib1g-dev - Zlib compression library development files (required for Ruby)
+# libffi-dev - Foreign Function Interface library (required for fiddle gem and Ruby FFI)
+# libyaml-dev - YAML parsing library (required for psych gem and Ruby YAML support)
+# git - Version control system (required by many gems and Ruby tools)
+# rustc - Rust compiler (required for YJIT - Ruby's Just-In-Time compiler)
+# cargo - Rust package manager (required for YJIT)
+# build-essential - C compiler and build tools (already in base, but essential for Ruby)
 # ---------------------------------------------------------------
 # ufw - for basic security
 # fail2ban - intrusion prevention system
@@ -60,6 +62,14 @@ RUN apt-get update && apt-get install -y \
     libpq-dev \
     default-mysql-client \
     default-libmysqlclient-dev \
+    libssl-dev \
+    libreadline-dev \
+    zlib1g-dev \
+    libffi-dev \
+    libyaml-dev \
+    git \
+    rustc \
+    cargo \
     ufw \
     fail2ban \
     rsync \
@@ -70,10 +80,6 @@ RUN apt-get update && apt-get install -y \
     lsb-release \
     ca-certificates \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
-
-# Update gem system to the latest version as root (requires system permissions)
-# https://rubygems.org/gems/rubygems-update/versions
-RUN gem update --system 3.7.2
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 # Rails User Setup
@@ -92,6 +98,23 @@ RUN groupadd --system --gid 1000 rails && \
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 USER rails:rails
+
+# https://www.ruby-lang.org/en/downloads/
+ARG RUBY_VERSION=3.4.7
+# https://rubygems.org/gems/rubygems-update/versions
+ARG DEFAULT_GEM_VERSION=3.7.2
+# https://nodejs.org/en/download
+ARG NODE_VERSION=22.20.0
+# https://www.npmjs.com/package/npm
+ARG NPM_VERSION=11.6.1
+# https://github.com/nvm-sh/nvm/releases
+ARG NVM_VERSION=0.40.3
+
+ENV RUBY_VERSION=${RUBY_VERSION}
+ENV NVM_VERSION=${NVM_VERSION}
+ENV NPM_VERSION=${NPM_VERSION}
+ENV NODE_VERSION=${NODE_VERSION}
+ENV DEFAULT_GEM_VERSION=${DEFAULT_GEM_VERSION}
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 # NODE.JS (Local version for rails user)
@@ -112,40 +135,53 @@ ENV PATH="/home/rails/.nvm/versions/node/v${NODE_VERSION}/bin:${PATH}"
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
+# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+# RBENV (Ruby Version Manager) for having local Ruby for user
+# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+WORKDIR /home/rails
+
+RUN git clone https://github.com/rbenv/rbenv.git ~/.rbenv && \
+    git clone https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build && \
+    echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bashrc && \
+    echo 'eval "$(rbenv init -)"' >> ~/.bashrc
+
+ENV PATH="/home/rails/.rbenv/bin:/home/rails/.rbenv/shims:${PATH}"
+
+# Configure rbenv to compile Ruby with YJIT support
+# YJIT_OPTS - enables YJIT JIT compiler during Ruby build
+# ZJIT is an alternative JIT compiler for Ruby, focused on reducing memory usage
+ENV RUBY_CONFIGURE_OPTS="--enable-yjit"
+
+# Note:
+# See: https://docs.ruby-lang.org/en/master/zjit_md.html => "--enable-zjit=dev"
+
+# Use direct binary path for rbenv commands to avoid PATH initialization issues in Docker
+RUN ~/.rbenv/bin/rbenv install ${RUBY_VERSION}
+RUN ~/.rbenv/bin/rbenv global ${RUBY_VERSION}
+
+# Update gem system to the latest version
+# https://rubygems.org/gems/rubygems-update/versions
+RUN ~/.rbenv/shims/gem update --system ${DEFAULT_GEM_VERSION}
+
+# Install default Ruby on Rails
+RUN ~/.rbenv/shims/gem install rails --no-document
+
+# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
 # Create app directory
 RUN mkdir -p /home/rails/app
-
-# Set editor for rails credentials
-ENV EDITOR="vim"
-
-# Gem Settings
-# Install user-specific gems to avoid permission issues
-ENV GEM_HOME="/home/rails/.gem"
-ENV PATH="$GEM_HOME/bin:$PATH"
-
-# Bundler Settings
-# Install gems to the user directory
-# To have a better control over gem versions per project
-# Disable the local cache of gems
-ENV BUNDLE_PATH=/home/rails/.bundle
-ENV BUNDLE_DISABLE_SHARED_GEMS=true
-ENV BUNDLE_NO_CACHE=false
 
 # YJIT is a new JIT compiler for Ruby that can significantly improve performance
 # Enable YJIT (Ruby's Just-In-Time compiler) for better performance
 ENV RUBY_YJIT_ENABLE=1
 ENV RUBYOPT="--yjit"
 
-# ZJIT is an alternative JIT compiler for Ruby, focused on reducing memory usage
-# Uncomment the following lines to enable ZJIT instead of YJIT
-# ENV RUBY_ZJIT_ENABLE=1
-# ENV RUBYOPT="--zjit"
+# Set editor for rails credentials
+ENV EDITOR="vim"
 
 # Working directory
 WORKDIR /home/rails/app
 
-# Install Ruby on Rails
-RUN gem install rails --no-document
-
-# Default command
-CMD ["bash"]
+# Default shell command
+CMD ["/bin/bash", "-c", "-l"]

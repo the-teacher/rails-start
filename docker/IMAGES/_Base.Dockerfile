@@ -23,8 +23,16 @@
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 # Ruby version to use
-ARG RUBY_VERSION=3.4.6-bookworm
+ARG DEBIAN_VERSION=debian:bookworm
 
+# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+# STAGE | MAIN
+# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+FROM --platform=$BUILDPLATFORM $DEBIAN_VERSION
+
+# Build arguments
+ARG TARGETARCH
+ARG BUILDPLATFORM
 # https://nodejs.org/en/download
 ARG NODE_VERSION=22.20.0
 # https://www.npmjs.com/package/npm
@@ -32,21 +40,14 @@ ARG NPM_VERSION=11.6.1
 # https://github.com/nvm-sh/nvm/releases
 ARG NVM_VERSION=0.40.3
 
-# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-# STAGE | MAIN
-# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-FROM --platform=$BUILDPLATFORM ruby:${RUBY_VERSION}
-
-ARG TARGETARCH
-ARG BUILDPLATFORM
-ARG RUBY_VERSION
-ARG NODE_VERSION
-ARG NPM_VERSION
-ARG NVM_VERSION
+ENV TARGETARCH=${TARGETARCH}
+ENV BUILDPLATFORM=${BUILDPLATFORM}
+ENV NODE_VERSION=${NODE_VERSION}
+ENV NPM_VERSION=${NPM_VERSION}
+ENV NVM_VERSION=${NVM_VERSION}
 
 RUN echo "$BUILDPLATFORM" > /BUILDPLATFORM
 RUN echo "$TARGETARCH" > /TARGETARCH
-RUN echo "$RUBY_VERSION" > /RUBY_VERSION
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 # Install all required packages:
@@ -73,6 +74,7 @@ RUN echo "$RUBY_VERSION" > /RUBY_VERSION
 #   - gzip: Compression utility
 #   - file: Determines file type
 #   - lsof: Lists open files and processes
+#   - ca-certificates: Common CA certificates for HTTPS (here for node/npm)
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 RUN apt-get update && apt-get install -y --no-install-recommends \
     # Build tools
@@ -104,6 +106,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gzip \
     file \
     lsof \
+    # SSL/TLS certificates
+    ca-certificates \
     # Clean up
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
@@ -116,6 +120,7 @@ SHELL ["/bin/bash", "--login", "-c"]
 
 ENV NVM_DIR="/opt/.nvm"
 RUN mkdir -p /opt/.nvm
+
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v${NVM_VERSION}/install.sh | bash
 RUN . "$NVM_DIR/nvm.sh" && nvm install ${NODE_VERSION}
 RUN . "$NVM_DIR/nvm.sh" && nvm use ${NODE_VERSION}
