@@ -17,8 +17,6 @@ MAKEFLAGS += --no-print-directory
 # Install dependencies (ensure all groups are included)
 bundle:
 	bundle config unset --local without || true
-	touch /usr/local/bundle/config
-	cat /usr/local/bundle/config
 	bundle install
 
 update-bundler:
