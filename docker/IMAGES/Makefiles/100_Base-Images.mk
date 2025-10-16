@@ -84,41 +84,30 @@ base-image-amd64-shell:
 		$(IMAGE_NAME):amd64 \
 		/bin/bash
 
-# Enter shell of the latest ARM64 image as root user
-base-image-arm64-root-shell:
+# Test Ruby environment on ARM64 image
+base-image-arm64-ruby-env-test:
 	docker run --rm -it \
 		--platform linux/arm64 \
-		-v $(PWD)/docker/checks/image_processors.sh:/root/image_processors.sh \
+		-v $(PWD)/checks/ruby-env.sh:/root/ruby-env.sh \
 		--user root \
 		$(IMAGE_NAME):arm64 \
-		/bin/bash
+		/bin/bash -c "source /root/ruby-env.sh"
 
-# Enter shell of the latest AMD64 image as root user
-base-image-amd64-root-shell:
+# Test Ruby environment on AMD64 image
+base-image-amd64-ruby-env-test:
 	docker run --rm -it \
 		--platform linux/amd64 \
-		-v $(PWD)/docker/checks/image_processors.sh:/root/image_processors.sh \
+		-v $(PWD)/checks/ruby-env.sh:/root/ruby-env.sh \
 		--user root \
 		$(IMAGE_NAME):amd64 \
-		/bin/bash
+		/bin/bash -c "source /root/ruby-env.sh"
 
-# Test image processors on ARM64 image
-base-image-arm64-images-test:
-	docker run --rm -it \
-		--platform linux/arm64 \
-		-v $(PWD)/docker/checks/image_processors.sh:/root/image_processors.sh \
-		--user root \
-		$(IMAGE_NAME):arm64 \
-		/bin/bash -c "source /root/image_processors.sh"
-
-# Test image processors on AMD64 image
-base-image-amd64-images-test:
-	docker run --rm -it \
-		--platform linux/amd64 \
-		-v $(PWD)/docker/checks/image_processors.sh:/root/image_processors.sh \
-		--user root \
-		$(IMAGE_NAME):amd64 \
-		/bin/bash -c "source /root/image_processors.sh"
+# Test Ruby environment on both architectures
+base-images-ruby-env-test:
+	@echo "Testing Ruby environment on ARM64..."
+	make base-image-arm64-ruby-env-test
+	@echo "Testing Ruby environment on AMD64..."
+	make base-image-amd64-ruby-env-test
 
 # Test image processors on both architectures
 base-images-images-test:
@@ -194,17 +183,15 @@ base-images-help:
 	@echo "  make base-image-amd64-build         - Build base image for AMD64"
 	@echo "  make base-image-arm64-shell         - Enter shell of base ARM64 image as rails user"
 	@echo "  make base-image-amd64-shell         - Enter shell of base AMD64 image as rails user"
-	@echo "  make base-image-arm64-root-shell    - Enter shell of base ARM64 image as root user"
-	@echo "  make base-image-amd64-root-shell    - Enter shell of base AMD64 image as root user"
-	@echo "  make base-image-arm64-images-test   - Test image processors on ARM64 image"
-	@echo "  make base-image-amd64-images-test   - Test image processors on AMD64 image"
+	@echo "  make base-image-arm64-ruby-env-test - Test Ruby environment on ARM64 image"
+	@echo "  make base-image-amd64-ruby-env-test - Test Ruby environment on AMD64 image"
 	@echo ""
 	@echo "Multi-architecture commands (base-images-*):"
 	@echo "  make base-images-build              - Build base image for all platforms"
+	@echo "  make base-images-ruby-env-test      - Test Ruby environment on both architectures"
 	@echo "  make base-images-manifest-create    - Create manifest for base image"
 	@echo "  make base-images-push               - Push base images to Docker Hub"
 	@echo "  make base-images-manifest-push      - Push manifest to Docker Hub"
-	@echo "  make base-images-images-test        - Test image processors on both architectures"
 	@echo "  make base-images-clean              - Remove all base project images"
 	@echo ""
 	@echo "Buildx commands (modern multi-architecture approach):"

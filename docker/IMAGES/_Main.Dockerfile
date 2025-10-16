@@ -39,7 +39,14 @@ ENV RUBYOPT="--yjit"
 USER root
 
 # Install essential packages (not included in base image):
+# DATABASES
+# ---------------------------------------------------------------
 # sqlite3 and libsqlite3-dev - for SQLite database support
+# postgresql-client - PostgreSQL client utilities (psql, etc.)
+# libpq-dev - PostgreSQL development libraries for pg gem compilation
+# default-mysql-client - MySQL client utilities
+# default-libmysqlclient-dev - MySQL development libraries for mysql2 gem compilation
+# ---------------------------------------------------------------
 # ufw - for basic security
 # fail2ban - intrusion prevention system
 # rsync - for file synchronization
@@ -53,6 +60,10 @@ USER root
 RUN apt-get update && apt-get install -y \
     sqlite3 \
     libsqlite3-dev \
+    postgresql-client \
+    libpq-dev \
+    default-mysql-client \
+    default-libmysqlclient-dev \
     ufw \
     fail2ban \
     rsync \

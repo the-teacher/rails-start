@@ -22,19 +22,17 @@ Documentation for all make commands in `Makefiles/100_Base-Images.mk` (executed 
 
 ### Shell Access
 
-| Command                            | Description                                   |
-| ---------------------------------- | --------------------------------------------- |
-| `make base-image-arm64-shell`      | Enter shell of base ARM64 image as rails user |
-| `make base-image-amd64-shell`      | Enter shell of base AMD64 image as rails user |
-| `make base-image-arm64-root-shell` | Enter shell of base ARM64 image as root user  |
-| `make base-image-amd64-root-shell` | Enter shell of base AMD64 image as root user  |
+| Command                       | Description                                  |
+| ----------------------------- | -------------------------------------------- |
+| `make base-image-arm64-shell` | Enter shell of base ARM64 image as root user |
+| `make base-image-amd64-shell` | Enter shell of base AMD64 image as root user |
 
 ### Testing
 
-| Command                             | Description                          |
-| ----------------------------------- | ------------------------------------ |
-| `make base-image-arm64-images-test` | Test image processors on ARM64 image |
-| `make base-image-amd64-images-test` | Test image processors on AMD64 image |
+| Command                               | Description                          |
+| ------------------------------------- | ------------------------------------ |
+| `make base-image-arm64-ruby-env-test` | Test Ruby environment on ARM64 image |
+| `make base-image-amd64-ruby-env-test` | Test Ruby environment on AMD64 image |
 
 ## Multi-Architecture Commands
 
@@ -55,9 +53,9 @@ Documentation for all make commands in `Makefiles/100_Base-Images.mk` (executed 
 
 ### Testing
 
-| Command                        | Description                                 |
-| ------------------------------ | ------------------------------------------- |
-| `make base-images-images-test` | Test image processors on both architectures |
+| Command                          | Description                                 |
+| -------------------------------- | ------------------------------------------- |
+| `make base-images-ruby-env-test` | Test Ruby environment on both architectures |
 
 ### Complete Workflows
 
@@ -118,9 +116,10 @@ make base-images-buildx-update   # Complete buildx workflow
 ### Development and Testing
 
 ```bash
-make base-image-arm64-build      # Build ARM64 image
-make base-image-arm64-shell      # Test in shell
-make base-image-arm64-images-test # Test image processors
+make base-image-arm64-build         # Build ARM64 image
+make base-image-arm64-shell         # Test in shell
+make base-image-arm64-ruby-env-test # Test Ruby environment
+make base-images-ruby-env-test      # Test Ruby environment on both architectures
 ```
 
 ### Cleanup
