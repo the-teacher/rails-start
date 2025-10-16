@@ -29,6 +29,10 @@ stop:
 down:
 	make stop
 
+# Stop containers and remove images, volumes, and orphans
+image-reset:
+	docker compose -f $(COMPOSE_FILE) down --rmi all --volumes --remove-orphans
+
 # Show running containers status
 status:
 	@echo "Running containers:"
