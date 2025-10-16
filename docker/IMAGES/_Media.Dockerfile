@@ -1,4 +1,11 @@
+# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+# Name: rails-start.media
+# Description: Media Layer Image with image optimization tools
+# 
 # Visit: https://github.com/the-teacher/rails-start
+# Dockerhub: https://hub.docker.com/r/iamteacher/rails-start.media/tags
+# Author: Ilya Zykin (https://github.com/the-teacher)
+# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 # Rails Start - Fast Track to Rails Development
@@ -15,15 +22,8 @@
 # https://hub.docker.com/r/iamteacher/rails-start.media/tags
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-
-# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-# Media Layer Image
-# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-# Visit: https://github.com/the-teacher/rails-start
-# Media Layer Image
-
 # Ruby version to use
-ARG RUBY_VERSION=3.4.6-bookworm
+ARG BASE_DEBIAN=debian:bookworm
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 # Software versions
@@ -70,8 +70,15 @@ ARG PNGCRUSH_VERSION=1.8.13
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 # STAGE | BASE DEBIAN
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-FROM --platform=$BUILDPLATFORM ruby:${RUBY_VERSION} AS base_debian
-RUN apt-get update && apt-get install -y build-essential cmake nasm bash findutils
+FROM --platform=$BUILDPLATFORM ${BASE_DEBIAN} AS base_debian
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    zlib1g-dev \
+    wget \
+    cmake \
+    nasm \
+    bash \
+    findutils
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 # STAGE | BASE RUST

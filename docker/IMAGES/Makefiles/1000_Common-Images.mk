@@ -35,6 +35,7 @@ common-images-help:
 	@echo "  make common-images-media-sizes   - Show sizes of media images"
 	@echo "  make common-images-sizes-all     - Show sizes of all images"
 	@echo "  make common-images-show-all      - Show all Docker images"
+	@echo "  make docker-status               - Show Docker disk usage and system information"
 	@echo "  make common-images-clean         - Remove all project images (base, main, media)"
 	@echo ""
 	@echo "Shortcuts:"
@@ -125,6 +126,16 @@ common-images-show-all:
 	@echo "=============================================================="
 	@docker images
 	@echo "=============================================================="
+
+# Show Docker disk usage
+docker-status:
+	@echo "Docker disk usage:"
+	@echo "=============================================================="
+	@docker system df -v
+	@echo "=============================================================="
+	@echo ""
+	@echo "Summary:"
+	@docker system df
 
 # Clean all images (base, main, and media)
 common-images-clean:
