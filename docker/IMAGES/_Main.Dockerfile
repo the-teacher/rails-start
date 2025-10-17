@@ -27,6 +27,7 @@ USER root
 # Install essential packages (not included in base image):
 # DATABASES
 # ---------------------------------------------------------------
+# git - Version control system (required by many gems and Ruby tools)
 # sqlite3 and libsqlite3-dev - for SQLite database support
 # postgresql-client - PostgreSQL client utilities (psql, etc.)
 # libpq-dev - PostgreSQL development libraries for pg gem compilation
@@ -40,7 +41,6 @@ USER root
 # zlib1g-dev - Zlib compression library development files (required for Ruby)
 # libffi-dev - Foreign Function Interface library (required for fiddle gem and Ruby FFI)
 # libyaml-dev - YAML parsing library (required for psych gem and Ruby YAML support)
-# git - Version control system (required by many gems and Ruby tools)
 # rustc - Rust compiler (required for YJIT - Ruby's Just-In-Time compiler)
 # cargo - Rust package manager (required for YJIT)
 # build-essential - C compiler and build tools (already in base, but essential for Ruby)
@@ -54,8 +54,11 @@ USER root
 # gnupg - for GPG keys
 # lsb-release - for distribution information
 # ca-certificates - for HTTPS
+# JMALLOC - memory allocator to reduce fragmentation
+# ---------------------------------------------------------------
 
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install --no-install-recommends -y \
+    git \
     sqlite3 \
     libsqlite3-dev \
     postgresql-client \
@@ -67,7 +70,6 @@ RUN apt-get update && apt-get install -y \
     zlib1g-dev \
     libffi-dev \
     libyaml-dev \
-    git \
     rustc \
     cargo \
     ufw \
@@ -79,6 +81,11 @@ RUN apt-get update && apt-get install -y \
     gnupg \
     lsb-release \
     ca-certificates \
+    # JMALLOC - memory allocator to reduce fragmentation
+    libjemalloc2 \
+    # Link jemalloc to a common path for easy use on different architectures
+    && ln -sf $(find /usr/lib -name libjemalloc.so.2 | head -n 1) /usr/lib/libjemalloc.so.2 \
+    # Cleanup
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -151,6 +158,7 @@ ENV PATH="/home/rails/.rbenv/bin:/home/rails/.rbenv/shims:${PATH}"
 # Configure rbenv to compile Ruby with YJIT support
 # YJIT_OPTS - enables YJIT JIT compiler during Ruby build
 # ZJIT is an alternative JIT compiler for Ruby, focused on reducing memory usage
+# Example: ./configure "--prefix=$HOME/.rbenv/versions/X.Y.Z" --enable-shared --enable-yjit --with-ext=openssl,psy
 ENV RUBY_CONFIGURE_OPTS="--enable-yjit"
 
 # Note:
@@ -179,6 +187,12 @@ ENV RUBYOPT="--yjit"
 
 # Set editor for rails credentials
 ENV EDITOR="vim"
+
+# Common use of jemalloc to reduce memory fragmentation
+# TEST: LD_PRELOAD=/usr/lib/libjemalloc.so.2 ruby -e 'sleep 100' &
+# TEST: cat /proc/$(pgrep ruby)/maps | grep jemalloc
+# TEST: IRB: puts `grep jemalloc /proc/self/maps`
+ENV LD_PRELOAD="/usr/lib/libjemalloc.so.2"
 
 # Working directory
 WORKDIR /home/rails/app
