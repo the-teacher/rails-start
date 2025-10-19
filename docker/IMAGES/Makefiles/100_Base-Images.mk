@@ -16,9 +16,9 @@
 BASE_DOCKERFILE = ./_Base.Dockerfile
 IMAGE_NAME = iamteacher/rails-start.base
 
-# Ruby version and OS version for the base image
-# https://hub.docker.com/_/ruby/tags?name=bookworm
-RUBY_VERSION = 3.4.6-bookworm
+# Debian version for the base image
+# https://hub.docker.com/_/debian/tags?name=bookworm
+DEBIAN_VERSION = debian:bookworm
 
 # Build image for ARM64
 base-image-arm64-build:
@@ -27,7 +27,6 @@ base-image-arm64-build:
 		-f $(BASE_DOCKERFILE) \
 		--build-arg BUILDPLATFORM="linux/arm64" \
 		--build-arg TARGETARCH="arm64" \
-		--build-arg RUBY_VERSION="$(RUBY_VERSION)" \
 		.
 
 # Build image for AMD64
@@ -37,7 +36,6 @@ base-image-amd64-build:
 		-f $(BASE_DOCKERFILE) \
 		--build-arg BUILDPLATFORM="linux/amd64" \
 		--build-arg TARGETARCH="amd64" \
-		--build-arg RUBY_VERSION="$(RUBY_VERSION)" \
 		.
 
 # Build images for all platforms
@@ -152,7 +150,6 @@ base-images-buildx:
 		--builder rails-start-builder \
 		-f $(BASE_DOCKERFILE) \
 		--platform linux/arm64,linux/amd64 \
-		--build-arg RUBY_VERSION="$(RUBY_VERSION)" \
 		-t $(IMAGE_NAME):latest \
 		.
 
@@ -163,7 +160,6 @@ base-images-buildx-push:
 		--builder rails-start-builder \
 		-f $(BASE_DOCKERFILE) \
 		--platform linux/arm64,linux/amd64 \
-		--build-arg RUBY_VERSION="$(RUBY_VERSION)" \
 		-t $(IMAGE_NAME):latest \
 		--push \
 		.

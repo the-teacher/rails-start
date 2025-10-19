@@ -74,6 +74,12 @@ rails-status:
 	@echo "=============================================================="
 	docker compose -f $(COMPOSE_FILE) exec rails_app bash -c "ps aux"
 
+# Copy Ruby environment check script to rails user home and execute it
+rails-ruby-env-test:
+	docker compose -f $(COMPOSE_FILE) cp docker/IMAGES/checks/ruby-env.sh rails_app:/home/rails/ruby-env.sh
+	docker compose -f $(COMPOSE_FILE) exec -e LD_PRELOAD=/usr/lib/libjemalloc.so.2 rails_app bash /home/rails/ruby-env.sh
+	docker compose -f $(COMPOSE_FILE) exec rails_app rm -f /home/rails/ruby-env.sh
+
 # =============================================================================
 # Docker Container Management Commands (host-level only)
 # =============================================================================
@@ -112,6 +118,7 @@ rails-help:
 	@echo "Docker Container Management:"
 	@echo "  make rails-bash              - Access bash in development container"
 	@echo "  make rails-status            - Show running processes inside Rails container"
+	@echo "  make rails-ruby-env-test     - Check Ruby environment (YJIT, jemalloc, versions)"
 	@echo ""
 	@echo "Note: Most commands delegate to __RailsApp__/Makefiles/200_Rails.mk inside the container."
 	@echo "=================================================================="

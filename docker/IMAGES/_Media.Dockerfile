@@ -1,6 +1,6 @@
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 # Name: rails-start.media
-# Description: Media Layer Image with image optimization tools
+# Description: Media Image with additional media software
 # 
 # Visit: https://github.com/the-teacher/rails-start
 # Dockerhub: https://hub.docker.com/r/iamteacher/rails-start.media/tags
@@ -16,10 +16,6 @@
 # Created by Ilya Zykin (https://github.com/the-teacher)
 #
 # ⭐ Support the project - leave your stars on GitHub and tell your colleagues!
-# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
-# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-# https://hub.docker.com/r/iamteacher/rails-start.media/tags
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 # Ruby version to use
@@ -193,26 +189,6 @@ RUN cd advancecomp-${ADVANCECOMP_VERSION} && \
     make install
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-# STAGE | IMAGEMAGICK 7+
-# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-FROM base_debian AS imagemagick
-
-ARG IMAGEMAGICK_VERSION
-
-RUN apt-get update && apt-get install -y \
-    libpng-dev libjpeg-dev libtiff-dev libwebp-dev libheif-dev libopenjp2-7-dev \
-    libx11-dev libxext-dev zlib1g-dev liblcms2-dev libfontconfig1-dev libfreetype6-dev \
-    libxml2-dev libltdl7-dev ghostscript
-
-RUN wget -O ImageMagick-${IMAGEMAGICK_VERSION}.tar.gz https://github.com/ImageMagick/ImageMagick/archive/${IMAGEMAGICK_VERSION}.tar.gz
-RUN tar -xvzf ImageMagick-${IMAGEMAGICK_VERSION}.tar.gz
-WORKDIR /ImageMagick-${IMAGEMAGICK_VERSION}
-RUN ./configure --with-modules --with-quantum-depth=16 --with-heic=yes --with-webp=yes
-RUN make -j$(nproc)
-RUN make install
-RUN ldconfig /usr/local/lib
-
-# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 # STAGE | GIFSICLE
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 FROM base_debian AS gifsicle
@@ -262,7 +238,7 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     zlib1g-dev
 
-RUN wget -O optipng-${OPTIPNG_VERSION}.tar.gz https://downloads.sourceforge.net/optipng/optipng-${OPTIPNG_VERSION}.tar.gz
+RUN wget -O optipng-${OPTIPNG_VERSION}.tar.gz https://sourceforge.net/projects/optipng/files/OptiPNG/optipng-${OPTIPNG_VERSION}/optipng-${OPTIPNG_VERSION}.tar.gz/download
 RUN tar -xvzf optipng-${OPTIPNG_VERSION}.tar.gz
 WORKDIR /optipng-${OPTIPNG_VERSION}
 RUN ./configure
@@ -282,7 +258,8 @@ RUN apt-get update && apt-get install -y \
     zlib1g-dev \
     libpng-dev
 
-RUN wget -O pngcrush-${PNGCRUSH_VERSION}.tar.gz https://downloads.sourceforge.net/pmt/pngcrush-${PNGCRUSH_VERSION}.tar.gz
+RUN wget -O pngcrush-${PNGCRUSH_VERSION}.tar.gz https://sourceforge.net/projects/pmt/files/pngcrush/${PNGCRUSH_VERSION}/pngcrush-${PNGCRUSH_VERSION}.tar.gz/download || \
+    wget -O pngcrush-${PNGCRUSH_VERSION}.tar.gz https://github.com/glennrp/pngcrush/archive/refs/tags/v${PNGCRUSH_VERSION}.tar.gz
 RUN tar -xvzf pngcrush-${PNGCRUSH_VERSION}.tar.gz
 WORKDIR /pngcrush-${PNGCRUSH_VERSION}
 RUN make
@@ -320,6 +297,37 @@ RUN tar -xvzf libwebp-${WEBP_VERSION}-linux-x86-64.tar.gz
 RUN cp -R libwebp-${WEBP_VERSION}-linux-x86-64/bin/* /usr/local/bin/
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+# STAGE | IMAGEMAGICK 7+
+# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+FROM base_debian AS imagemagick
+
+ARG IMAGEMAGICK_VERSION
+
+RUN apt-get update && apt-get install -y \
+    libpng-dev \
+    libjpeg-dev \
+    libtiff-dev \
+    libwebp-dev \
+    libheif-dev \
+    libopenjp2-7-dev \
+    libx11-dev \
+    libxext-dev \
+    zlib1g-dev liblcms2-dev \
+    libfontconfig1-dev \
+    libfreetype6-dev \
+    libxml2-dev \
+    libltdl7-dev \
+    ghostscript
+
+RUN wget -O ImageMagick-${IMAGEMAGICK_VERSION}.tar.gz https://github.com/ImageMagick/ImageMagick/archive/${IMAGEMAGICK_VERSION}.tar.gz
+RUN tar -xvzf ImageMagick-${IMAGEMAGICK_VERSION}.tar.gz
+WORKDIR /ImageMagick-${IMAGEMAGICK_VERSION}
+RUN ./configure --with-modules --with-quantum-depth=16 --with-heic=yes --with-webp=yes
+RUN make -j$(nproc)
+RUN make install
+RUN ldconfig /usr/local/lib
+
+# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 # STAGE | MAIN
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 FROM iamteacher/rails-start.main:latest
@@ -351,15 +359,22 @@ COPY --from=jpegarchive  /usr/local/bin/jpeg-recompress  /usr/bin
 COPY --from=libjpeg      /usr/local/bin/jpegtran         /usr/bin
 COPY --from=libjpeg      /usr/local/lib/libjpeg.so.9     /usr/lib
 
-# Copy ImageMagick files
+# Copy ImageMagick binaries
 COPY --from=imagemagick /usr/local/bin/magick /usr/bin/
 COPY --from=imagemagick /usr/local/bin/convert /usr/bin/
 COPY --from=imagemagick /usr/local/bin/identify /usr/bin/
 COPY --from=imagemagick /usr/local/bin/mogrify /usr/bin/
 COPY --from=imagemagick /usr/local/bin/composite /usr/bin/
+
+# Copy ImageMagick libraries and configuration
 COPY --from=imagemagick /usr/local/lib/ /usr/local/lib/
 COPY --from=imagemagick /usr/local/include/ImageMagick-7/ /usr/local/include/ImageMagick-7/
 COPY --from=imagemagick /usr/local/etc/ImageMagick-7/ /usr/local/etc/ImageMagick-7/
+
+# Copy ImageMagick runtime dependencies from imagemagick stage
+# Support multiple architectures
+COPY --from=imagemagick /lib/*/libltdl.so.7 /lib/
+COPY --from=imagemagick /lib/*/libgomp.so.1 /lib/
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 # Install additional packages for media processing:
@@ -367,9 +382,7 @@ COPY --from=imagemagick /usr/local/etc/ImageMagick-7/ /usr/local/etc/ImageMagick
 # Video/Audio tools:
 #   - ffmpeg: Multimedia framework for handling video, audio, and other multimedia files
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-RUN rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/* && \
-    apt-get update && \
-    apt-get install -y \
+RUN apt-get update && apt-get install --no-install-recommends -y \
     ffmpeg \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
@@ -388,11 +401,6 @@ COPY checks/image_processors.sh /root/image_processors.sh
 COPY checks/image_processors.sh /home/rails/image_processors.sh
 RUN chown rails:rails /home/rails/image_processors.sh
 
-# copy ruby environment check script
-COPY checks/ruby-env.sh /root/ruby-env.sh
-COPY checks/ruby-env.sh /home/rails/ruby-env.sh
-RUN chown rails:rails /home/rails/ruby-env.sh
-
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 # FINAL CONFIGURATION
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -401,6 +409,5 @@ RUN chown rails:rails /home/rails/ruby-env.sh
 USER rails:rails
 WORKDIR /home/rails/app
 
-# Default command
-CMD ["bash"]
-
+# Default shell command
+CMD ["/bin/bash", "-c", "-l"]

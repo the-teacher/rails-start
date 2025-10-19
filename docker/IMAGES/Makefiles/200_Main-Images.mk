@@ -155,6 +155,7 @@ main-images-buildx:
 		--builder rails-start-builder \
 		-f $(MAIN_DOCKERFILE) \
 		--platform linux/arm64,linux/amd64 \
+		--progress=plain \
 		-t $(MAIN_IMAGE_NAME):latest \
 		.
 
@@ -165,6 +166,7 @@ main-images-buildx-push:
 		--builder rails-start-builder \
 		-f $(MAIN_DOCKERFILE) \
 		--platform linux/arm64,linux/amd64 \
+		--progress=plain \
 		-t $(MAIN_IMAGE_NAME):latest \
 		--push \
 		.

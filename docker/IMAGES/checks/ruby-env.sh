@@ -83,6 +83,20 @@ check_yjit_status() {
     ruby -e 'puts RubyVM::YJIT.enabled? rescue puts "YJIT not available in this Ruby version"'
 }
 
+# Check jemalloc status
+check_jemalloc_status() {
+    section_header "jemalloc Status" "green"
+
+    # Check environment variable
+    echo "Environment variables:"
+    echo "LD_PRELOAD: ${LD_PRELOAD:-Not set}"
+
+    # Check if jemalloc is actually loaded
+    echo ""
+    echo "jemalloc loaded in current Ruby process:"
+    ruby -e 'maps = File.read("/proc/self/maps") rescue ""; puts maps.include?("jemalloc") ? "[OK] jemalloc is loaded" : "[FAIL] jemalloc is NOT loaded"'
+}
+
 # Main function
 main() {
     section_header "Ruby Environment Check" "blue"
@@ -92,6 +106,7 @@ main() {
     check_bundler_version
     check_rails_version
     check_yjit_status
+    check_jemalloc_status
     
     section_header "Check Complete" "blue"
 }

@@ -175,6 +175,9 @@ RUN ~/.rbenv/shims/gem update --system ${DEFAULT_GEM_VERSION}
 # Install default Ruby on Rails
 RUN ~/.rbenv/shims/gem install rails --no-document
 
+# Copy Ruby environment check script to rails user home directory
+COPY --chown=rails:rails checks/ruby-env.sh /home/rails/ruby-env.sh
+
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 # Create app directory
