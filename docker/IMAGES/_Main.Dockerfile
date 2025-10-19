@@ -110,6 +110,7 @@ USER rails:rails
 ARG RUBY_VERSION=3.4.7
 # https://rubygems.org/gems/rubygems-update/versions
 ARG DEFAULT_GEM_VERSION=3.7.2
+
 # https://nodejs.org/en/download
 ARG NODE_VERSION=22.20.0
 # https://www.npmjs.com/package/npm
@@ -118,10 +119,11 @@ ARG NPM_VERSION=11.6.1
 ARG NVM_VERSION=0.40.3
 
 ENV RUBY_VERSION=${RUBY_VERSION}
+ENV DEFAULT_GEM_VERSION=${DEFAULT_GEM_VERSION}
+
 ENV NVM_VERSION=${NVM_VERSION}
 ENV NPM_VERSION=${NPM_VERSION}
 ENV NODE_VERSION=${NODE_VERSION}
-ENV DEFAULT_GEM_VERSION=${DEFAULT_GEM_VERSION}
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 # NODE.JS (Local version for rails user)

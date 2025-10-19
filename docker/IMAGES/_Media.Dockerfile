@@ -258,8 +258,7 @@ RUN apt-get update && apt-get install -y \
     zlib1g-dev \
     libpng-dev
 
-RUN wget -O pngcrush-${PNGCRUSH_VERSION}.tar.gz https://sourceforge.net/projects/pmt/files/pngcrush/${PNGCRUSH_VERSION}/pngcrush-${PNGCRUSH_VERSION}.tar.gz/download || \
-    wget -O pngcrush-${PNGCRUSH_VERSION}.tar.gz https://github.com/glennrp/pngcrush/archive/refs/tags/v${PNGCRUSH_VERSION}.tar.gz
+RUN wget -O pngcrush-${PNGCRUSH_VERSION}.tar.gz https://sourceforge.net/projects/pmt/files/pngcrush/${PNGCRUSH_VERSION}/pngcrush-${PNGCRUSH_VERSION}.tar.gz/download
 RUN tar -xvzf pngcrush-${PNGCRUSH_VERSION}.tar.gz
 WORKDIR /pngcrush-${PNGCRUSH_VERSION}
 RUN make

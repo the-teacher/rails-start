@@ -37,7 +37,6 @@ ARG BUILDPLATFORM
 ENV TARGETARCH=${TARGETARCH}
 ENV BUILDPLATFORM=${BUILDPLATFORM}
 
-
 RUN echo "$BUILDPLATFORM" > /BUILDPLATFORM
 RUN echo "$TARGETARCH" > /TARGETARCH
 
@@ -105,30 +104,3 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 SHELL ["/bin/bash", "--login", "-c"]
-
-# https://nodejs.org/en/download
-# ARG NODE_VERSION=22.20.0
-# https://www.npmjs.com/package/npm
-# ARG NPM_VERSION=11.6.1
-# https://github.com/nvm-sh/nvm/releases
-# ARG NVM_VERSION=0.40.3
-# ENV NODE_VERSION=${NODE_VERSION}
-# ENV NPM_VERSION=${NPM_VERSION}
-# ENV NVM_VERSION=${NVM_VERSION}
-
-# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-# NODE.JS (Global version for all users)
-# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
-# ENV NVM_DIR="/opt/.nvm"
-# RUN mkdir -p /opt/.nvm
-
-# RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v${NVM_VERSION}/install.sh | bash
-# RUN . "$NVM_DIR/nvm.sh" && nvm install ${NODE_VERSION}
-# RUN . "$NVM_DIR/nvm.sh" && nvm use ${NODE_VERSION}
-# RUN . "$NVM_DIR/nvm.sh" && npm install -g npm@${NPM_VERSION}
-# RUN . "$NVM_DIR/nvm.sh" && npm install -g yarn@latest
-# RUN . "$NVM_DIR/nvm.sh" && npm install -g svgo
-
-# Add NVM binaries to PATH
-# ENV PATH="/opt/.nvm/versions/node/v${NODE_VERSION}/bin:${PATH}"
