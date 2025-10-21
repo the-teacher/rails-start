@@ -2,7 +2,10 @@ services:
   rails_app:
     tty: true
     stdin_open: true
-    image: iamteacher/rails-start.main:latest
+    # image: iamteacher/rails-start.main:latest
+    image: iamteacher/rails-start.main:arm64
+    container_name: rails-app
+    hostname: rails-app
     env_file:
       - ../ENV/local/.env.${RAILS_ENV:-development}
     environment:
@@ -13,3 +16,9 @@ services:
       - ../__RailsApp__:/home/rails/RailsApp
     working_dir: /home/rails/RailsApp
     command: sleep infinity
+    networks:
+      - rails-test-network
+
+networks:
+  rails-test-network:
+    external: true

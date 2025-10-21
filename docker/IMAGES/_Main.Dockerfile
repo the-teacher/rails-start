@@ -19,7 +19,8 @@
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 # Using base image instead of Ubuntu
-FROM iamteacher/rails-start.base:latest
+# FROM iamteacher/rails-start.base:latest
+FROM iamteacher/rails-start.base:arm64
 
 # Install common packages as root
 USER root

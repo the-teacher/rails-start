@@ -1,0 +1,31 @@
+services:
+  debian-server:
+    privileged: true
+    build:
+      context: ..
+      dockerfile: docker/Debian.SSH.Dockerfile
+    container_name: debian-test-server
+    hostname: debian-server
+    environment:
+      - DEBIAN_FRONTEND=noninteractive
+      - HISTFILE=/root/.bash_history
+      - HISTSIZE=1000
+      - HISTFILESIZE=2000
+    ports:
+      - "2222:22"
+      - "8080:80"
+      - "8443:443"
+    volumes:
+      - ../../logs:/var/log/app
+      - ../../logs/.bash_history:/root/.bash_history
+      - docker-data:/var/lib/docker
+    networks:
+      - rails-test-network
+
+# To resole a file system limitation issue with Docker in Docker
+volumes:
+  docker-data:
+
+networks:
+  rails-test-network:
+    external: true
