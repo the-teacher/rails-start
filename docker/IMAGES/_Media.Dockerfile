@@ -406,7 +406,7 @@ RUN chown rails:rails /home/rails/image_processors.sh
 
 # Switch back to rails user
 USER rails:rails
-WORKDIR /home/rails/app
+WORKDIR /home/rails/RailsApp
 
 # Default shell command
 CMD ["/bin/bash", "-c", "-l"]

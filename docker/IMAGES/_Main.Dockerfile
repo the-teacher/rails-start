@@ -183,7 +183,7 @@ COPY --chown=rails:rails checks/ruby-env.sh /home/rails/ruby-env.sh
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 # Create app directory
-RUN mkdir -p /home/rails/app
+RUN mkdir -p /home/rails/RailsApp
 
 # YJIT is a new JIT compiler for Ruby that can significantly improve performance
 # Enable YJIT (Ruby's Just-In-Time compiler) for better performance
@@ -200,7 +200,7 @@ ENV EDITOR="vim"
 ENV LD_PRELOAD="/usr/lib/libjemalloc.so.2"
 
 # Working directory
-WORKDIR /home/rails/app
+WORKDIR /home/rails/RailsApp
 
 # Default shell command
 CMD ["/bin/bash", "-c", "-l"]

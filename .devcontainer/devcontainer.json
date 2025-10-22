@@ -3,7 +3,7 @@
 
   "service": "rails_app",
   "dockerComposeFile": "../docker/docker-compose.yml",
-  "workspaceFolder": "/home/rails/app",
+  "workspaceFolder": "/home/rails/RailsApp",
 
   "customizations": {
     "vscode": {

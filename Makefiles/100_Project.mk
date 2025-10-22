@@ -65,7 +65,7 @@ project-setup-irb-config:
 	@echo "" > __RailsApp__/tmp/.irbrc
 	@echo "# IRB Configuration" >> __RailsApp__/tmp/.irbrc
 	@echo "# See ENV: IRBRC" >> __RailsApp__/tmp/.irbrc
-	@echo "IRB.conf[:HISTORY_FILE] = '/home/rails/app/tmp/.irb_history'" >> __RailsApp__/tmp/.irbrc
+	@echo "IRB.conf[:HISTORY_FILE] = '/home/rails/RailsApp/tmp/.irb_history'" >> __RailsApp__/tmp/.irbrc
 	@echo "IRB.conf[:SAVE_HISTORY] = 1000" >> __RailsApp__/tmp/.irbrc
 	@echo "IRB.conf[:AUTO_INDENT] = true" >> __RailsApp__/tmp/.irbrc
 

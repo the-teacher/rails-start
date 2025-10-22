@@ -10,6 +10,6 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ../__RailsApp__:/home/rails/app
-    working_dir: /home/rails/app
+      - ../__RailsApp__:/home/rails/RailsApp
+    working_dir: /home/rails/RailsApp
     command: sleep infinity

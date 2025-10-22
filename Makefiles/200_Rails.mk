@@ -51,6 +51,9 @@ rails-start:
 	docker compose -f $(COMPOSE_FILE) exec rails_app make db-migrate
 	make rails-server-daemon
 
+rails-shell:
+	make shell
+	
 rails-stop:
 	docker compose -f $(COMPOSE_FILE) exec rails_app make stop
 
