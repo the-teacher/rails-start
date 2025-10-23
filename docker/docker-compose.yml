@@ -14,6 +14,7 @@ services:
       - "3000:3000"
     volumes:
       - ../__RailsApp__:/home/rails/RailsApp
+      - ../__KAMAL__:/home/rails/Kamal
     working_dir: /home/rails/RailsApp
     command: sleep infinity
     networks:

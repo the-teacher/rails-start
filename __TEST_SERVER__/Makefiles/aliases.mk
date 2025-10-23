@@ -39,9 +39,8 @@ shell:
 	make server-shell
 
 # Connect via SSH (using keys)
-# Usage: make ssh USER=root|rails
 ssh:
-	make ssh-keys-connect USER=$(USER)
+	make server-ssh
 
 # Build server image
 build:
