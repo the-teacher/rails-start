@@ -11,7 +11,6 @@
 include ./Makefiles/100_Project.mk
 include ./Makefiles/200_Rails.mk
 include ./Makefiles/300_Production.mk
-include ./Makefiles/400_Test_Server.mk
 
 # Main help command for internal commands
 help:
