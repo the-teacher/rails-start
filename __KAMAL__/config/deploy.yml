@@ -7,10 +7,10 @@ image: my-user/my-app
 # Deploy to these servers.
 servers:
   web:
-    - 192.168.0.1
+    - debian-test-server
   # job:
   #   hosts:
-  #     - 192.168.0.1
+  #     - debian-test-server
   #   cmd: bin/jobs
 
 # Enable SSL auto certification via Let's Encrypt and allow for multiple apps on a single web server.
@@ -36,7 +36,7 @@ registry:
 
 # Configure builder setup.
 builder:
-  arch: amd64
+  arch: arm64
   # Pass in additional build args needed for your Dockerfile.
   # args:
   #   RUBY_VERSION: <%= ENV["RBENV_VERSION"] || ENV["rvm_ruby_string"] || "#{RUBY_ENGINE}-#{RUBY_ENGINE_VERSION}" %>
@@ -56,10 +56,8 @@ builder:
 #   shell: app exec --interactive --reuse "bash"
 
 # Use a different ssh user than root
-#
-# ssh:
-#   user: app
-
+ssh:
+  user: root
 # Use a persistent storage volume.
 #
 # volumes:
