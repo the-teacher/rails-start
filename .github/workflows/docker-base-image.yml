@@ -1,0 +1,80 @@
+name: Build and Push Base Docker Image
+
+on:
+  push:
+    branches: ["main", "master"]
+    paths:
+      - "docker/IMAGES/_Base.Dockerfile"
+      - ".github/workflows/docker-base-image.yml"
+  pull_request:
+    branches: ["main", "master"]
+    paths:
+      - "docker/IMAGES/_Base.Dockerfile"
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository_owner }}/rails-start.base
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Setup QEMU for multi-arch builds support
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      # Setup Docker Buildx for multi-platform builds
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Login to GitHub Container Registry
+      - name: Log in to GitHub Container Registry
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Generate image tags
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      # Build and push image for multi-arch
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./docker/IMAGES
+          file: ./docker/IMAGES/_Base.Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # Output information after successful build
+      - name: Image built successfully
+        if: success()
+        run: |
+          echo "✅ Base image built successfully!"
+          echo "Platforms: linux/amd64, linux/arm64"
+          echo "Tags: ${{ steps.meta.outputs.tags }}"
