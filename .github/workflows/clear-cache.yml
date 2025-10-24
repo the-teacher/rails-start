@@ -13,55 +13,60 @@ jobs:
       actions: write
 
     steps:
-      - name: Clear all caches
+      - name: Get cache list via REST API
+        id: fetch-caches
         run: |
-          echo "🗑️  Fetching all GitHub Actions caches..."
+          echo "🗑️  Fetching all GitHub Actions caches via REST API..."
 
-          # Get total count
-          TOTAL=$(gh actions-cache list -R ${{ github.repository }} --json id --jq '. | length')
+          RESPONSE=$(curl -s \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/caches")
+
+          TOTAL=$(echo "$RESPONSE" | jq '.total_count')
           echo "Found $TOTAL cache entries"
+          echo "caches_json=$RESPONSE" >> $GITHUB_OUTPUT
 
-          # Delete all caches in batches
-          PAGE=1
-          BATCH_SIZE=100
-          while [ $PAGE -le 10 ]; do
-            echo "Processing batch $PAGE..."
-            CACHES=$(gh actions-cache list -R ${{ github.repository }} \
-              --limit $BATCH_SIZE \
-              --sort created-at \
-              --direction desc \
-              --json id \
-              --jq -r '.[].id')
-            
-            if [ -z "$CACHES" ]; then
-              echo "No more caches to delete"
-              break
+      - name: Delete all caches via REST API
+        if: fromJson(steps.fetch-caches.outputs.caches_json).total_count > 0
+        run: |
+          echo "Deleting all caches..."
+
+          CACHES='${{ steps.fetch-caches.outputs.caches_json }}'
+
+          echo "$CACHES" | jq -r '.actions_caches[] | .key' | while read CACHE_KEY; do
+            if [ ! -z "$CACHE_KEY" ]; then
+              echo "  → Deleting cache: $CACHE_KEY"
+              
+              curl -s -X DELETE \
+                -H "Accept: application/vnd.github+json" \
+                -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+                -H "X-GitHub-Api-Version: 2022-11-28" \
+                "https://api.github.com/repos/${{ github.repository }}/actions/caches?key=$CACHE_KEY" \
+                | jq -r '.total_count // "deleted"' || true
             fi
-            
-            echo "$CACHES" | while read CACHE_ID; do
-              if [ ! -z "$CACHE_ID" ]; then
-                echo "  → Deleting cache ID: $CACHE_ID"
-                gh actions-cache delete $CACHE_ID -R ${{ github.repository }} --confirm || true
-              fi
-            done
-            
-            PAGE=$((PAGE + 1))
           done
 
-          echo "✅ Cache cleanup completed!"
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          echo "✅ Cache deletion completed!"
 
-      - name: Verify cache status
+      - name: Verify cache cleared
         run: |
-          echo "📊 Remaining cache entries:"
-          COUNT=$(gh actions-cache list -R ${{ github.repository }} --json id --jq '. | length')
-          echo "Total caches: $COUNT"
+          echo "📊 Verifying cache status..."
 
-          if [ $COUNT -gt 0 ]; then
+          RESPONSE=$(curl -s \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/caches")
+
+          REMAINING=$(echo "$RESPONSE" | jq '.total_count')
+          echo "Remaining caches: $REMAINING"
+
+          if [ "$REMAINING" -gt 0 ]; then
             echo ""
-            echo "Sample of remaining caches:"
-            gh actions-cache list -R ${{ github.repository }} --limit 5 --sort created-at --direction desc
+            echo "Sample of remaining caches (first 5):"
+            echo "$RESPONSE" | jq '.actions_caches[] | {key: .key, size_bytes: .size_in_bytes, created_at: .created_at}' | head -30
+          else
+            echo "✅ All caches successfully cleared!"
           fi
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
