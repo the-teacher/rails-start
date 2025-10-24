@@ -43,6 +43,8 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ env.BASE_IMAGE_NAME }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           labels: |
             org.opencontainers.image.title=Rails Start Base
             org.opencontainers.image.description=Base Image with common software for Rails development
@@ -91,6 +93,8 @@ jobs:
           tags: ${{ env.MAIN_IMAGE_NAME }}:latest
           build-args: |
             BASE_IMAGE=${{ env.BASE_IMAGE_NAME }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           labels: |
             org.opencontainers.image.title=Rails Start Main
             org.opencontainers.image.description=Main Rails Image with Ruby, Node.js and common tools
@@ -139,6 +143,8 @@ jobs:
           tags: ${{ env.MEDIA_IMAGE_NAME }}:latest
           build-args: |
             BASE_IMAGE=${{ env.MAIN_IMAGE_NAME }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           labels: |
             org.opencontainers.image.title=Rails Start Media
             org.opencontainers.image.description=Media Image with image and video processing tools
