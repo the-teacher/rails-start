@@ -1,0 +1,36 @@
+name: Clear GitHub Actions Cache
+
+# Manual trigger only
+on:
+  workflow_dispatch:
+
+jobs:
+  clear-cache:
+    name: Clear Cache
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write
+
+    steps:
+      - name: Clear cache
+        run: |
+          echo "🗑️  Clearing GitHub Actions cache..."
+          
+          # Get all cache keys
+          gh actions-cache list -R ${{ github.repository }} --sort created-at --direction desc | cut -f 1 | while read key
+          do
+            echo "Deleting cache key: $key"
+            gh actions-cache delete "$key" -R ${{ github.repository }} --confirm
+          done
+          
+          echo "✅ Cache cleared successfully!"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verify cache is empty
+        run: |
+          echo "Remaining cache entries:"
+          gh actions-cache list -R ${{ github.repository }} || echo "No caches found"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
