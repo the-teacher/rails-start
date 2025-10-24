@@ -74,6 +74,10 @@ coverage
 
 /node_modules
 
+# Kamal playground from rails8/kamal branch
+# You may need to remove it if you are planning to merge kamal into your project
+/__KAMAL__
+
 # __RailsApp__
 
 __RailsApp__/vendor/bundle

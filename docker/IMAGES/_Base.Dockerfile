@@ -49,6 +49,8 @@ RUN echo "$TARGETARCH" > /TARGETARCH
 #   - curl: Command line for transferring data with URL syntax
 #   - telnet: Telnet client for network debugging
 #   - net-tools: Network utilities (netstat)
+#   - dnsutils: DNS utilities (dig, nslookup)
+#   - openssh-client: SSH client for remote connections
 #   - bash: Bourne Again SHell
 #   - vim: Improved vi text editor
 #   - nano: Simple text editor
@@ -76,6 +78,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     telnet \
     net-tools \
+    dnsutils \
+    openssh-client \
     # Shell
     bash \
     # Text editors
