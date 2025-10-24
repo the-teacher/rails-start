@@ -20,15 +20,15 @@ Media (linux/amd64, linux/arm64)
 
 Each workflow has a `check-*` job that verifies the upstream workflow completed successfully.
 
-| Workflow                           | Trigger                          | What it does       | Registry   |
-| ---------------------------------- | -------------------------------- | ------------------ | ---------- |
-| `docker-base-image.yml`            | Push/PR + manual                 | Base amd64, arm64  | GHCR       |
-| `docker-base-dockerhub.yml`        | Manual only                      | Base amd64, arm64  | Docker Hub |
-| `docker-main-image.yml`            | workflow_run(Base) + push/manual | Main amd64, arm64  | GHCR       |
-| `docker-main-dockerhub.yml`        | Manual only                      | Main amd64, arm64  | Docker Hub |
-| `docker-media-image.yml`           | workflow_run(Main) + push/manual | Media amd64, arm64 | GHCR       |
-| `docker-media-dockerhub.yml`       | Manual only                      | Media amd64, arm64 | Docker Hub |
-| `docker-update-all-images-dockerhub.yml` | Manual only (sequential)  | Base → Main → Media | Docker Hub |
+| Workflow                                 | Trigger                          | What it does        | Registry   |
+| ---------------------------------------- | -------------------------------- | ------------------- | ---------- |
+| `docker-base-image.yml`                  | Push/PR + manual                 | Base amd64, arm64   | GHCR       |
+| `docker-base-dockerhub.yml`              | Manual only                      | Base amd64, arm64   | Docker Hub |
+| `docker-main-image.yml`                  | workflow_run(Base) + push/manual | Main amd64, arm64   | GHCR       |
+| `docker-main-dockerhub.yml`              | Manual only                      | Main amd64, arm64   | Docker Hub |
+| `docker-media-image.yml`                 | workflow_run(Main) + push/manual | Media amd64, arm64  | GHCR       |
+| `docker-media-dockerhub.yml`             | Manual only                      | Media amd64, arm64  | Docker Hub |
+| `docker-update-all-images-dockerhub.yml` | Manual only (sequential)         | Base → Main → Media | Docker Hub |
 
 ## 🏗️ Architectures
 
