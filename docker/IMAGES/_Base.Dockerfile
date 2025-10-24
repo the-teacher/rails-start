@@ -1,9 +1,13 @@
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+# Dockerhub: https://hub.docker.com/r/iamteacher/rails-start.base/tags
+# GitHub Container Registry: https://github.com/the-teacher/rails-start/pkgs/container/rails-start.base
+# =-0-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 # Name: rails-start.base
 # Description: Base Image with the most common software
 # 
 # Visit: https://github.com/the-teacher/rails-start
-# Dockerhub: https://hub.docker.com/r/iamteacher/rails-start.base/tags
 # Author: Ilya Zykin (https://github.com/the-teacher)
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 

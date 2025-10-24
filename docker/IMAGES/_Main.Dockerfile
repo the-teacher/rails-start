@@ -1,9 +1,13 @@
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+# Dockerhub: https://hub.docker.com/r/iamteacher/rails-start.main/tags
+# GitHub Container Registry: https://github.com/the-teacher/rails-start/pkgs/container/rails-start.main
+# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 # Name: rails-start.main
 # Description: Main Rails Image with additional software
 # 
 # Visit: https://github.com/the-teacher/rails-start
-# Dockerhub: https://hub.docker.com/r/iamteacher/rails-start.main/tags
 # Author: Ilya Zykin (https://github.com/the-teacher)
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
@@ -18,8 +22,13 @@
 # ⭐ Support the project - leave your stars on GitHub and tell your colleagues!
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
+# Base image argument - allows switching between GHCR and Docker Hub
+# Default: iamteacher/rails-start.base:latest (Docker Hub)
+# Alternative: ghcr.io/the-teacher/rails-start.base:latest (GitHub Container Registry)
+ARG BASE_IMAGE=iamteacher/rails-start.base:latest
+
 # Using base image instead of Ubuntu
-FROM iamteacher/rails-start.base:latest
+FROM ${BASE_IMAGE}
 
 # Install common packages as root
 USER root
@@ -112,9 +121,9 @@ ARG RUBY_VERSION=3.4.7
 ARG DEFAULT_GEM_VERSION=3.7.2
 
 # https://nodejs.org/en/download
-ARG NODE_VERSION=22.20.0
+ARG NODE_VERSION=22.21.0
 # https://www.npmjs.com/package/npm
-ARG NPM_VERSION=11.6.1
+ARG NPM_VERSION=11.6.2
 # https://github.com/nvm-sh/nvm/releases
 ARG NVM_VERSION=0.40.3
 

@@ -1,4 +1,4 @@
-name: Build and Push Base Image to Docker Hub
+name: Build and Push Main Image to Docker Hub
 
 # Triggered only on manual run (workflow_dispatch)
 on:
@@ -8,9 +8,17 @@ on:
         description: "Tag for the image (e.g., v1.0.0, latest)"
         required: true
         default: "latest"
+      base_image_source:
+        description: "Base image source"
+        required: true
+        default: "dockerhub"
+        type: choice
+        options:
+          - dockerhub
+          - ghcr
 
 env:
-  IMAGE_NAME: iamteacher/rails-start.base
+  IMAGE_NAME: iamteacher/rails-start.main
 
 jobs:
   build:
@@ -37,6 +45,18 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_TOKEN }}
 
+      # Determine base image source
+      - name: Determine base image source
+        id: base_image
+        run: |
+          if [[ "${{ github.event.inputs.base_image_source }}" == "ghcr" ]]; then
+            BASE_IMAGE="ghcr.io/the-teacher/rails-start.base:latest"
+          else
+            BASE_IMAGE="iamteacher/rails-start.base:latest"
+          fi
+          echo "base_image=${BASE_IMAGE}" >> $GITHUB_OUTPUT
+          echo "Using base image: ${BASE_IMAGE}"
+
       # Determine tags based on manual input
       - name: Determine tags
         id: tags
@@ -50,13 +70,15 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: ./docker/IMAGES
-          file: ./docker/IMAGES/_Base.Dockerfile
+          file: ./docker/IMAGES/_Main.Dockerfile
           platforms: linux/amd64,linux/arm64,linux/arm/v7
           push: true
           tags: ${{ steps.tags.outputs.tags }}
+          build-args: |
+            BASE_IMAGE=${{ steps.base_image.outputs.base_image }}
           labels: |
-            org.opencontainers.image.title=Rails Start Base
-            org.opencontainers.image.description=Base Image with common software for Rails development
+            org.opencontainers.image.title=Rails Start Main
+            org.opencontainers.image.description=Main Rails Image with Ruby, Node.js and common tools
             org.opencontainers.image.source=${{ github.repository }}
             org.opencontainers.image.revision=${{ github.sha }}
 
@@ -64,6 +86,7 @@ jobs:
       - name: Image pushed successfully
         if: success()
         run: |
-          echo "✅ Base image pushed to Docker Hub!"
-          echo "Platforms: linux/amd64, linux/arm64"
+          echo "✅ Main image pushed to Docker Hub!"
+          echo "Base image: ${{ steps.base_image.outputs.base_image }}"
+          echo "Platforms: linux/amd64, linux/arm64, linux/arm/v7"
           echo "Tags: ${{ steps.tags.outputs.tags }}"

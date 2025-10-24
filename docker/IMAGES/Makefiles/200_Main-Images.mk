@@ -18,12 +18,24 @@
 MAIN_DOCKERFILE = ./_Main.Dockerfile
 MAIN_IMAGE_NAME = iamteacher/rails-start.main
 
+# Base image source (can be 'dockerhub' or 'ghcr')
+# dockerhub: iamteacher/rails-start.base:latest (Docker Hub)
+# ghcr: ghcr.io/the-teacher/rails-start.base:latest (GitHub Container Registry)
+BASE_IMAGE_SOURCE ?= dockerhub
+
+ifeq ($(BASE_IMAGE_SOURCE), ghcr)
+  BASE_IMAGE = ghcr.io/the-teacher/rails-start.base:latest
+else
+  BASE_IMAGE = iamteacher/rails-start.base:latest
+endif
+
 # Build main image for ARM64
 main-image-arm64-build:
 	docker build \
 		-t $(MAIN_IMAGE_NAME):arm64 \
 		-f $(MAIN_DOCKERFILE) \
 		--platform linux/arm64 \
+		--build-arg BASE_IMAGE=$(BASE_IMAGE) \
 		.
 
 # Build main image for AMD64
@@ -32,6 +44,7 @@ main-image-amd64-build:
 		-t $(MAIN_IMAGE_NAME):amd64 \
 		-f $(MAIN_DOCKERFILE) \
 		--platform linux/amd64 \
+		--build-arg BASE_IMAGE=$(BASE_IMAGE) \
 		.
 
 # Build main images for all platforms
@@ -156,6 +169,7 @@ main-images-buildx:
 		-f $(MAIN_DOCKERFILE) \
 		--platform linux/arm64,linux/amd64 \
 		--progress=plain \
+		--build-arg BASE_IMAGE=$(BASE_IMAGE) \
 		-t $(MAIN_IMAGE_NAME):latest \
 		.
 
@@ -167,6 +181,7 @@ main-images-buildx-push:
 		-f $(MAIN_DOCKERFILE) \
 		--platform linux/arm64,linux/amd64 \
 		--progress=plain \
+		--build-arg BASE_IMAGE=$(BASE_IMAGE) \
 		-t $(MAIN_IMAGE_NAME):latest \
 		--push \
 		.
@@ -181,6 +196,11 @@ main-images-help:
 	@echo "=============================================================="
 	@echo "Main image building commands:"
 	@echo "=============================================================="
+	@echo ""
+	@echo "Base image selection (set BASE_IMAGE_SOURCE):"
+	@echo "  make main-image-arm64-build BASE_IMAGE_SOURCE=dockerhub"
+	@echo "  make main-image-arm64-build BASE_IMAGE_SOURCE=ghcr"
+	@echo ""
 	@echo "Single architecture commands (main-image-*):"
 	@echo "  make main-image-arm64-build         - Build main image for ARM64"
 	@echo "  make main-image-amd64-build         - Build main image for AMD64"
@@ -209,4 +229,8 @@ main-images-help:
 	@echo "Complete workflow:"
 	@echo "  make main-images-update             - Build, push images and manifest (classic)"
 	@echo "  make main-images-buildx-update      - Build and push multi-arch image (modern)"
+	@echo ""
+	@echo "Environment variables:"
+	@echo "  BASE_IMAGE_SOURCE=dockerhub         - Use Docker Hub base image (default)"
+	@echo "  BASE_IMAGE_SOURCE=ghcr              - Use GitHub Container Registry base image"
 	@echo "=============================================================="

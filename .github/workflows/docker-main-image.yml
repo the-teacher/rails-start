@@ -1,20 +1,30 @@
-name: Build and Push Base Docker Image
+name: Build and Push Main Docker Image
 
 on:
   push:
     branches: ["main", "master"]
     paths:
-      - "docker/IMAGES/_Base.Dockerfile"
-      - ".github/workflows/docker-base-image.yml"
+      - "docker/IMAGES/_Main.Dockerfile"
+      - ".github/workflows/docker-main-image.yml"
   pull_request:
     branches: ["main", "master"]
     paths:
-      - "docker/IMAGES/_Base.Dockerfile"
+      - "docker/IMAGES/_Main.Dockerfile"
   workflow_dispatch:
+    inputs:
+      base_image_source:
+        description: "Base image source"
+        required: true
+        default: "ghcr"
+        type: choice
+        options:
+          - ghcr
+          - dockerhub
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository_owner }}/rails-start.base
+  IMAGE_NAME: ${{ github.repository_owner }}/rails-start.main
+  DOCKERHUB_IMAGE_NAME: iamteacher/rails-start.main
 
 jobs:
   build:
@@ -35,6 +45,26 @@ jobs:
       # Setup Docker Buildx for multi-platform builds
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+
+      # Determine base image source
+      - name: Determine base image source
+        id: base_image
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            SOURCE="${{ github.event.inputs.base_image_source }}"
+          else
+            # Default to GHCR for automatic pushes
+            SOURCE="ghcr"
+          fi
+
+          if [[ "$SOURCE" == "ghcr" ]]; then
+            BASE_IMAGE="ghcr.io/the-teacher/rails-start.base:latest"
+          else
+            BASE_IMAGE="iamteacher/rails-start.base:latest"
+          fi
+
+          echo "base_image=${BASE_IMAGE}" >> $GITHUB_OUTPUT
+          echo "Using base image: ${BASE_IMAGE}"
 
       # Login to GitHub Container Registry
       - name: Log in to GitHub Container Registry
@@ -62,11 +92,13 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: ./docker/IMAGES
-          file: ./docker/IMAGES/_Base.Dockerfile
+          file: ./docker/IMAGES/_Main.Dockerfile
           platforms: linux/amd64,linux/arm64,linux/arm/v7
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            BASE_IMAGE=${{ steps.base_image.outputs.base_image }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           provenance: false
@@ -75,6 +107,7 @@ jobs:
       - name: Image built successfully
         if: success()
         run: |
-          echo "✅ Base image built successfully!"
-          echo "Platforms: linux/amd64, linux/arm64"
+          echo "✅ Main image built successfully!"
+          echo "Base image: ${{ steps.base_image.outputs.base_image }}"
+          echo "Platforms: linux/amd64, linux/arm64, linux/arm/v7"
           echo "Tags: ${{ steps.meta.outputs.tags }}"
