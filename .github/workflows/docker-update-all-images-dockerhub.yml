@@ -55,7 +55,10 @@ jobs:
           file: ./docker/IMAGES/_Base.Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ${{ env.BASE_IMAGE_NAME }}:${{ github.event.inputs.base_tag }}
+          tags: |
+            ${{ env.BASE_IMAGE_NAME }}:${{ github.event.inputs.base_tag }}
+            ${{ env.BASE_IMAGE_NAME }}:amd64
+            ${{ env.BASE_IMAGE_NAME }}:arm64
           labels: |
             org.opencontainers.image.title=Rails Start Base
             org.opencontainers.image.description=Base Image with common software for Rails development
@@ -102,7 +105,10 @@ jobs:
           file: ./docker/IMAGES/_Main.Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ${{ env.MAIN_IMAGE_NAME }}:${{ github.event.inputs.main_tag }}
+          tags: |
+            ${{ env.MAIN_IMAGE_NAME }}:${{ github.event.inputs.main_tag }}
+            ${{ env.MAIN_IMAGE_NAME }}:amd64
+            ${{ env.MAIN_IMAGE_NAME }}:arm64
           build-args: |
             BASE_IMAGE=${{ env.BASE_IMAGE_NAME }}:${{ github.event.inputs.base_tag }}
           labels: |
@@ -152,7 +158,10 @@ jobs:
           file: ./docker/IMAGES/_Media.Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ${{ env.MEDIA_IMAGE_NAME }}:${{ github.event.inputs.media_tag }}
+          tags: |
+            ${{ env.MEDIA_IMAGE_NAME }}:${{ github.event.inputs.media_tag }}
+            ${{ env.MEDIA_IMAGE_NAME }}:amd64
+            ${{ env.MEDIA_IMAGE_NAME }}:arm64
           build-args: |
             BASE_IMAGE=${{ env.MAIN_IMAGE_NAME }}:${{ github.event.inputs.main_tag }}
           labels: |
