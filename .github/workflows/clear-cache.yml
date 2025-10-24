@@ -18,37 +18,38 @@ jobs:
         run: |
           echo "🗑️  Fetching all GitHub Actions caches via REST API..."
 
-          RESPONSE=$(curl -s \
+          curl -s \
             -H "Accept: application/vnd.github+json" \
             -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
-            "https://api.github.com/repos/${{ github.repository }}/actions/caches")
+            "https://api.github.com/repos/${{ github.repository }}/actions/caches" \
+            > /tmp/caches.json
 
-          TOTAL=$(echo "$RESPONSE" | jq '.total_count')
+          TOTAL=$(jq '.total_count' /tmp/caches.json)
           echo "Found $TOTAL cache entries"
-          echo "caches_json=$RESPONSE" >> $GITHUB_OUTPUT
+          echo "cache_count=$TOTAL" >> $GITHUB_OUTPUT
 
       - name: Delete all caches via REST API
-        if: fromJson(steps.fetch-caches.outputs.caches_json).total_count > 0
+        if: steps.fetch-caches.outputs.cache_count > 0
         run: |
-          echo "Deleting all caches..."
+          echo "🗑️  Deleting all ${{ steps.fetch-caches.outputs.cache_count }} caches..."
 
-          CACHES='${{ steps.fetch-caches.outputs.caches_json }}'
-
-          echo "$CACHES" | jq -r '.actions_caches[] | .key' | while read CACHE_KEY; do
+          DELETED=0
+          jq -r '.actions_caches[] | .key' /tmp/caches.json | while read CACHE_KEY; do
             if [ ! -z "$CACHE_KEY" ]; then
-              echo "  → Deleting cache: $CACHE_KEY"
+              echo "  → Deleting: $CACHE_KEY"
               
               curl -s -X DELETE \
                 -H "Accept: application/vnd.github+json" \
                 -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
                 -H "X-GitHub-Api-Version: 2022-11-28" \
-                "https://api.github.com/repos/${{ github.repository }}/actions/caches?key=$CACHE_KEY" \
-                | jq -r '.total_count // "deleted"' || true
+                "https://api.github.com/repos/${{ github.repository }}/actions/caches?key=$CACHE_KEY"
+              
+              DELETED=$((DELETED + 1))
             fi
           done
 
-          echo "✅ Cache deletion completed!"
+          echo "✅ Deletion completed!"
 
       - name: Verify cache cleared
         run: |
@@ -65,7 +66,7 @@ jobs:
 
           if [ "$REMAINING" -gt 0 ]; then
             echo ""
-            echo "Sample of remaining caches (first 5):"
+            echo "⚠️  Sample of remaining caches (first 5):"
             echo "$RESPONSE" | jq '.actions_caches[] | {key: .key, size_bytes: .size_in_bytes, created_at: .created_at}' | head -30
           else
             echo "✅ All caches successfully cleared!"
