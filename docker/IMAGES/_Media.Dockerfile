@@ -42,6 +42,8 @@ ARG BASE_DEBIAN=debian:bookworm
 
 # https://github.com/shssoichiro/oxipng/releases
 ARG OXIPNG_VERSION=9.1.5
+# https://www.ijg.org/files
+ARG JPEG_VERSION=9f
 # https://github.com/mozilla/mozjpeg/releases
 ARG MOZJPEG_VERSION=4.1.1
 # https://github.com/danielgtaylor/jpeg-archive/releases
