@@ -279,9 +279,11 @@ jobs:
         if: success()
         run: |
           echo "✅ Media image pushed to Docker Hub!"
-          echo "Main image: ${{ env.MAIN_IMAGE_NAME }}:${{ github.event.inputs.main_tag }}"
-          echo "Platforms: linux/amd64, linux/arm64"
-          echo "Tags: ${{ steps.tags.outputs.tags }}"
+          echo "Tags:"
+          echo "  - ${{ env.MEDIA_IMAGE_NAME }}:amd64 (platform-specific)"
+          echo "  - ${{ env.MEDIA_IMAGE_NAME }}:arm64 (platform-specific)"
+          echo "  - ${{ env.MEDIA_IMAGE_NAME }}:${{ github.event.inputs.media_tag }} (multiarch)"
+          echo "  - ${{ env.MEDIA_IMAGE_NAME }}:latest (multiarch)"
 
   # ============================================================
   # Summary
@@ -314,27 +316,4 @@ jobs:
           echo "  - ${{ env.MAIN_IMAGE_NAME }}:latest"
           echo "  - ${{ env.MEDIA_IMAGE_NAME }}:${{ github.event.inputs.media_tag }}"
           echo "  - ${{ env.MEDIA_IMAGE_NAME }}:latest"
-          echo "=========================================="
-
-  # ============================================================
-  # Summary
-  # ============================================================
-  summary:
-    name: Build Summary
-    runs-on: ubuntu-latest
-    needs: [build-base, build-main, build-media]
-    if: always()
-
-    steps:
-      - name: Build complete
-        run: |
-          echo "=========================================="
-          echo "✅ All images built and pushed to Docker Hub!"
-          echo "=========================================="
-          echo ""
-          echo "Base:  ${{ env.BASE_IMAGE_NAME }}:${{ github.event.inputs.base_tag }}"
-          echo "Main:  ${{ env.MAIN_IMAGE_NAME }}:${{ github.event.inputs.main_tag }}"
-          echo "Media: ${{ env.MEDIA_IMAGE_NAME }}:${{ github.event.inputs.media_tag }}"
-          echo ""
-          echo "Platforms: linux/amd64, linux/arm64"
           echo "=========================================="
