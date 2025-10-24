@@ -81,12 +81,21 @@ docker run --rm ghcr.io/the-teacher/rails-start.media:latest ffmpeg -version
 
 ## 🔐 Secrets (for Docker Hub)
 
-If Docker Hub publishing is needed, add to Settings → Secrets:
+To enable Docker Hub publishing:
 
-- `DOCKER_HUB_USERNAME`
-- `DOCKER_HUB_TOKEN` (not password!)
+1. **Get token:** https://app.docker.com/accounts/iamteacher/settings/personal-access-tokens
 
-GHCR uses `GITHUB_TOKEN` (built-in).
+   - Click "New Access Token"
+   - Set type to "Read & Write"
+   - Copy token immediately (won't show again)
+
+2. **Add to GitHub:** https://github.com/the-teacher/rails-start/settings/secrets/actions
+   - Click "New repository secret"
+   - Add `DOCKER_HUB_USERNAME` = your Docker Hub username
+   - Add `DOCKER_HUB_TOKEN` = the token you copied
+   - ⚠️ Use token, not password!
+
+GHCR uses `GITHUB_TOKEN` (built-in, no setup needed).
 
 ## 📋 Tags
 
