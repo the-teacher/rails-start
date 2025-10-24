@@ -20,15 +20,12 @@ Media (linux/amd64, linux/arm64)
 
 Each workflow has a `check-*` job that verifies the upstream workflow completed successfully.
 
-| Workflow                                 | Trigger                          | What it does        | Registry   |
-| ---------------------------------------- | -------------------------------- | ------------------- | ---------- |
-| `docker-base-image.yml`                  | Push/PR + manual                 | Base amd64, arm64   | GHCR       |
-| `docker-base-dockerhub.yml`              | Manual only                      | Base amd64, arm64   | Docker Hub |
-| `docker-main-image.yml`                  | workflow_run(Base) + push/manual | Main amd64, arm64   | GHCR       |
-| `docker-main-dockerhub.yml`              | Manual only                      | Main amd64, arm64   | Docker Hub |
-| `docker-media-image.yml`                 | workflow_run(Main) + push/manual | Media amd64, arm64  | GHCR       |
-| `docker-media-dockerhub.yml`             | Manual only                      | Media amd64, arm64  | Docker Hub |
-| `docker-update-all-images-dockerhub.yml` | Manual only (sequential)         | Base → Main → Media | Docker Hub |
+| Workflow                 | Trigger                          | What it does       | Registry   |
+| ------------------------ | -------------------------------- | ------------------ | ---------- |
+| `docker-base-image.yml`  | Push/PR + manual                 | Base amd64, arm64  | GHCR       |
+| `docker-main-image.yml`  | workflow_run(Base) + push/manual | Main amd64, arm64  | GHCR       |
+| `docker-media-image.yml` | workflow_run(Main) + push/manual | Media amd64, arm64 | GHCR       |
+| `docker-update-all-images.yml` | Manual only (sequential)   | Base → Main → Media (multiarch :latest) | Docker Hub |
 
 ## 🏗️ Architectures
 
@@ -142,9 +139,8 @@ On push to master:
 
 ## 📚 Files
 
-- `.github/workflows/docker-*-image.yml` — GHCR workflows (automatic)
-- `.github/workflows/docker-*-dockerhub.yml` — Docker Hub workflows (manual individual)
-- `.github/workflows/docker-update-all-images-dockerhub.yml` — All-in-one Docker Hub (Base → Main → Media, sequential)
+- `.github/workflows/docker-*-image.yml` — GHCR workflows (automatic on push)
+- `.github/workflows/docker-update-all-images.yml` — Docker Hub manual update (Base → Main → Media, multiarch :latest only)
 - `docker/IMAGES/_Base.Dockerfile` — Base image
 - `docker/IMAGES/_Main.Dockerfile` — Main image (ARG BASE_IMAGE)
 - `docker/IMAGES/_Media.Dockerfile` — Media image (ARG BASE_IMAGE)
