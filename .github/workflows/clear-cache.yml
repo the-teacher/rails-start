@@ -16,14 +16,14 @@ jobs:
       - name: Clear cache
         run: |
           echo "🗑️  Clearing GitHub Actions cache..."
-          
+
           # Get all cache keys
           gh actions-cache list -R ${{ github.repository }} --sort created-at --direction desc | cut -f 1 | while read key
           do
             echo "Deleting cache key: $key"
             gh actions-cache delete "$key" -R ${{ github.repository }} --confirm
           done
-          
+
           echo "✅ Cache cleared successfully!"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
