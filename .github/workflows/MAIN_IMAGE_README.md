@@ -1,6 +1,6 @@
 # Main Rails Docker Image Build Workflows
 
-Two GitHub Actions workflows for automatic building and publishing Main Rails image in multi-arch (ARM64, AMD64, and ARM/v7).
+Two GitHub Actions workflows for automatic building and publishing Main Rails image in multi-arch (ARM64 and AMD64).
 
 ## 🎯 Key Feature: Flexible Base Image Selection
 
@@ -15,15 +15,24 @@ Main image can be built from **two different sources**:
 
 ### 1. `docker-main-image.yml` - GHCR (GitHub Container Registry)
 
-**Triggers:**
+**Triggers (in priority order):**
 
-- 🔄 Push to `main` or `master` branches (if files in `docker/IMAGES/` changed)
-- 🔄 Pull Request to `main` or `master` branches
-- ⚙️ Manual run (workflow_dispatch) - allows selecting base image source
+1. ⏳ **After Base Image Build** (`workflow_run`)
+
+   - Waits for `Build and Push Base Docker Image` to complete successfully
+   - Automatically starts building Main after Base is ready
+   - Ensures Main uses fresh Base image
+
+2. 🔄 **Push to branch** (when Main or workflow files change)
+
+   - Direct trigger if Base hasn't changed
+
+3. ⚙️ **Manual run** (workflow_dispatch)
+   - Choose base image source manually
 
 **What it does:**
 
-- ✅ Builds image for `linux/amd64`, `linux/arm64`, and `linux/arm/v7`
+- ✅ Builds image for `linux/amd64` and `linux/arm64`
 - 📤 Pushes to GitHub Container Registry (ghcr.io)
 - 💾 Caches layers to speed up future builds
 - 🏷️ Automatically generates tags (branch, SHA, latest)
@@ -62,7 +71,7 @@ FROM ghcr.io/the-teacher/rails-start.main:latest
 
 **What it does:**
 
-- ✅ Builds image for `linux/amd64`, `linux/arm64`, and `linux/arm/v7`
+- ✅ Builds image for `linux/amd64` and `linux/arm64`
 - 📤 Pushes to Docker Hub
 - 🔀 Allows choosing base image source (GHCR or Docker Hub)
 
@@ -110,11 +119,10 @@ Uses `${{ secrets.GITHUB_TOKEN }}` - automatically available.
 
 ## 🏗️ Supported Architectures
 
-| Architecture     | Usage                                  |
-| ---------------- | -------------------------------------- |
-| **linux/amd64**  | Intel/AMD 64-bit (desktops, servers)   |
-| **linux/arm64**  | ARM 64-bit (M1/M2 Mac, modern servers) |
-| **linux/arm/v7** | ARM 32-bit (Raspberry Pi, legacy ARM)  |
+| Architecture    | Usage                                  |
+| --------------- | -------------------------------------- |
+| **linux/amd64** | Intel/AMD 64-bit (desktops, servers)   |
+| **linux/arm64** | ARM 64-bit (M1/M2 Mac, modern servers) |
 
 ---
 
@@ -133,18 +141,50 @@ Uses `${{ secrets.GITHUB_TOKEN }}` - automatically available.
 
 ## 🚀 Typical Workflow
 
+### Automatic Build Chain (Recommended)
+
+```
+1. You push changes to docker/IMAGES/_Base.Dockerfile
+   ↓
+2. GitHub automatically triggers Base workflow
+   ↓
+3. Base image builds for arm64 + amd64
+   ↓
+4. Base image pushes to ghcr.io successfully
+   ↓
+5. Main workflow AUTOMATICALLY triggered (workflow_run)
+   ↓
+6. Main image builds using fresh Base image
+   ↓
+7. Main image pushes to ghcr.io
+```
+
+**Result:** Main always uses the latest Base image! ✅
+
 ### Development (GHCR)
 
 ```bash
-# Improve Main Dockerfile
-git commit -am "Add new tools to Main image"
+# Improve Base Dockerfile
+git commit -am "Add new tools to Base image"
 git push origin master
 
-# → GHA automatically (using GHCR base):
-# 1. Pulls ghcr.io/the-teacher/rails-start.base:latest
-# 2. Builds image for arm64 + amd64 + arm/v7
-# 3. Pushes to ghcr.io
-# 4. Caches layers
+# → GHA automatically:
+# 1. Builds Base image for arm64 + amd64
+# 2. Pushes to ghcr.io
+# 3. Main workflow starts automatically
+# 4. Builds Main using new Base
+# 5. Pushes Main to ghcr.io
+```
+
+### Manual Build with specific Base
+
+```bash
+# If you want to rebuild Main with specific Base source:
+# 1. GitHub → Actions
+# 2. "Build and Push Main Docker Image"
+# 3. "Run workflow"
+# 4. Choose Base image source (ghcr or dockerhub)
+# 5. "Run workflow"
 ```
 
 ### Release (Docker Hub)

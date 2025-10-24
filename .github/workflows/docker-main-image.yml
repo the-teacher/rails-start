@@ -1,15 +1,13 @@
 name: Build and Push Main Docker Image
 
 on:
-  push:
+  # Trigger after Base image workflow completes successfully
+  workflow_run:
+    workflows: ["Build and Push Base Docker Image"]
+    types:
+      - completed
     branches: ["main", "master"]
-    paths:
-      - "docker/IMAGES/_Main.Dockerfile"
-      - ".github/workflows/docker-main-image.yml"
-  pull_request:
-    branches: ["main", "master"]
-    paths:
-      - "docker/IMAGES/_Main.Dockerfile"
+  # Also allow manual trigger
   workflow_dispatch:
     inputs:
       base_image_source:
@@ -20,6 +18,16 @@ on:
         options:
           - ghcr
           - dockerhub
+  # Allow manual builds when Base Dockerfile or this workflow changes
+  push:
+    branches: ["main", "master"]
+    paths:
+      - "docker/IMAGES/_Main.Dockerfile"
+      - ".github/workflows/docker-main-image.yml"
+  pull_request:
+    branches: ["main", "master"]
+    paths:
+      - "docker/IMAGES/_Main.Dockerfile"
 
 env:
   REGISTRY: ghcr.io
@@ -27,8 +35,28 @@ env:
   DOCKERHUB_IMAGE_NAME: iamteacher/rails-start.main
 
 jobs:
-  build:
+  check-base:
+    name: Check Base Image Build Status
     runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_run'
+    steps:
+      - name: Verify Base workflow success
+        run: |
+          if [[ "${{ github.event.workflow_run.conclusion }}" != "success" ]]; then
+            echo "❌ Base image build failed or was cancelled"
+            exit 1
+          fi
+          echo "✅ Base image built successfully"
+
+  build:
+    name: Build Main Image
+    runs-on: ubuntu-latest
+    needs: [check-base]
+    if: |
+      always() && (
+        github.event_name != 'workflow_run' ||
+        needs.check-base.result == 'success'
+      )
     permissions:
       contents: read
       packages: write
@@ -93,7 +121,7 @@ jobs:
         with:
           context: ./docker/IMAGES
           file: ./docker/IMAGES/_Main.Dockerfile
-          platforms: linux/amd64,linux/arm64,linux/arm/v7
+          platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
