@@ -29,27 +29,59 @@ jobs:
           echo "Found $TOTAL cache entries"
           echo "cache_count=$TOTAL" >> $GITHUB_OUTPUT
 
-      - name: Delete all caches via REST API
+      - name: Delete all caches via REST API (with retry)
         if: steps.fetch-caches.outputs.cache_count > 0
         run: |
           echo "🗑️  Deleting all ${{ steps.fetch-caches.outputs.cache_count }} caches..."
 
-          DELETED=0
-          jq -r '.actions_caches[] | .key' /tmp/caches.json | while read CACHE_KEY; do
-            if [ ! -z "$CACHE_KEY" ]; then
-              echo "  → Deleting: $CACHE_KEY"
-              
-              curl -s -X DELETE \
-                -H "Accept: application/vnd.github+json" \
-                -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-                -H "X-GitHub-Api-Version: 2022-11-28" \
-                "https://api.github.com/repos/${{ github.repository }}/actions/caches?key=$CACHE_KEY"
-              
-              DELETED=$((DELETED + 1))
+          MAX_ITERATIONS=10
+          ITERATION=1
+
+          while [ $ITERATION -le $MAX_ITERATIONS ]; do
+            echo ""
+            echo "📍 Iteration $ITERATION/$MAX_ITERATIONS"
+            
+            # Fetch current list
+            curl -s \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              "https://api.github.com/repos/${{ github.repository }}/actions/caches" \
+              > /tmp/caches_current.json
+            
+            CURRENT_COUNT=$(jq '.total_count' /tmp/caches_current.json)
+            echo "Current cache count: $CURRENT_COUNT"
+            
+            if [ "$CURRENT_COUNT" -eq 0 ]; then
+              echo "✅ All caches cleared!"
+              exit 0
             fi
+            
+            # Delete all caches in current list
+            DELETED_IN_ITERATION=0
+            jq -r '.actions_caches[] | .key' /tmp/caches_current.json | while read CACHE_KEY; do
+              if [ ! -z "$CACHE_KEY" ]; then
+                echo "  → Deleting: $CACHE_KEY"
+                
+                curl -s -X DELETE \
+                  -H "Accept: application/vnd.github+json" \
+                  -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+                  -H "X-GitHub-Api-Version: 2022-11-28" \
+                  "https://api.github.com/repos/${{ github.repository }}/actions/caches?key=$CACHE_KEY" \
+                  > /dev/null
+                
+                # Small delay to avoid rate limiting
+                sleep 0.1
+              fi
+            done
+            
+            echo "  ⏳ Waiting 2 seconds before next iteration..."
+            sleep 2
+            
+            ITERATION=$((ITERATION + 1))
           done
 
-          echo "✅ Deletion completed!"
+          echo "⚠️  Reached max iterations. Some caches may remain."
 
       - name: Verify cache cleared
         run: |
