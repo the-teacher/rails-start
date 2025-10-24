@@ -1,0 +1,92 @@
+name: Build and Push Media Image to Docker Hub
+
+# Triggered only on manual run (workflow_dispatch)
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag for the image (e.g., v1.0.0, latest)"
+        required: true
+        default: "latest"
+      main_image_source:
+        description: "Main image source"
+        required: true
+        default: "dockerhub"
+        type: choice
+        options:
+          - dockerhub
+          - ghcr
+
+env:
+  IMAGE_NAME: iamteacher/rails-start.media
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Setup QEMU for multi-arch builds support
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      # Setup Docker Buildx for multi-platform builds
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Login to Docker Hub
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_TOKEN }}
+
+      # Determine main image source
+      - name: Determine main image source
+        id: main_image
+        run: |
+          if [[ "${{ github.event.inputs.main_image_source }}" == "ghcr" ]]; then
+            MAIN_IMAGE="ghcr.io/the-teacher/rails-start.main:latest"
+          else
+            MAIN_IMAGE="iamteacher/rails-start.main:latest"
+          fi
+          echo "main_image=${MAIN_IMAGE}" >> $GITHUB_OUTPUT
+          echo "Using main image: ${MAIN_IMAGE}"
+
+      # Determine tags based on manual input
+      - name: Determine tags
+        id: tags
+        run: |
+          TAG=${{ github.event.inputs.tag }}
+          echo "tags=${{ env.IMAGE_NAME }}:${TAG}" >> $GITHUB_OUTPUT
+          echo "Building with tag: ${TAG}"
+
+      # Build and push image for multi-arch
+      - name: Build and push to Docker Hub
+        uses: docker/build-push-action@v6
+        with:
+          context: ./docker/IMAGES
+          file: ./docker/IMAGES/_Media.Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.tags.outputs.tags }}
+          build-args: |
+            BASE_IMAGE=${{ steps.main_image.outputs.main_image }}
+          labels: |
+            org.opencontainers.image.title=Rails Start Media
+            org.opencontainers.image.description=Media Image with image and video processing tools
+            org.opencontainers.image.source=${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+
+      # Output information after successful push
+      - name: Image pushed successfully
+        if: success()
+        run: |
+          echo "✅ Media image pushed to Docker Hub!"
+          echo "Main image: ${{ steps.main_image.outputs.main_image }}"
+          echo "Platforms: linux/amd64, linux/arm64"
+          echo "Tags: ${{ steps.tags.outputs.tags }}"

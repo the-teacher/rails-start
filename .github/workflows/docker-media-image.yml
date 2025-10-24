@@ -1,0 +1,141 @@
+name: Build and Push Media Docker Image
+
+on:
+  # Trigger after Main image workflow completes successfully
+  workflow_run:
+    workflows: ["Build and Push Main Docker Image"]
+    types:
+      - completed
+    branches: ["main", "master"]
+  # Also allow manual trigger
+  workflow_dispatch:
+    inputs:
+      main_image_source:
+        description: "Main image source"
+        required: true
+        default: "ghcr"
+        type: choice
+        options:
+          - ghcr
+          - dockerhub
+  # Allow manual builds when Media Dockerfile or this workflow changes
+  push:
+    branches: ["main", "master"]
+    paths:
+      - "docker/IMAGES/_Media.Dockerfile"
+      - ".github/workflows/docker-media-image.yml"
+  pull_request:
+    branches: ["main", "master"]
+    paths:
+      - "docker/IMAGES/_Media.Dockerfile"
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository_owner }}/rails-start.media
+  DOCKERHUB_IMAGE_NAME: iamteacher/rails-start.media
+
+jobs:
+  check-main:
+    name: Check Main Image Build Status
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_run'
+    steps:
+      - name: Verify Main workflow success
+        run: |
+          if [[ "${{ github.event.workflow_run.conclusion }}" != "success" ]]; then
+            echo "❌ Main image build failed or was cancelled"
+            exit 1
+          fi
+          echo "✅ Main image built successfully"
+
+  build:
+    name: Build Media Image
+    runs-on: ubuntu-latest
+    needs: [check-main]
+    if: |
+      always() && (
+        github.event_name != 'workflow_run' ||
+        needs.check-main.result == 'success'
+      )
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Setup QEMU for multi-arch builds support
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      # Setup Docker Buildx for multi-platform builds
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Determine main image source
+      - name: Determine main image source
+        id: main_image
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            SOURCE="${{ github.event.inputs.main_image_source }}"
+          else
+            # Default to GHCR for automatic pushes
+            SOURCE="ghcr"
+          fi
+
+          if [[ "$SOURCE" == "ghcr" ]]; then
+            MAIN_IMAGE="ghcr.io/the-teacher/rails-start.main:latest"
+          else
+            MAIN_IMAGE="iamteacher/rails-start.main:latest"
+          fi
+
+          echo "main_image=${MAIN_IMAGE}" >> $GITHUB_OUTPUT
+          echo "Using main image: ${MAIN_IMAGE}"
+
+      # Login to GitHub Container Registry
+      - name: Log in to GitHub Container Registry
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Generate image tags
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value={{branch}}
+
+      # Build and push image for multi-arch
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./docker/IMAGES
+          file: ./docker/IMAGES/_Media.Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            BASE_IMAGE=${{ steps.main_image.outputs.main_image }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          provenance: false
+
+      # Output information after successful build
+      - name: Image built successfully
+        if: success()
+        run: |
+          echo "✅ Media image built successfully!"
+          echo "Main image: ${{ steps.main_image.outputs.main_image }}"
+          echo "Platforms: linux/amd64, linux/arm64"
+          echo "Tags: ${{ steps.meta.outputs.tags }}"

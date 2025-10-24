@@ -1,9 +1,13 @@
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+# Dockerhub: https://hub.docker.com/r/iamteacher/rails-start.media/tags
+# GitHub Container Registry: https://ghcr.io/the-teacher/rails-start.media/tags
+# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 # Name: rails-start.media
 # Description: Media Image with additional media software
 # 
 # Visit: https://github.com/the-teacher/rails-start
-# Dockerhub: https://hub.docker.com/r/iamteacher/rails-start.media/tags
 # Author: Ilya Zykin (https://github.com/the-teacher)
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
@@ -18,7 +22,12 @@
 # ⭐ Support the project - leave your stars on GitHub and tell your colleagues!
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-# Ruby version to use
+# Main image argument - allows switching between GHCR and Docker Hub
+# Default: iamteacher/rails-start.main:latest (Docker Hub)
+# Alternative: ghcr.io/the-teacher/rails-start.main:latest (GitHub Container Registry)
+ARG BASE_IMAGE=iamteacher/rails-start.main:latest
+
+# Base Debian version to use
 ARG BASE_DEBIAN=debian:bookworm
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -33,8 +42,6 @@ ARG BASE_DEBIAN=debian:bookworm
 
 # https://github.com/shssoichiro/oxipng/releases
 ARG OXIPNG_VERSION=9.1.5
-# https://www.ijg.org/files
-ARG JPEG_VERSION=9f
 # https://github.com/mozilla/mozjpeg/releases
 ARG MOZJPEG_VERSION=4.1.1
 # https://github.com/danielgtaylor/jpeg-archive/releases
@@ -329,7 +336,7 @@ RUN ldconfig /usr/local/lib
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 # STAGE | MAIN
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-FROM iamteacher/rails-start.main:latest
+FROM ${BASE_IMAGE}
 
 # Switch to root for installing packages and copying binaries
 USER root

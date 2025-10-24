@@ -18,12 +18,24 @@
 MEDIA_DOCKERFILE = ./_Media.Dockerfile
 MEDIA_IMAGE_NAME = iamteacher/rails-start.media
 
+# Main image source (can be 'dockerhub' or 'ghcr')
+# dockerhub: iamteacher/rails-start.main:latest (Docker Hub)
+# ghcr: ghcr.io/the-teacher/rails-start.main:latest (GitHub Container Registry)
+MAIN_IMAGE_SOURCE ?= dockerhub
+
+ifeq ($(MAIN_IMAGE_SOURCE), ghcr)
+  MAIN_IMAGE = ghcr.io/the-teacher/rails-start.main:latest
+else
+  MAIN_IMAGE = iamteacher/rails-start.main:latest
+endif
+
 # Build media image for ARM64
 media-image-arm64-build:
 	docker build \
 		-t $(MEDIA_IMAGE_NAME):arm64 \
 		-f $(MEDIA_DOCKERFILE) \
 		--platform linux/arm64 \
+		--build-arg BASE_IMAGE=$(MAIN_IMAGE) \
 		.
 
 # Build media image for AMD64
@@ -32,6 +44,7 @@ media-image-amd64-build:
 		-t $(MEDIA_IMAGE_NAME):amd64 \
 		-f $(MEDIA_DOCKERFILE) \
 		--platform linux/amd64 \
+		--build-arg BASE_IMAGE=$(MAIN_IMAGE) \
 		.
 
 # Build media images for all platforms
@@ -156,6 +169,7 @@ media-images-buildx:
 		-f $(MEDIA_DOCKERFILE) \
 		--platform linux/arm64,linux/amd64 \
 		--progress=plain \
+		--build-arg BASE_IMAGE=$(MAIN_IMAGE) \
 		-t $(MEDIA_IMAGE_NAME):latest \
 		.
 
@@ -167,6 +181,7 @@ media-images-buildx-push:
 		-f $(MEDIA_DOCKERFILE) \
 		--platform linux/arm64,linux/amd64 \
 		--progress=plain \
+		--build-arg BASE_IMAGE=$(MAIN_IMAGE) \
 		-t $(MEDIA_IMAGE_NAME):latest \
 		--push \
 		.
