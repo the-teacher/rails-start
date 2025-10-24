@@ -88,5 +88,5 @@ jobs:
         run: |
           echo "✅ Main image pushed to Docker Hub!"
           echo "Base image: ${{ steps.base_image.outputs.base_image }}"
-          echo "Platforms: linux/amd64, linux/arm64, linux/arm/v7"
+          echo "Platforms: linux/amd64, linux/arm64"
           echo "Tags: ${{ steps.tags.outputs.tags }}"

@@ -355,7 +355,7 @@ docker buildx build \
 
 ```bash
 docker buildx build \
-  --platform linux/amd64,linux/arm64,linux/arm/v7 \
+  --platform linux/amd64,linux/arm64 \
   -f _Main.Dockerfile \
   --build-arg BASE_IMAGE=ghcr.io/the-teacher/rails-start.base:latest \
   -t ghcr.io/the-teacher/rails-start.main:latest \

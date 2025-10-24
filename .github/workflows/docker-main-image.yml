@@ -137,5 +137,5 @@ jobs:
         run: |
           echo "✅ Main image built successfully!"
           echo "Base image: ${{ steps.base_image.outputs.base_image }}"
-          echo "Platforms: linux/amd64, linux/arm64, linux/arm/v7"
+          echo "Platforms: linux/amd64, linux/arm64"
           echo "Tags: ${{ steps.meta.outputs.tags }}"
