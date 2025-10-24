@@ -13,24 +13,55 @@ jobs:
       actions: write
 
     steps:
-      - name: Clear cache
+      - name: Clear all caches
         run: |
-          echo "🗑️  Clearing GitHub Actions cache..."
+          echo "🗑️  Fetching all GitHub Actions caches..."
 
-          # Get all cache keys
-          gh actions-cache list -R ${{ github.repository }} --sort created-at --direction desc | cut -f 1 | while read key
-          do
-            echo "Deleting cache key: $key"
-            gh actions-cache delete "$key" -R ${{ github.repository }} --confirm
+          # Get total count
+          TOTAL=$(gh actions-cache list -R ${{ github.repository }} --json id --jq '. | length')
+          echo "Found $TOTAL cache entries"
+
+          # Delete all caches in batches
+          PAGE=1
+          BATCH_SIZE=100
+          while [ $PAGE -le 10 ]; do
+            echo "Processing batch $PAGE..."
+            CACHES=$(gh actions-cache list -R ${{ github.repository }} \
+              --limit $BATCH_SIZE \
+              --sort created-at \
+              --direction desc \
+              --json id \
+              --jq -r '.[].id')
+            
+            if [ -z "$CACHES" ]; then
+              echo "No more caches to delete"
+              break
+            fi
+            
+            echo "$CACHES" | while read CACHE_ID; do
+              if [ ! -z "$CACHE_ID" ]; then
+                echo "  → Deleting cache ID: $CACHE_ID"
+                gh actions-cache delete $CACHE_ID -R ${{ github.repository }} --confirm || true
+              fi
+            done
+            
+            PAGE=$((PAGE + 1))
           done
 
-          echo "✅ Cache cleared successfully!"
+          echo "✅ Cache cleanup completed!"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Verify cache is empty
+      - name: Verify cache status
         run: |
-          echo "Remaining cache entries:"
-          gh actions-cache list -R ${{ github.repository }} || echo "No caches found"
+          echo "📊 Remaining cache entries:"
+          COUNT=$(gh actions-cache list -R ${{ github.repository }} --json id --jq '. | length')
+          echo "Total caches: $COUNT"
+
+          if [ $COUNT -gt 0 ]; then
+            echo ""
+            echo "Sample of remaining caches:"
+            gh actions-cache list -R ${{ github.repository }} --limit 5 --sort created-at --direction desc
+          fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

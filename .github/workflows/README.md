@@ -20,12 +20,13 @@ Media (linux/amd64, linux/arm64)
 
 Each workflow has a `check-*` job that verifies the upstream workflow completed successfully.
 
-| Workflow                 | Trigger                          | What it does       | Registry   |
-| ------------------------ | -------------------------------- | ------------------ | ---------- |
-| `docker-base-image.yml`  | Push/PR + manual                 | Base amd64, arm64  | GHCR       |
-| `docker-main-image.yml`  | workflow_run(Base) + push/manual | Main amd64, arm64  | GHCR       |
-| `docker-media-image.yml` | workflow_run(Main) + push/manual | Media amd64, arm64 | GHCR       |
-| `docker-update-all-images.yml` | Manual only (sequential)   | Base → Main → Media (multiarch :latest) | Docker Hub |
+| Workflow                       | Trigger                          | What it does                            | Registry   |
+| ------------------------------ | -------------------------------- | --------------------------------------- | ---------- |
+| `docker-base-image.yml`        | Push/PR + manual                 | Base amd64, arm64                       | GHCR       |
+| `docker-main-image.yml`        | workflow_run(Base) + push/manual | Main amd64, arm64                       | GHCR       |
+| `docker-media-image.yml`       | workflow_run(Main) + push/manual | Media amd64, arm64                      | GHCR       |
+| `docker-update-all-images.yml` | Manual only (sequential)         | Base → Main → Media (multiarch :latest) | Docker Hub |
+| `clear-cache.yml`              | Manual only                      | Delete all GitHub Actions caches        | —          |
 
 ## 🏗️ Architectures
 
@@ -136,6 +137,38 @@ On push to master:
 
 - All workflows use same platforms: `linux/amd64,linux/arm64`
 - Media uses `BASE_IMAGE` from Main; Main uses `BASE_IMAGE` from Base
+
+## 💾 GitHub Actions Cache Management
+
+### How Caching Works
+
+Each build step uses `cache-from: type=gha` and `cache-to: type=gha,mode=max` to store and reuse Docker layers:
+
+- **First build:** All layers are built and stored in cache
+- **Subsequent builds (same Dockerfile):** Layers are reused from cache → much faster ✅
+- **Cache age:** Automatic cleanup after 7 days of no access
+
+### View Caches
+
+Go to **Actions → Caches** in GitHub to see:
+- Cache size
+- Last accessed date
+- Associated workflow/branch
+
+### Clear All Caches (Manual)
+
+If you notice old caches or want a fresh build:
+
+1. GitHub Actions tab
+2. Select **"Clear GitHub Actions Cache"** workflow
+3. Click **"Run workflow"** → confirm
+4. Monitor the run log to see how many caches were deleted
+
+### Force Fresh Build
+
+Option 1: Run `clear-cache.yml` first, then re-run your build workflow
+
+Option 2: Modify Dockerfile slightly (GitHub detects file changes and skips cache)
 
 ## 📚 Files
 
