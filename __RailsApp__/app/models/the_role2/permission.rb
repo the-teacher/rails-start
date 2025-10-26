@@ -70,7 +70,9 @@ module TheRole2
     # Log each permission change and ensure actor is defined
     def log_action!(action)
       actor = TheRole2::PermissionLog.actor
-      raise "TheRole2::PermissionLog.actor is not set" if actor.blank?
+
+      # Skip logging if no actor is set
+      return if actor.blank?
 
       TheRole2::PermissionLog.create!(
         permission: self,

@@ -10,7 +10,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_10_26_000008) do
+ActiveRecord::Schema[8.1].define(version: 2025_10_26_000014) do
+  create_table "comments", force: :cascade do |t|
+    t.text "content", null: false
+    t.datetime "created_at", null: false
+    t.integer "post_id", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["post_id", "user_id"], name: "index_comments_on_post_id_and_user_id"
+    t.index ["post_id"], name: "index_comments_on_post_id"
+    t.index ["user_id"], name: "index_comments_on_user_id"
+  end
+
   create_table "companies", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.bigint "current_role_id"
@@ -18,6 +29,62 @@ ActiveRecord::Schema[8.1].define(version: 2025_10_26_000008) do
     t.string "name", null: false
     t.datetime "updated_at", null: false
     t.index ["current_role_id"], name: "index_companies_on_current_role_id"
+  end
+
+  create_table "departments", force: :cascade do |t|
+    t.integer "company_id", null: false
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id", "name"], name: "index_departments_on_company_id_and_name", unique: true
+    t.index ["company_id"], name: "index_departments_on_company_id"
+  end
+
+  create_table "employees", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "department_id", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["department_id"], name: "index_employees_on_department_id"
+    t.index ["user_id", "department_id"], name: "idx_employees_user_department", unique: true
+    t.index ["user_id"], name: "index_employees_on_user_id"
+  end
+
+  create_table "exam_assignments", force: :cascade do |t|
+    t.datetime "assigned_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.datetime "created_at", null: false
+    t.integer "exam_id", null: false
+    t.integer "student_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["exam_id"], name: "index_exam_assignments_on_exam_id"
+    t.index ["student_id", "exam_id"], name: "idx_exam_assignments_student_exam", unique: true
+    t.index ["student_id"], name: "index_exam_assignments_on_student_id"
+  end
+
+  create_table "exams", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.integer "duration_minutes"
+    t.boolean "published", default: false
+    t.datetime "scheduled_at"
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["published"], name: "index_exams_on_published"
+    t.index ["scheduled_at"], name: "index_exams_on_scheduled_at"
+    t.index ["user_id"], name: "index_exams_on_user_id"
+  end
+
+  create_table "posts", force: :cascade do |t|
+    t.text "content"
+    t.datetime "created_at", null: false
+    t.boolean "published", default: false
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["published"], name: "index_posts_on_published"
+    t.index ["user_id"], name: "index_posts_on_user_id"
   end
 
   create_table "profiles", force: :cascade do |t|
@@ -101,8 +168,17 @@ ActiveRecord::Schema[8.1].define(version: 2025_10_26_000008) do
     t.index ["email"], name: "index_users_on_email", unique: true
   end
 
+  add_foreign_key "comments", "posts"
+  add_foreign_key "comments", "users"
   add_foreign_key "companies", "the_role2_roles", column: "current_role_id"
   add_foreign_key "companies", "the_role2_roles", column: "current_role_id"
+  add_foreign_key "departments", "companies"
+  add_foreign_key "employees", "departments"
+  add_foreign_key "employees", "users"
+  add_foreign_key "exam_assignments", "exams"
+  add_foreign_key "exam_assignments", "students"
+  add_foreign_key "exams", "users"
+  add_foreign_key "posts", "users"
   add_foreign_key "profiles", "the_role2_roles", column: "current_role_id"
   add_foreign_key "profiles", "the_role2_roles", column: "current_role_id"
   add_foreign_key "profiles", "users"
