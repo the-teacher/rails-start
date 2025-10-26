@@ -8,6 +8,8 @@
 # ⭐ Support the project - leave your stars on GitHub and tell your colleagues!
 # =============================================================================
 
+.PHONY: test
+
 # Suppress command output (to avoid messages like "Entering directory ...")
 MAKEFLAGS += --no-print-directory
 
@@ -81,6 +83,7 @@ generate-migration:
 migration:
 	make generate-migration name=$(name)
 
+# Needs .PHONY: test (see beginning of file)
 # Testing
 test:
 	bundle exec rails test
