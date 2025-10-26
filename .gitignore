@@ -5,6 +5,7 @@
 #   git config --global core.excludesfile '~/.gitignore_global'
 .DS_Store
 /.idea
+/__RailsApp__/.git
 
 /db/PGSQL
 !/db/PGSQL/.keep

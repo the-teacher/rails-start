@@ -10,7 +10,38 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_10_26_000003) do
+ActiveRecord::Schema[8.1].define(version: 2025_10_26_000008) do
+  create_table "companies", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "current_role_id"
+    t.text "description"
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.index ["current_role_id"], name: "index_companies_on_current_role_id"
+  end
+
+  create_table "profiles", force: :cascade do |t|
+    t.string "bio"
+    t.datetime "created_at", null: false
+    t.bigint "current_role_id"
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["current_role_id"], name: "index_profiles_on_current_role_id"
+    t.index ["user_id"], name: "index_profiles_on_user_id"
+  end
+
+  create_table "students", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "current_role_id"
+    t.string "grade"
+    t.string "student_id", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id"
+    t.index ["current_role_id"], name: "index_students_on_current_role_id"
+    t.index ["student_id"], name: "index_students_on_student_id", unique: true
+    t.index ["user_id"], name: "index_students_on_user_id"
+  end
+
   create_table "the_role2_permission_logs", force: :cascade do |t|
     t.string "action", null: false
     t.integer "actor_id", null: false
@@ -60,6 +91,26 @@ ActiveRecord::Schema[8.1].define(version: 2025_10_26_000003) do
     t.index ["name"], name: "index_the_role2_roles_on_name", unique: true
   end
 
+  create_table "users", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "current_role_id"
+    t.string "email", null: false
+    t.string "name"
+    t.datetime "updated_at", null: false
+    t.index ["current_role_id"], name: "index_users_on_current_role_id"
+    t.index ["email"], name: "index_users_on_email", unique: true
+  end
+
+  add_foreign_key "companies", "the_role2_roles", column: "current_role_id"
+  add_foreign_key "companies", "the_role2_roles", column: "current_role_id"
+  add_foreign_key "profiles", "the_role2_roles", column: "current_role_id"
+  add_foreign_key "profiles", "the_role2_roles", column: "current_role_id"
+  add_foreign_key "profiles", "users"
+  add_foreign_key "students", "the_role2_roles", column: "current_role_id"
+  add_foreign_key "students", "the_role2_roles", column: "current_role_id"
+  add_foreign_key "students", "users"
   add_foreign_key "the_role2_permission_logs", "the_role2_permissions", column: "permission_id"
   add_foreign_key "the_role2_role_assignments", "the_role2_roles"
+  add_foreign_key "users", "the_role2_roles", column: "current_role_id"
+  add_foreign_key "users", "the_role2_roles", column: "current_role_id"
 end

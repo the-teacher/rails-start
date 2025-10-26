@@ -17,8 +17,14 @@ module TheRole2
     # Capture a snapshot of the permission at the moment of change
     def snapshot_permission
       self.snapshot = permission.slice(
-        "scope", "resource", "action", "value",
-        "enabled", "starts_at", "ends_at", "description"
+        "enabled",
+        "scope",
+        "resource",
+        "action",
+        "description",
+        "value",
+        "starts_at",
+        "ends_at",
       )
     end
   end
