@@ -16,6 +16,7 @@
 # - delete_permission!(key)        — Delete a permission entirely
 # - enable_permission!(key)        — Re-enable a previously disabled permission
 # - disable_permission!(key)       — Disable a permission (keep but don't apply)
+# - effective_permissions          — Get effective permissions (enabled + within time window)
 #
 # Usage:
 #   class User < ApplicationRecord
@@ -51,7 +52,7 @@ module TheRole2
     # Delete a permission from this holder and clear cache
     def delete_permission!(key)
       permission_by_key(key).destroy_all
-      reload_permission_cache!
+      reload_permissions!
     end
 
     # Enable a permission and update cache
@@ -72,7 +73,7 @@ module TheRole2
     def preload_permissions!
       return @_permission_cache if @_permission_cache.present?
 
-      @_permission_cache = permissions.effective.each_with_object({}) do |perm, hash|
+      @_permission_cache = effective_permissions.each_with_object({}) do |perm, hash|
         key = build_permission_key(perm.scope, perm.resource, perm.action)
         hash[key] = perm.value
       end
@@ -95,8 +96,13 @@ module TheRole2
       if @_permission_cache.present?
         @_permission_cache[normalized_key] || false
       else
-        permissions.effective.by_key(normalized_key).exists?
+        effective_permissions.by_key(normalized_key).exists?
       end
+    end
+
+    # Get effective permissions (enabled + within time window)
+    def effective_permissions
+      permissions.effective
     end
 
     private

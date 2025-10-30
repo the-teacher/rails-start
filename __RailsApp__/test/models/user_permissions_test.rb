@@ -1,7 +1,7 @@
 require "test_helper"
 
 # ===================================================================
-# User::PermissionsTest - Complete Test Suite for Permission System
+# [1] User::PermissionsTest - Complete Test Suite for Permission System
 # ===================================================================
 #
 # Test Cases:
@@ -33,7 +33,7 @@ require "test_helper"
 # 26. Find By Key With Scope - Find permission by key with scope
 # 27. Enabled Scope Filter - Filter enabled permissions
 # 28. Effective Scope Filter - Filter effective permissions (enabled and within time window)
-#
+# 29. Holder Validation - Permission requires a holder
 # ===================================================================
 
 class User::PermissionsTest < ActiveSupport::TestCase
@@ -437,5 +437,18 @@ class User::PermissionsTest < ActiveSupport::TestCase
     effective_perms = @user_john.permissions.effective
     assert_includes effective_perms, effective_permission
     assert_not_includes effective_perms, expired_permission
+  end
+
+  # Test Case 29: Holder Validation - Permission requires a holder
+  test "should require holder for permission" do
+    permission = TheRole2::Permission.new(
+      scope: nil,
+      resource: "posts",
+      action: "create",
+      value: true
+    )
+
+    assert_not permission.valid?
+    assert_includes permission.errors[:holder], "can't be blank"
   end
 end

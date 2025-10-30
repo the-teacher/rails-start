@@ -24,9 +24,12 @@ module TheRole2
   class Permission < ApplicationRecord
     self.table_name = "the_role2_permissions"
 
+    include TheRole2::Concerns::UniqueWithinTimeWindow
+
     belongs_to :holder, polymorphic: true
     has_many :logs, class_name: "TheRole2::PermissionLog", dependent: :destroy
 
+    validates :holder, presence: true
     validates :resource, presence: true
     validates :action, presence: true
     validates :value, inclusion: { in: [ true, false ] }
@@ -63,7 +66,7 @@ module TheRole2
 
     after_create  -> { log_action!(:create) }
     after_update  -> { log_action!(:update) }
-    after_destroy -> { log_action!(:delete) }
+    before_destroy -> { log_action!(:delete) }
 
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # HELPER METHODS
@@ -120,9 +123,10 @@ module TheRole2
       # Skip logging if no actor is set
       return if actor.blank?
 
-      TheRole2::PermissionLog.create!(
+      TheRole2::PermissionLog.new(
         permission: self,
-        actor: actor,
+        actor_type: actor.class.name,
+        actor_id: actor.id,
         action: action
       )
     end
