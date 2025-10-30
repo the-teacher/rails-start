@@ -1,0 +1,9 @@
+john:
+  email: john@example.com
+  created_at: <%= Time.current %>
+  updated_at: <%= Time.current %>
+
+alice:
+  email: alice@example.com
+  created_at: <%= Time.current %>
+  updated_at: <%= Time.current %>

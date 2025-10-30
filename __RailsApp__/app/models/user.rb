@@ -1,5 +1,6 @@
 class User < ApplicationRecord
   include TheRole2::HasRoles
+  include TheRole2::HasPermissions
 
   has_many :profiles, dependent: :destroy
   has_many :posts, dependent: :destroy

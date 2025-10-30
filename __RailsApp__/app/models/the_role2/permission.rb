@@ -1,4 +1,26 @@
 module TheRole2
+  # Permission model for TheRole2 RBAC system
+  #
+  # Represents a permission that can be assigned to roles or models directly.
+  # Supports scopes, time-based activation, and audit logging.
+  #
+  # Available Methods:
+  # - full_key              - Returns "scope::resource::action" string
+  # - title                 - Alias for full_key
+  # - effective?            - Check if permission is enabled and within time window
+  # - enable!               - Enable permission (set enabled: true)
+  # - disable!              - Disable permission (set enabled: false)
+  # - on!                   - Grant permission (set value: true)
+  # - off!                  - Deny permission (set value: false)
+  #
+  # Class Methods:
+  # - parse_key(key)        - Parse "scope::resource::action" into components [scope, resource, action]
+  #
+  # Scopes:
+  # - enabled               - Only enabled permissions
+  # - effective             - Enabled + within time window
+  # - by_key(key)           - Find by compound key
+  #
   class Permission < ApplicationRecord
     self.table_name = "the_role2_permissions"
 
@@ -12,7 +34,9 @@ module TheRole2
     # Automatically normalize identifiers (lowercase, underscores)
     normalizes :scope, :resource, :action, with: TheRole2::KeyNormalizer
 
-    # --- scopes ---
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # SCOPES
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     scope :enabled, -> { where(enabled: true) }
     scope :effective, -> {
       enabled
@@ -33,12 +57,18 @@ module TheRole2
       end
     end
 
-    # --- automatic logging ---
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # LOGGING
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     after_create  -> { log_action!(:create) }
     after_update  -> { log_action!(:update) }
     after_destroy -> { log_action!(:delete) }
 
-    # --- helpers ---
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # HELPER METHODS
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     def full_key
       [ scope, resource, action ].compact.join("::")
     end
@@ -49,6 +79,22 @@ module TheRole2
 
     def effective?
       enabled? && within_time_window?
+    end
+
+    def enable!
+      update!(enabled: true)
+    end
+
+    def disable!
+      update!(enabled: false)
+    end
+
+    def on!
+      update!(value: true)
+    end
+
+    def off!
+      update!(value: false)
     end
 
     def self.parse_key(key)
