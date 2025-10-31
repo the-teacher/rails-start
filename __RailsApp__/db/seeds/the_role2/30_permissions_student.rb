@@ -2,7 +2,7 @@
 # exec: bin/rails runner db/seeds/the_role2/30_permissions_student.rb
 # Create permissions for Student role
 
-TheRole2::PermissionLog.actor = User.first
+TheRole2::PermissionLog.current_actor = User.first
 student_role = TheRole2::Role.find_by!(name: 'Student')
 
 permissions_data = [

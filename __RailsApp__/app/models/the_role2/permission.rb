@@ -24,15 +24,34 @@ module TheRole2
   class Permission < ApplicationRecord
     self.table_name = "the_role2_permissions"
 
-    include TheRole2::Concerns::UniqueWithinTimeWindow
-
     belongs_to :holder, polymorphic: true
-    has_many :logs, class_name: "TheRole2::PermissionLog", dependent: :destroy
+    has_many :logs, class_name: "TheRole2::PermissionLog"
 
     validates :holder, presence: true
     validates :resource, presence: true
     validates :action, presence: true
     validates :value, inclusion: { in: [ true, false ] }
+
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # Time Window Uniqueness Validation
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
+    include TheRole2::Concerns::UniqueWithinTimeWindow
+    validate :validate_unique_within_time_window
+
+    def validate_unique_within_time_window
+      unique_within_time_window do
+        self.class.unscoped.where(
+          holder_type: holder_type,
+          holder_id: holder_id,
+          scope: scope,
+          resource: resource,
+          action: action
+        )
+      end
+    end
+
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     # Automatically normalize identifiers (lowercase, underscores)
     normalizes :scope, :resource, :action, with: TheRole2::KeyNormalizer
@@ -40,12 +59,17 @@ module TheRole2
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # SCOPES
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     scope :enabled, -> { where(enabled: true) }
-    scope :effective, -> {
-      enabled
-        .where("starts_at IS NULL OR starts_at <= ?", Time.current)
-        .where("ends_at IS NULL OR ends_at >= ?", Time.current)
+
+    scope :within_time_window, -> {
+      where("starts_at IS NULL OR starts_at <= ?", Time.current)
+      .where("ends_at IS NULL OR ends_at >= ?", Time.current)
     }
+
+    scope :effective, -> { within_time_window.enabled }
+
+    default_scope { within_time_window }
 
     scope :by_key, ->(key) do
       scope_name, resource_name, action_name = parse_key(key)
@@ -64,8 +88,8 @@ module TheRole2
     # LOGGING
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    after_create  -> { log_action!(:create) }
-    after_update  -> { log_action!(:update) }
+    after_create -> { log_action!(:create) }
+    after_update -> { log_action!(:update) }
     before_destroy -> { log_action!(:delete) }
 
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -81,7 +105,7 @@ module TheRole2
     end
 
     def effective?
-      enabled? && within_time_window?
+      within_time_window? && enabled?
     end
 
     def enable!
@@ -118,15 +142,8 @@ module TheRole2
 
     # Log each permission change and ensure actor is defined
     def log_action!(action)
-      actor = TheRole2::PermissionLog.actor
-
-      # Skip logging if no actor is set
-      return if actor.blank?
-
-      TheRole2::PermissionLog.new(
+      ::TheRole2::PermissionLog.create_log!(
         permission: self,
-        actor_type: actor.class.name,
-        actor_id: actor.id,
         action: action
       )
     end

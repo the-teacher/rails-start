@@ -95,7 +95,7 @@ Permission.parse_key(key)            # Parse "posts::create" → [nil, 'posts', 
 
 ```ruby
 # Set the current user as the actor for audit trail
-TheRole2::PermissionLog.actor = User.first
+TheRole2::PermissionLog.current_actor = User.first
 
 # Get or create a role
 user_role = TheRole2::Role.create_or_find_by!(name: 'User')
@@ -141,7 +141,7 @@ Then use the model's permission methods:
 
 ```ruby
 # Set actor for auditing
-TheRole2::PermissionLog.actor = User.first
+TheRole2::PermissionLog.current_actor = User.first
 
 user = User.find(1)
 
@@ -193,7 +193,7 @@ user.enable_permission!('university::exams::show')
 
 ```ruby
 company = Company.find(1)
-TheRole2::PermissionLog.actor = User.first
+TheRole2::PermissionLog.current_actor = User.first
 
 # Create work-scoped permissions on company
 company.permissions.create!(
@@ -220,7 +220,7 @@ company.has_permission?('work::employees::manage')    # => true
 
 ```ruby
 user = User.first
-TheRole2::PermissionLog.actor = User.first
+TheRole2::PermissionLog.current_actor = User.first
 
 # Permission valid for next 30 days only
 user.permissions.create!(

@@ -40,7 +40,7 @@ class User::PermissionsTest < ActiveSupport::TestCase
   setup do
     @user_john = users(:john)
     # Set permission actor for audit trail
-    TheRole2::PermissionLog.actor = @user_john
+    TheRole2::PermissionLog.current_actor = @user_john
   end
 
   # Test Case 1: Permission can be created directly on user

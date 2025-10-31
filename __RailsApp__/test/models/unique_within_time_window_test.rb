@@ -21,11 +21,11 @@ require "test_helper"
 class TheRole2::Concerns::UniqueWithinTimeWindowTest < ActiveSupport::TestCase
   setup do
     @user_john = users(:john)
-    TheRole2::PermissionLog.actor = @user_john
+    TheRole2::PermissionLog.current_actor = @user_john
   end
 
   teardown do
-    TheRole2::PermissionLog.actor = nil
+    TheRole2::PermissionLog.current_actor = nil
   end
 
   # Test Case 1: Permissions without time window overlap are allowed
@@ -233,7 +233,7 @@ class TheRole2::Concerns::UniqueWithinTimeWindowTest < ActiveSupport::TestCase
     )
 
     user_alice = users(:alice)
-    TheRole2::PermissionLog.actor = user_alice
+    TheRole2::PermissionLog.current_actor = user_alice
 
     # Different holder - should be valid
     permission = user_alice.permissions.create(

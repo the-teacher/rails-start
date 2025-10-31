@@ -121,7 +121,7 @@ module TheRole2
     # Find permissions by compound key
     def permission_by_key(key)
       scope, resource, action = TheRole2::Permission.parse_key(key)
-      permissions.where(scope: scope, resource: resource, action: action)
+      permissions.unscoped.where(scope: scope, resource: resource, action: action)
     end
 
     # Update specific permission in cache after enable

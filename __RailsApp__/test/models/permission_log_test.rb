@@ -14,6 +14,9 @@ require "test_helper"
 #  7. Multiple Logs Sequence - Verify logs track multiple changes in sequence
 #  8. Log Snapshot Content - Verify snapshot contains all relevant fields
 #  9. Log Without Actor Raises - Creating permission without actor should fail
+#  9.1. Logging Disable Method - disable_logging! disables logging and sets status to DISABLED
+#  9.2. Logging Enable Method - enable_logging! enables logging and sets status to ENABLED
+#  9.3. Logging Disabled Behavior - When logging is disabled, no log is created and actor is not required
 # 10. Log Actor Polymorphic - Log actor works with different holder types
 # 11. Log Delete Captures Final State - Delete log captures permission state before deletion
 # 12. Log Created At Timestamp - Log records accurate creation timestamp
@@ -31,12 +34,12 @@ class TheRole2::PermissionLogTest < ActiveSupport::TestCase
 
   teardown do
     # Clear thread-local actor after each test
-    TheRole2::PermissionLog.actor = nil
+    TheRole2::PermissionLog.current_actor = nil
   end
 
   # Test Case 1: Log is created when permission is created
   test "should create log on permission creation" do
-    TheRole2::PermissionLog.actor = @user_john
+    TheRole2::PermissionLog.current_actor = @user_john
 
     assert_difference "TheRole2::PermissionLog.count", 1 do
       @user_john.permissions.create!(
@@ -50,7 +53,7 @@ class TheRole2::PermissionLogTest < ActiveSupport::TestCase
 
   # Test Case 2: Log is created when permission is updated
   test "should create log on permission update" do
-    TheRole2::PermissionLog.actor = @user_john
+    TheRole2::PermissionLog.current_actor = @user_john
     permission = @user_john.permissions.create!(
       scope: nil,
       resource: "posts",
@@ -67,7 +70,7 @@ class TheRole2::PermissionLogTest < ActiveSupport::TestCase
 
   # Test Case 3: Log is created when permission is deleted
   test "should create log on permission deletion" do
-    TheRole2::PermissionLog.actor = @user_john
+    TheRole2::PermissionLog.current_actor = @user_john
     permission = @user_john.permissions.create!(
       scope: nil,
       resource: "posts",
@@ -84,7 +87,7 @@ class TheRole2::PermissionLogTest < ActiveSupport::TestCase
 
   # Test Case 4: Log captures permission snapshot
   test "should capture snapshot in log" do
-    TheRole2::PermissionLog.actor = @user_john
+    TheRole2::PermissionLog.current_actor = @user_john
     @user_john.permissions.create!(
       scope: nil,
       resource: "posts",
@@ -107,7 +110,7 @@ class TheRole2::PermissionLogTest < ActiveSupport::TestCase
 
   # Test Case 5: Log records the actor
   test "should record actor in log" do
-    TheRole2::PermissionLog.actor = @user_john
+    TheRole2::PermissionLog.current_actor = @user_john
     @user_john.permissions.create!(
       scope: nil,
       resource: "posts",
@@ -125,7 +128,7 @@ class TheRole2::PermissionLogTest < ActiveSupport::TestCase
 
   # Test Case 6: Log records the action type
   test "should record action type in log" do
-    TheRole2::PermissionLog.actor = @user_john
+    TheRole2::PermissionLog.current_actor = @user_john
     permission = @user_john.permissions.create!(
       scope: nil,
       resource: "posts",
@@ -147,7 +150,7 @@ class TheRole2::PermissionLogTest < ActiveSupport::TestCase
 
   # Test Case 7: Multiple logs track sequence of changes
   test "should track sequence of permission changes" do
-    TheRole2::PermissionLog.actor = @user_john
+    TheRole2::PermissionLog.current_actor = @user_john
     permission = @user_john.permissions.create!(
       scope: nil,
       resource: "posts",
@@ -159,7 +162,7 @@ class TheRole2::PermissionLogTest < ActiveSupport::TestCase
     permission.update!(description: "Updated")
     permission.destroy
 
-    logs = permission.logs.order(:created_at)
+    logs = TheRole2::PermissionLog.where(permission_id: permission.id).order(:created_at)
     assert_equal 4, logs.count
     assert_equal "create", logs[0].action
     assert_equal "update", logs[1].action
@@ -169,7 +172,7 @@ class TheRole2::PermissionLogTest < ActiveSupport::TestCase
 
   # Test Case 8: Log snapshot contains all permission fields
   test "should capture all fields in snapshot" do
-    TheRole2::PermissionLog.actor = @user_john
+    TheRole2::PermissionLog.current_actor = @user_john
     @user_john.permissions.create!(
       scope: "university",
       resource: "exams",
@@ -190,15 +193,15 @@ class TheRole2::PermissionLogTest < ActiveSupport::TestCase
     assert_equal false, snapshot["value"]
     assert_equal true, snapshot["enabled"]
     assert_equal "Show exams", snapshot["description"]
-    assert_present snapshot["starts_at"]
-    assert_present snapshot["ends_at"]
+    assert_not_nil snapshot["starts_at"]
+    assert_not_nil snapshot["ends_at"]
   end
 
   # Test Case 9: Creating permission without actor raises error
   test "should raise error if actor not set" do
-    TheRole2::PermissionLog.actor = nil
+    TheRole2::PermissionLog.current_actor = nil
 
-    assert_raises RuntimeError do
+    assert_raises ActiveRecord::RecordInvalid do
       @user_john.permissions.create!(
         scope: nil,
         resource: "posts",
@@ -208,9 +211,52 @@ class TheRole2::PermissionLogTest < ActiveSupport::TestCase
     end
   end
 
+  # Helper to preserve logging state around a block
+  def with_logging_state
+    prev_logging_state = TheRole2::PermissionLog.disable_logging
+    yield
+  ensure
+    TheRole2::PermissionLog.disable_logging = prev_logging_state
+  end
+
+  # Test Case 9.1: disable_logging! disables logging and returns false
+  test "should disable logging with disable_logging!" do
+    with_logging_state do
+      assert_equal false, TheRole2::PermissionLog.disable_logging!
+      assert_equal true, TheRole2::PermissionLog.disable_logging
+      assert_equal "DISABLED", TheRole2::PermissionLog.logging_status
+    end
+  end
+
+  # Test Case 9.2: enable_logging! enables logging and returns true
+  test "should enable logging with enable_logging!" do
+    with_logging_state do
+      TheRole2::PermissionLog.disable_logging!
+      assert_equal true, TheRole2::PermissionLog.enable_logging!
+      assert_equal false, TheRole2::PermissionLog.disable_logging
+      assert_equal "ENABLED", TheRole2::PermissionLog.logging_status
+    end
+  end
+
+  # Test Case 9.3: when logging is disabled, no log is created and actor is not required
+  test "should not create log and not require actor when logging is disabled" do
+    with_logging_state do
+      TheRole2::PermissionLog.disable_logging!
+      assert_no_difference "TheRole2::PermissionLog.count" do
+        @user_john.permissions.create!(
+          scope: nil,
+          resource: "posts",
+          action: "create",
+          value: true
+        )
+      end
+      TheRole2::PermissionLog.enable_logging!
+    end
+  end
+
   # Test Case 10: Log works with different polymorphic actors
   test "should log with different actor types" do
-    TheRole2::PermissionLog.actor = @user_alice
+    TheRole2::PermissionLog.current_actor = @user_alice
 
     @user_alice.permissions.create!(
       scope: nil,
@@ -228,7 +274,7 @@ class TheRole2::PermissionLogTest < ActiveSupport::TestCase
 
   # Test Case 11: Delete log captures final state before deletion
   test "should capture permission state in delete log" do
-    TheRole2::PermissionLog.actor = @user_john
+    TheRole2::PermissionLog.current_actor = @user_john
     permission = @user_john.permissions.create!(
       scope: nil,
       resource: "posts",
@@ -238,9 +284,10 @@ class TheRole2::PermissionLogTest < ActiveSupport::TestCase
       description: "Final state"
     )
 
+    permission_id = permission.id
     permission.destroy
 
-    delete_log = TheRole2::PermissionLog.where(action: "delete").last
+    delete_log = TheRole2::PermissionLog.where(permission_id: permission_id, action: "delete").last
     assert_not_nil delete_log
     snapshot = delete_log.snapshot
 
@@ -251,7 +298,7 @@ class TheRole2::PermissionLogTest < ActiveSupport::TestCase
 
   # Test Case 12: Log records accurate timestamp
   test "should record creation timestamp" do
-    TheRole2::PermissionLog.actor = @user_john
+    TheRole2::PermissionLog.current_actor = @user_john
     before_time = Time.current
     @user_john.permissions.create!(
       scope: nil,
@@ -268,7 +315,7 @@ class TheRole2::PermissionLogTest < ActiveSupport::TestCase
 
   # Test Case 13: Multiple updates create separate logs
   test "should create separate logs for each update" do
-    TheRole2::PermissionLog.actor = @user_john
+    TheRole2::PermissionLog.current_actor = @user_john
     permission = @user_john.permissions.create!(
       scope: nil,
       resource: "posts",
@@ -290,7 +337,7 @@ class TheRole2::PermissionLogTest < ActiveSupport::TestCase
 
   # Test Case 14: Permission.logs returns all associated logs
   test "should return all associated logs via permission.logs" do
-    TheRole2::PermissionLog.actor = @user_john
+    TheRole2::PermissionLog.current_actor = @user_john
     permission = @user_john.permissions.create!(
       scope: nil,
       resource: "posts",
@@ -309,7 +356,7 @@ class TheRole2::PermissionLogTest < ActiveSupport::TestCase
 
   # Test Case 15: Query logs by action type
   test "should query logs by action type" do
-    TheRole2::PermissionLog.actor = @user_john
+    TheRole2::PermissionLog.current_actor = @user_john
     permission = @user_john.permissions.create!(
       scope: nil,
       resource: "posts",
@@ -331,7 +378,7 @@ class TheRole2::PermissionLogTest < ActiveSupport::TestCase
 
   # Test Case 16: Log snapshot is JSON
   test "should store snapshot as JSON" do
-    TheRole2::PermissionLog.actor = @user_john
+    TheRole2::PermissionLog.current_actor = @user_john
     @user_john.permissions.create!(
       scope: "university",
       resource: "exams",
@@ -348,7 +395,7 @@ class TheRole2::PermissionLogTest < ActiveSupport::TestCase
 
   # Test Case 17: Actor relationship works bidirectionally
   test "should access logs through actor" do
-    TheRole2::PermissionLog.actor = @user_john
+    TheRole2::PermissionLog.current_actor = @user_john
     @user_john.permissions.create!(
       scope: nil,
       resource: "posts",
@@ -375,7 +422,7 @@ class TheRole2::PermissionLogTest < ActiveSupport::TestCase
 
   # Test Case 18: Log enum action values
   test "should use enum for action field" do
-    TheRole2::PermissionLog.actor = @user_john
+    TheRole2::PermissionLog.current_actor = @user_john
     @user_john.permissions.create!(
       scope: nil,
       resource: "posts",

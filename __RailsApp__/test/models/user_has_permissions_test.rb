@@ -28,7 +28,7 @@ class User::HasPermissionsTest < ActiveSupport::TestCase
   setup do
     @user_john = users(:john)
     # Set permission actor for audit trail
-    TheRole2::PermissionLog.actor = @user_john
+    TheRole2::PermissionLog.current_actor = @user_john
   end
 
   # Test Case 1: Preload permissions into cache
@@ -133,7 +133,7 @@ class User::HasPermissionsTest < ActiveSupport::TestCase
 
   # Test Case 8: Delete permission removes it entirely
   test "should delete permission" do
-    TheRole2::PermissionLog.actor = @user_john
+    TheRole2::PermissionLog.current_actor = @user_john
     @user_john.permissions.create!(
       scope: nil,
       resource: "posts",
@@ -149,7 +149,7 @@ class User::HasPermissionsTest < ActiveSupport::TestCase
 
   # Test Case 9: Delete permission clears cache
   test "should clear cache after deletion" do
-    TheRole2::PermissionLog.actor = @user_john
+    TheRole2::PermissionLog.current_actor = @user_john
     @user_john.permissions.create!(
       scope: nil,
       resource: "posts",
@@ -242,7 +242,7 @@ class User::HasPermissionsTest < ActiveSupport::TestCase
 
   # Test Case 14: Delete permission by scoped key
   test "should delete permission by scoped key" do
-    TheRole2::PermissionLog.actor = @user_john
+    TheRole2::PermissionLog.current_actor = @user_john
     @user_john.permissions.create!(
       scope: "university",
       resource: "exams",
@@ -271,7 +271,7 @@ class User::HasPermissionsTest < ActiveSupport::TestCase
 
   # Test Case 16: Multiple operations sequence
   test "should handle sequence of permission operations" do
-    TheRole2::PermissionLog.actor = @user_john
+    TheRole2::PermissionLog.current_actor = @user_john
     # Create
     @user_john.permissions.create!(
       scope: nil,
@@ -280,6 +280,7 @@ class User::HasPermissionsTest < ActiveSupport::TestCase
       value: true,
       enabled: true
     )
+
     @user_john.preload_permissions!
     assert @user_john.has_permission?("posts::create")
 

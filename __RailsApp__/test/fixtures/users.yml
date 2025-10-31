@@ -1,9 +1,11 @@
 john:
   email: john@example.com
+  name: John Doe
   created_at: <%= Time.current %>
   updated_at: <%= Time.current %>
 
 alice:
   email: alice@example.com
+  name: Alice Smith
   created_at: <%= Time.current %>
   updated_at: <%= Time.current %>

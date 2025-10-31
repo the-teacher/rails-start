@@ -162,7 +162,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_10_26_000014) do
     t.datetime "created_at", null: false
     t.bigint "current_role_id"
     t.string "email", null: false
-    t.string "name"
+    t.string "name", null: false
     t.datetime "updated_at", null: false
     t.index ["current_role_id"], name: "index_users_on_current_role_id"
     t.index ["email"], name: "index_users_on_email", unique: true
@@ -185,7 +185,6 @@ ActiveRecord::Schema[8.1].define(version: 2025_10_26_000014) do
   add_foreign_key "students", "the_role2_roles", column: "current_role_id"
   add_foreign_key "students", "the_role2_roles", column: "current_role_id"
   add_foreign_key "students", "users"
-  add_foreign_key "the_role2_permission_logs", "the_role2_permissions", column: "permission_id"
   add_foreign_key "the_role2_role_assignments", "the_role2_roles"
   add_foreign_key "users", "the_role2_roles", column: "current_role_id"
   add_foreign_key "users", "the_role2_roles", column: "current_role_id"

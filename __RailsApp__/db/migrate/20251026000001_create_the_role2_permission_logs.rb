@@ -1,7 +1,7 @@
 class CreateTheRole2PermissionLogs < ActiveRecord::Migration[8.1]
   def change
     create_table :the_role2_permission_logs do |t|
-      t.references :permission, null: false, foreign_key: { to_table: :the_role2_permissions }
+      t.references :permission, null: false
       t.references :actor, polymorphic: true, null: false
 
       # Action type (create / update / delete)

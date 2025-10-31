@@ -2,7 +2,7 @@
 # exec: bin/rails runner db/seeds/the_role2/40_permissions_employee.rb
 # Create permissions for Employee role
 
-TheRole2::PermissionLog.actor = User.first
+TheRole2::PermissionLog.current_actor = User.first
 employee_role = TheRole2::Role.find_by!(name: 'Employee')
 
 permissions_data = [

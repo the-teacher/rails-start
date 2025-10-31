@@ -3,21 +3,25 @@ module TheRole2
     module UniqueWithinTimeWindow
       extend ActiveSupport::Concern
 
-      included do
-        validate :unique_within_time_window
-      end
+      MAX_TIME = Time.utc(9999,12,31,23,59,59)
 
       # Check that permission scope/resource/action combination is unique
       # within overlapping time windows for the same holder
-      def unique_within_time_window
+      def unique_within_time_window(&block)
+        unless block_given?
+          raise ArgumentError, "TheRole2::Concerns::UniqueWithinTimeWindow#unique_within_time_window requires a block returning an ActiveRecord::Relation"
+        end
+
+        query = instance_exec(&block)
+
         # Find other permissions with same holder, scope, resource, action
-        query = TheRole2::Permission.where(
-          holder_type: holder_type,
-          holder_id: holder_id,
-          scope: scope,
-          resource: resource,
-          action: action
-        )
+        # query = TheRole2::Permission.where(
+        #   holder_type: holder_type,
+        #   holder_id: holder_id,
+        #   scope: scope,
+        #   resource: resource,
+        #   action: action
+        # )
 
         # Exclude current record if it's an update
         query = query.where.not(id: id) if persisted?
@@ -47,8 +51,8 @@ module TheRole2
         other_start = Time.at(0) if other_start.nil?
 
         # If either has no end, it goes to future
-        self_end = Time.at(Float::INFINITY) if self_end.nil?
-        other_end = Time.at(Float::INFINITY) if other_end.nil?
+        self_end = MAX_TIME if self_end.nil?
+        other_end = MAX_TIME if other_end.nil?
 
         # Check overlap: end > other_start AND start < other_end
         self_end > other_start && self_start < other_end

@@ -2,7 +2,7 @@
 # exec: bin/rails runner db/seeds/the_role2/20_permissions_user.rb
 # Create permissions for User role
 
-TheRole2::PermissionLog.actor = User.first
+TheRole2::PermissionLog.current_actor = User.first
 user_role = TheRole2::Role.find_by!(name: 'User')
 
 # Scopes: nil (global), university, work

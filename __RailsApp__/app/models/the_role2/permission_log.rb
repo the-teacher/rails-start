@@ -12,24 +12,48 @@ module TheRole2
     }, prefix: true
 
     before_create :snapshot_permission
-    before_create :set_actor_from_thread_local
+    before_validation :set_actor_from_thread_local, on: :create
 
     # Thread-local actor reference (set per request or console session)
-    thread_mattr_accessor :actor
+    thread_mattr_accessor :current_actor
+    thread_mattr_accessor :disable_logging
+
+    # Logging control methods
+    def self.disable_logging!
+      warn "[TheRole2::PermissionLog] Logging is now DISABLED"
+      self.disable_logging = true
+      false
+    end
+
+    def self.enable_logging!
+      warn "[TheRole2::PermissionLog] Logging is now ENABLED"
+      self.disable_logging = false
+      true
+    end
+
+    def self.logging_status
+      disable_logging ? "DISABLED" : "ENABLED"
+    end
+
+    # Centralized log creation method
+    def self.create_log!(**attrs)
+      return if disable_logging
+      create!(**attrs)
+    end
 
     private
 
     # Set actor from thread-local variable (required)
     def set_actor_from_thread_local
-      actor = TheRole2::PermissionLog.actor
+      return if self.class.disable_logging
 
-      if actor.present?
-        # TODO: Check why polymorphic assignment does not work directly
-        # For polymorphic association, we need to set both id and type
-        self.actor_id = actor.id
-        self.actor_type = actor.class.name
+      current_actor = TheRole2::PermissionLog.current_actor
+      
+      if current_actor.present?
+        self.actor = current_actor
       else
-        raise "TheRole2::PermissionLog.actor must be set before creating a permission log"
+        errors.add(:actor, "must be set before creating a permission log")
+        raise ActiveRecord::RecordInvalid, self
       end
     end
 
