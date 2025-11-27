@@ -1,4 +1,14 @@
+name: rails-start
+
 services:
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "18080:8080"
+    volumes:
+      - ../__RailsApp__/config/nginx/production.conf:/etc/nginx/conf.d/default.conf:ro
+      - ../__RailsApp__/public:/public:ro
+
   rails_app:
     tty: true
     stdin_open: true
