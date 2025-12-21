@@ -46,13 +46,13 @@ build:
 rebuild:
 	docker compose -f $(COMPOSE_FILE) build --no-cache
 
-# Open shell in rails_app container as root user
+# Open shell in rails container as root user
 root-shell:
-	docker compose -f $(COMPOSE_FILE) exec --user root rails_app bash
+	docker compose -f $(COMPOSE_FILE) exec --user root rails bash
 
-# Open shell in rails_app container
+# Open shell in rails container
 shell:
-	docker compose -f $(COMPOSE_FILE) exec rails_app bash
+	docker compose -f $(COMPOSE_FILE) exec rails bash
 
 project-setup-structure:
 	mkdir -p __RailsApp__/tmp
@@ -84,5 +84,5 @@ project-help:
 	@echo "  make status              - Show running containers status"
 	@echo "  make build               - Build or rebuild containers"
 	@echo "  make rebuild             - Rebuild containers"
-	@echo "  make shell               - Open shell in rails_app container"
+	@echo "  make shell               - Open shell in rails container"
 	@echo "=============================================================="

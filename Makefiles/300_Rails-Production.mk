@@ -21,80 +21,80 @@ COMPOSE_FILE := ./docker/docker-compose.yml
 
 # Production setup
 rails-production-setup:
-	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails_app make production-setup
+	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails make production-setup
 
 # Production bundle commands
 rails-production-bundle:
-	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails_app make production-bundle
+	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails make production-bundle
 
 rails-production-bundle-reset:
-	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails_app make production-bundle-reset
+	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails make production-bundle-reset
 
 # Production assets commands
 rails-production-assets:
-	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails_app make production-assets-precompile
+	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails make production-assets-precompile
 
 rails-production-precompile:
-	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails_app make production-precompile
+	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails make production-precompile
 
 rails-production-assets-clean:
-	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails_app make production-assets-clean
+	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails make production-assets-clean
 
 # Production database commands
 rails-production-db-create:
-	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails_app make production-db-create
+	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails make production-db-create
 
 rails-production-db-migrate:
-	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails_app make production-db-migrate
+	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails make production-db-migrate
 
 rails-production-db-seed:
-	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails_app make production-db-seed
+	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails make production-db-seed
 
 rails-production-db-setup:
-	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails_app make production-db-create
-	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails_app make production-db-migrate
-	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails_app make production-db-seed
+	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails make production-db-create
+	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails make production-db-migrate
+	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails make production-db-seed
 
 rails-production-db-reset:
-	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails_app make production-db-reset
+	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails make production-db-reset
 
 rails-production-db-rollback:
-	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails_app make production-db-rollback
+	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails make production-db-rollback
 
 # Production server commands
 rails-production-server:
-	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails_app bash -c "RAILS_ENV=production bundle exec puma -b tcp://0.0.0.0:3000"
+	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails bash -c "RAILS_ENV=production bundle exec puma -b tcp://0.0.0.0:3000"
 
 rails-production-server-daemon:
-	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec -d rails_app bash -c "RAILS_ENV=production bundle exec puma -b tcp://0.0.0.0:3000 --pidfile tmp/pids/production-server.pid"
+	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec -d rails bash -c "RAILS_ENV=production bundle exec puma -b tcp://0.0.0.0:3000 --pidfile tmp/pids/production-server.pid"
 
 rails-production-start:
 	make env-setup-production
 	make rails-production-up
 	make rails-production-setup
-	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails_app make production-bundle
-	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails_app make production-db-create
-	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails_app make production-db-migrate
-	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails_app make production-assets-clean
-	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails_app make production-assets-precompile
+	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails make production-bundle
+	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails make production-db-create
+	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails make production-db-migrate
+	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails make production-assets-clean
+	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails make production-assets-precompile
 	make rails-production-server-daemon
 
 rails-production-stop:
-	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails_app make production-stop
+	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails make production-stop
 
 # Production console
 rails-production-console:
-	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails_app make production-console
+	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails make production-console
 
 # Production logs (delegated to container)
 rails-production-log-tail:
-	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails_app make production-log-tail
+	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails make production-log-tail
 
 rails-production-logs:
-	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails_app make production-logs
+	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails make production-logs
 
 rails-production-log-clear:
-	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails_app make production-log-clear
+	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails make production-log-clear
 
 # =============================================================================
 # Docker Container Management Commands (host-level only)
@@ -119,7 +119,7 @@ rails-production-docker-logs:
 
 # Production bash access
 rails-production-bash:
-	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails_app bash
+	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails bash
 
 # =============================================================================
 # Combined Workflows 

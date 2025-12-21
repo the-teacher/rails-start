@@ -22,8 +22,8 @@ Simple reference for `Makefiles/100_Project.mk` commands in logical usage order.
 
 <tr><td colspan="2"><strong>Container Status & Access</strong></td></tr>
 <tr><td><code>make status</code></td><td>Show running containers status</td></tr>
-<tr><td><code>make shell</code></td><td>Open shell in rails_app container</td></tr>
-<tr><td><code>make root-shell</code></td><td>Open shell in rails_app container as root</td></tr>
+<tr><td><code>make shell</code></td><td>Open shell in rails container</td></tr>
+<tr><td><code>make root-shell</code></td><td>Open shell in rails container as root</td></tr>
 
 <tr><td colspan="2"><strong>Project Setup</strong></td></tr>
 <tr><td><code>make project-setup-structure</code></td><td>Create required project directories and files</td></tr>

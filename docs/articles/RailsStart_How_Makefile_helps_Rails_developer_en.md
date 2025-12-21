@@ -165,7 +165,7 @@ make db-migrate        # Executes directly
 
 ```bash
 # Instead of complex command:
-docker compose -f ./docker/docker-compose.yml exec rails_app bundle exec rails db:migrate
+docker compose -f ./docker/docker-compose.yml exec rails bundle exec rails db:migrate
 
 # Simply:
 make rails-db-migrate
@@ -191,10 +191,10 @@ Host commands are automatically delegated to containers, maintaining interface u
 ```makefile
 # On host (Makefiles/200_Rails.mk)
 rails-console:
-	docker compose -f $(COMPOSE_FILE) exec rails_app make console
+	docker compose -f $(COMPOSE_FILE) exec rails make console
 
 rails-db-migrate:
-	docker compose -f $(COMPOSE_FILE) exec rails_app make db-migrate
+	docker compose -f $(COMPOSE_FILE) exec rails make db-migrate
 
 # In container (__RailsApp__/Makefiles/200_Rails.mk)
 console:
