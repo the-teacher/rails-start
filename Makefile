@@ -12,6 +12,7 @@ include Makefiles/100_Project.mk
 include Makefiles/200_Rails.mk
 include Makefiles/300_Rails-Production.mk
 include Makefiles/400_env.mk
+include Makefiles/500_nginx.mk
 
 # Main help command
 help:

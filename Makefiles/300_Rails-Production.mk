@@ -115,7 +115,7 @@ rails-production-restart:
 
 # View production logs from Docker
 rails-production-docker-logs:
-	RAILS_ENV=production RAILS_ENV=production docker compose -f $(COMPOSE_FILE) logs -f rails_app
+	RAILS_ENV=production RAILS_ENV=production docker compose -f $(COMPOSE_FILE) logs -f rails
 
 # Production bash access
 rails-production-bash:
