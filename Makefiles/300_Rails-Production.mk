@@ -23,6 +23,10 @@ COMPOSE_FILE := ./docker/docker-compose.yml
 rails-production-setup:
 	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails make production-setup
 
+# As root user inside container
+rails-production-setup-rails-ownership:
+	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec --user root rails chown -R rails:rails /home/rails/RailsApp
+
 # Production bundle commands
 rails-production-bundle:
 	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails make production-bundle
@@ -72,6 +76,7 @@ rails-production-start:
 	make env-setup-production
 	make rails-production-up
 	make rails-production-setup
+	make rails-production-setup-rails-ownership
 	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails make production-bundle
 	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails make production-db-create
 	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec rails make production-db-migrate
