@@ -72,6 +72,7 @@ RUN echo "$TARGETARCH" > /TARGETARCH
 #   - file: Determines file type
 #   - lsof: Lists open files and processes
 #   - ca-certificates: Common CA certificates for HTTPS (here for node/npm)
+#   - pkg-config: Helper tool for compiling applications and libraries
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 RUN apt-get update && apt-get install -y --no-install-recommends \
     # Build tools
@@ -107,6 +108,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     lsof \
     # SSL/TLS certificates
     ca-certificates \
+    pkg-config \
     # Clean up
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*

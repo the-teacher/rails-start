@@ -196,12 +196,12 @@ RUN mkdir -p /home/rails/RailsApp
 
 # YJIT is a new JIT compiler for Ruby that can significantly improve performance
 # Enable YJIT (Ruby's Just-In-Time compiler) for better performance
-# ENV RUBY_YJIT_ENABLE=1
-# ENV RUBYOPT="--yjit"
+ENV RUBY_YJIT_ENABLE=1
+ENV RUBYOPT="--yjit"
 
 # https://railsatscale.com/2025-12-24-launch-zjit/
-ENV RUBY_ZJIT_ENABLE=1
-ENV RUBYOPT="--zjit"
+# ENV RUBY_ZJIT_ENABLE=1
+# ENV RUBYOPT="--zjit"
 
 # Set editor for rails credentials
 ENV EDITOR="vim"
