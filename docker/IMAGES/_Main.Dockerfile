@@ -170,7 +170,7 @@ ENV PATH="/home/rails/.rbenv/bin:/home/rails/.rbenv/shims:${PATH}"
 # YJIT_OPTS - enables YJIT JIT compiler during Ruby build
 # ZJIT is an alternative JIT compiler for Ruby, focused on reducing memory usage
 # Example: ./configure "--prefix=$HOME/.rbenv/versions/X.Y.Z" --enable-shared --enable-yjit --with-ext=openssl,psy
-ENV RUBY_CONFIGURE_OPTS="--enable-yjit"
+ENV RUBY_CONFIGURE_OPTS="--enable-yjit --enable-zjit"
 
 # Note:
 # See: https://docs.ruby-lang.org/en/master/zjit_md.html => "--enable-zjit=dev"
@@ -196,8 +196,8 @@ RUN mkdir -p /home/rails/RailsApp
 
 # YJIT is a new JIT compiler for Ruby that can significantly improve performance
 # Enable YJIT (Ruby's Just-In-Time compiler) for better performance
-ENV RUBY_YJIT_ENABLE=1
-ENV RUBYOPT="--yjit"
+# ENV RUBY_YJIT_ENABLE=1
+# ENV RUBYOPT="--yjit"
 
 # https://railsatscale.com/2025-12-24-launch-zjit/
 ENV RUBY_ZJIT_ENABLE=1
