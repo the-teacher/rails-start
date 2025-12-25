@@ -12,7 +12,7 @@ services:
   rails:
     tty: true
     stdin_open: true
-    image: iamteacher/rails-start.main:latest
+    image: ghcr.io/the-teacher/rails-start.main:latest
     env_file:
       - ../ENV/local/.env.${RAILS_ENV:-development}
     environment:
