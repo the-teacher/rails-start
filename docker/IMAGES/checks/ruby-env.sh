@@ -83,6 +83,20 @@ check_yjit_status() {
     ruby -e 'puts RubyVM::YJIT.enabled? rescue puts "YJIT not available in this Ruby version"'
 }
 
+check_zjit_status() {
+    section_header "ZJIT Status" "green"
+
+    # Check environment variables
+    echo "Environment variables:"
+    echo "RUBY_ZJIT_ENABLE: ${RUBY_ZJIT_ENABLE:-Not set}"
+    echo "RUBYOPT: ${RUBYOPT:-Not set}"
+
+    # Check if ZJIT is actually enabled by running Ruby code
+    echo ""
+    echo "ZJIT enabled in current Ruby process:"
+    ruby -e 'puts RubyVM::ZJIT.enabled? rescue puts "ZJIT not available in this Ruby version"'
+}
+
 # Check jemalloc status
 check_jemalloc_status() {
     section_header "jemalloc Status" "green"
@@ -106,6 +120,7 @@ main() {
     check_bundler_version
     check_rails_version
     check_yjit_status
+    check_zjit_status
     check_jemalloc_status
     
     section_header "Check Complete" "blue"

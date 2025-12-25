@@ -50,8 +50,6 @@ USER root
 # zlib1g-dev - Zlib compression library development files (required for Ruby)
 # libffi-dev - Foreign Function Interface library (required for fiddle gem and Ruby FFI)
 # libyaml-dev - YAML parsing library (required for psych gem and Ruby YAML support)
-# rustc - Rust compiler (required for YJIT - Ruby's Just-In-Time compiler)
-# cargo - Rust package manager (required for YJIT)
 # build-essential - C compiler and build tools (already in base, but essential for Ruby)
 # ---------------------------------------------------------------
 # ufw - for basic security
@@ -64,6 +62,16 @@ USER root
 # lsb-release - for distribution information
 # ca-certificates - for HTTPS
 # JMALLOC - memory allocator to reduce fragmentation
+# ---------------------------------------------------------------
+
+# ---------------------------------------------------------------
+# ZJIT needs for Rust 1.85.0+
+# rustc - Rust compiler (required for YJIT - Ruby's Just-In-Time compiler)
+# cargo - Rust package manager (required for YJIT)
+# ---------------------------------------------------------------
+
+# ---------------------------------------------------------------
+# NOTE: Rust will be installed later for rails user to use with local Ruby
 # ---------------------------------------------------------------
 
 RUN apt-get update && apt-get install --no-install-recommends -y \
@@ -79,8 +87,6 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     zlib1g-dev \
     libffi-dev \
     libyaml-dev \
-    rustc \
-    cargo \
     ufw \
     fail2ban \
     rsync \
@@ -135,6 +141,19 @@ ENV NPM_VERSION=${NPM_VERSION}
 ENV NODE_VERSION=${NODE_VERSION}
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+# RUST (for ZJIT support in Ruby 4.0+)
+# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+# ZJIT needs Rust 1.85.0+
+# Install Rust via official rustup installer for rails user
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable
+
+# Add Rust to PATH for rails user
+ENV PATH="/home/rails/.cargo/bin:${PATH}"
+
+# Add Rust initialization to bashrc
+RUN echo 'source $HOME/.cargo/env' >> ~/.bashrc
+
+# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 # NODE.JS (Local version for rails user)
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
@@ -150,7 +169,6 @@ RUN . "$NVM_DIR/nvm.sh" && npm install -g svgo
 
 # Add NVM binaries to PATH
 ENV PATH="/home/rails/.nvm/versions/node/v${NODE_VERSION}/bin:${PATH}"
-
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -170,13 +188,11 @@ ENV PATH="/home/rails/.rbenv/bin:/home/rails/.rbenv/shims:${PATH}"
 # YJIT_OPTS - enables YJIT JIT compiler during Ruby build
 # ZJIT is an alternative JIT compiler for Ruby, focused on reducing memory usage
 # Example: ./configure "--prefix=$HOME/.rbenv/versions/X.Y.Z" --enable-shared --enable-yjit --with-ext=openssl,psy
+
 ENV RUBY_CONFIGURE_OPTS="--enable-yjit --enable-zjit"
 
-# Note:
-# See: https://docs.ruby-lang.org/en/master/zjit_md.html => "--enable-zjit=dev"
-
 # Use direct binary path for rbenv commands to avoid PATH initialization issues in Docker
-RUN ~/.rbenv/bin/rbenv install ${RUBY_VERSION}
+RUN source ~/.cargo/env && ~/.rbenv/bin/rbenv install ${RUBY_VERSION}
 RUN ~/.rbenv/bin/rbenv global ${RUBY_VERSION}
 
 # Update gem system to the latest version
@@ -196,12 +212,12 @@ RUN mkdir -p /home/rails/RailsApp
 
 # YJIT is a new JIT compiler for Ruby that can significantly improve performance
 # Enable YJIT (Ruby's Just-In-Time compiler) for better performance
-ENV RUBY_YJIT_ENABLE=1
-ENV RUBYOPT="--yjit"
+# ENV RUBY_YJIT_ENABLE=1
+# ENV RUBYOPT="--yjit"
 
 # https://railsatscale.com/2025-12-24-launch-zjit/
-# ENV RUBY_ZJIT_ENABLE=1
-# ENV RUBYOPT="--zjit"
+ENV RUBY_ZJIT_ENABLE=1
+ENV RUBYOPT="--zjit"
 
 # Set editor for rails credentials
 ENV EDITOR="vim"
