@@ -199,6 +199,10 @@ RUN mkdir -p /home/rails/RailsApp
 ENV RUBY_YJIT_ENABLE=1
 ENV RUBYOPT="--yjit"
 
+# https://railsatscale.com/2025-12-24-launch-zjit/
+ENV RUBY_ZJIT_ENABLE=1
+ENV RUBYOPT="--zjit"
+
 # Set editor for rails credentials
 ENV EDITOR="vim"
 
