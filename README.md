@@ -88,15 +88,15 @@ Now visit: `http://localhost:3000` in your browser.
 
 ### Docker Hub
 
-- [Base: Initial Software](https://hub.docker.com/r/iamteacher/rails-start.base/tags)
-- [Main: Ruby + NodeJS + Rails](https://hub.docker.com/r/iamteacher/rails-start.main/tags)
-- [Media: Media Processing Tools](https://hub.docker.com/r/iamteacher/rails-start.media/tags)
+- [Base: Initial Software](https://hub.docker.com/r/iamteacher/rails-start.base/tags) | [Base.Dockerfile](./docker/IMAGES/_Base.Dockerfile)
+- [Main: Ruby + NodeJS + Rails](https://hub.docker.com/r/iamteacher/rails-start.main/tags) | [Main.Dockerfile](./docker/IMAGES/_Main.Dockerfile)
+- [Media: Media Processing Tools](https://hub.docker.com/r/iamteacher/rails-start.media/tags) | [Media.Dockerfile](./docker/IMAGES/_Media.Dockerfile)
 
 ### Github Container Registry
 
-- [Base: Initial Software](https://github.com/the-teacher/rails-start/pkgs/container/rails-start.base)
-- [Main: Ruby + NodeJS + Rails](https://github.com/the-teacher/rails-start/pkgs/container/rails-start.main)
-- [Media: Media Processing Tools](https://github.com/the-teacher/rails-start/pkgs/container/rails-start.media)
+- [Base: Initial Software](https://github.com/the-teacher/rails-start/pkgs/container/rails-start.base) | [Base.Dockerfile](./docker/IMAGES/_Base.Dockerfile)
+- [Main: Ruby + NodeJS + Rails](https://github.com/the-teacher/rails-start/pkgs/container/rails-start.main) | [Main.Dockerfile](./docker/IMAGES/_Main.Dockerfile)
+- [Media: Media Processing Tools](https://github.com/the-teacher/rails-start/pkgs/container/rails-start.media) | [Media.Dockerfile](./docker/IMAGES/_Media.Dockerfile)
 
 # License
 
