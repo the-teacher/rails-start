@@ -116,14 +116,14 @@ RUN groupadd --system --gid 1000 rails && \
 USER rails:rails
 
 # https://www.ruby-lang.org/en/downloads/
-ARG RUBY_VERSION=3.4.7
+ARG RUBY_VERSION=4.0.0
 # https://rubygems.org/gems/rubygems-update/versions
-ARG DEFAULT_GEM_VERSION=3.7.2
+ARG DEFAULT_GEM_VERSION=4.0.3
 
 # https://nodejs.org/en/download
-ARG NODE_VERSION=22.21.0
+ARG NODE_VERSION=24.12.0
 # https://www.npmjs.com/package/npm
-ARG NPM_VERSION=11.6.2
+ARG NPM_VERSION=11.7.0
 # https://github.com/nvm-sh/nvm/releases
 ARG NVM_VERSION=0.40.3
 
