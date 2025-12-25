@@ -41,7 +41,7 @@ ARG BASE_DEBIAN=debian:bookworm
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 # https://github.com/shssoichiro/oxipng/releases
-ARG OXIPNG_VERSION=9.1.5
+ARG OXIPNG_VERSION=10.0.0
 # https://www.ijg.org/files
 ARG JPEG_VERSION=9f
 # https://github.com/mozilla/mozjpeg/releases
@@ -53,11 +53,11 @@ ARG PNGOUT_VERSION=20200115
 # https://github.com/amadvance/advancecomp/releases
 ARG ADVANCECOMP_VERSION=2.6
 # https://github.com/tjko/jpegoptim/releases
-ARG JPEGOPTIM_VERSION=1.5.5
+ARG JPEGOPTIM_VERSION=1.5.6
 # https://developers.google.com/speed/webp/download
 ARG WEBP_VERSION=1.6.0
 # https://github.com/ImageMagick/ImageMagick/releases
-ARG IMAGEMAGICK_VERSION=7.1.2-3
+ARG IMAGEMAGICK_VERSION=7.1.2-11
 # https://www.lcdf.org/gifsicle/
 ARG GIFSICLE_VERSION=1.96
 # https://www.sentex.net/~mwandel/jhead/
@@ -66,6 +66,7 @@ ARG JHEAD_VERSION=3.04
 # ARG OPTIPNG_VERSION=0.7.8
 ARG OPTIPNG_VERSION=7.9.1
 # https://pmt.sourceforge.net/pngcrush/
+# https://pmt.sourceforge.io/pngcrush/ChangeLog.html
 ARG PNGCRUSH_VERSION=1.8.13
 
 # https://pngquant.org/releases.html
