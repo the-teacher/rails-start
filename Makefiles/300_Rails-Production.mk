@@ -25,7 +25,7 @@ rails-production-setup:
 
 # As root user inside container
 rails-production-setup-rails-ownership:
-	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec --user root rails chown -R rails:rails /home/rails/RailsApp
+	RAILS_ENV=production docker compose -f $(COMPOSE_FILE) exec --user root rails sh -c 'chown -R rails:rails /home/rails/RailsApp 2>/dev/null || true'
 
 # Production bundle commands
 rails-production-bundle:

@@ -32,17 +32,20 @@ ARG DEBIAN_VERSION=debian:bookworm
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 # STAGE | MAIN
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-FROM --platform=$BUILDPLATFORM $DEBIAN_VERSION
+FROM --platform=$TARGETPLATFORM $DEBIAN_VERSION
 
 # Build arguments
 ARG TARGETARCH
 ARG BUILDPLATFORM
+ARG TARGETPLATFORM
 
 ENV TARGETARCH=${TARGETARCH}
 ENV BUILDPLATFORM=${BUILDPLATFORM}
+ENV TARGETPLATFORM=${TARGETPLATFORM}
 
 RUN echo "$BUILDPLATFORM" > /BUILDPLATFORM
 RUN echo "$TARGETARCH" > /TARGETARCH
+RUN echo "$TARGETPLATFORM" > /TARGETPLATFORM
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 # Install all required packages:

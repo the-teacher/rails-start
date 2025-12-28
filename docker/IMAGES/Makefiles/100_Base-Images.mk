@@ -12,6 +12,9 @@
 # https://hub.docker.com/r/iamteacher/rails-start.base/tags
 # ===============================================================
 
+DOCKER_HUB_REPO = iamteacher/rails-start.base
+GITHUB_REPO = ghcr.io/the-teacher/rails-start.base
+
 # Variables for building images
 BASE_DOCKERFILE = ./_Base.Dockerfile
 IMAGE_NAME = iamteacher/rails-start.base
@@ -25,7 +28,8 @@ base-image-arm64-build:
 	docker build \
 		-t $(IMAGE_NAME):arm64 \
 		-f $(BASE_DOCKERFILE) \
-		--build-arg BUILDPLATFORM="linux/arm64" \
+		--platform linux/arm64 \
+		--build-arg TARGETPLATFORM="linux/arm64" \
 		--build-arg TARGETARCH="arm64" \
 		.
 
@@ -34,7 +38,8 @@ base-image-amd64-build:
 	docker build \
 		-t $(IMAGE_NAME):amd64 \
 		-f $(BASE_DOCKERFILE) \
-		--build-arg BUILDPLATFORM="linux/amd64" \
+		--platform linux/amd64 \
+		--build-arg TARGETPLATFORM="linux/amd64" \
 		--build-arg TARGETARCH="amd64" \
 		.
 
@@ -168,6 +173,58 @@ base-images-buildx-push:
 base-images-buildx-update:
 	make base-images-buildx-push
 	@echo "Multi-architecture base image built and pushed successfully!"
+
+# Download the most recent version of images and check architecture
+base-images-arch-check:
+	@echo "=============================================================="
+	@echo "Checking architectures of base images"
+	@echo "=============================================================="
+	@echo ""
+	@echo "Cleaning up old local images..."
+	-docker rmi $(DOCKER_HUB_REPO):latest $(DOCKER_HUB_REPO):arm64 $(DOCKER_HUB_REPO):amd64 2>/dev/null || true
+	-docker rmi $(GITHUB_REPO):latest $(GITHUB_REPO):arm64 $(GITHUB_REPO):amd64 2>/dev/null || true
+	@echo ""
+	@echo "Pulling latest images from Docker Hub..."
+	@echo "--------------------------------------------------------------"
+	docker pull --platform linux/arm64 $(DOCKER_HUB_REPO):latest
+	docker pull --platform linux/amd64 $(DOCKER_HUB_REPO):latest
+	@echo ""
+	@echo "Pulling latest images from GitHub Container Registry..."
+	@echo "--------------------------------------------------------------"
+	docker pull --platform linux/arm64 $(GITHUB_REPO):latest
+	docker pull --platform linux/amd64 $(GITHUB_REPO):latest
+	@echo ""
+	@echo "=============================================================="
+	@echo "Architecture verification results:"
+	@echo "=============================================================="
+	@echo ""
+	@echo "Docker Hub (arm64):"
+	@printf "  Expected: arm64 | Actual: "
+	@docker inspect --format='{{.Architecture}}' $(DOCKER_HUB_REPO):latest | grep -q arm64 && echo "arm64 ✓" || (docker inspect --format='{{.Architecture}}' $(DOCKER_HUB_REPO):latest && echo "✗ MISMATCH!")
+	@echo ""
+	@echo "Docker Hub (amd64):"
+	@printf "  Expected: amd64 | Actual: "
+	@docker inspect --format='{{.Architecture}}' $(DOCKER_HUB_REPO):latest | grep -q amd64 && echo "amd64 ✓" || (docker inspect --format='{{.Architecture}}' $(DOCKER_HUB_REPO):latest && echo "✗ MISMATCH!")
+	@echo ""
+	@echo "GitHub Container Registry (arm64):"
+	@printf "  Expected: arm64 | Actual: "
+	@docker inspect --format='{{.Architecture}}' $(GITHUB_REPO):latest | grep -q arm64 && echo "arm64 ✓" || (docker inspect --format='{{.Architecture}}' $(GITHUB_REPO):latest && echo "✗ MISMATCH!")
+	@echo ""
+	@echo "GitHub Container Registry (amd64):"
+	@printf "  Expected: amd64 | Actual: "
+	@docker inspect --format='{{.Architecture}}' $(GITHUB_REPO):latest | grep -q amd64 && echo "amd64 ✓" || (docker inspect --format='{{.Architecture}}' $(GITHUB_REPO):latest && echo "✗ MISMATCH!")
+	@echo ""
+	@echo "=============================================================="
+	@echo "Full manifest inspection:"
+	@echo "=============================================================="
+	@echo ""
+	@echo "Docker Hub manifest:"
+	@docker manifest inspect $(DOCKER_HUB_REPO):latest | grep -E '"architecture"|"os"'
+	@echo ""
+	@echo "GitHub Container Registry manifest:"
+	@docker manifest inspect $(GITHUB_REPO):latest | grep -E '"architecture"|"os"'
+	@echo ""
+	@echo "=============================================================="
 
 # Help for base image building commands
 base-images-help:
