@@ -17,6 +17,8 @@
 # ===============================================================
 MEDIA_DOCKERFILE = ./_Media.Dockerfile
 MEDIA_IMAGE_NAME = iamteacher/rails-start.media
+MEDIA_DOCKER_HUB_REPO = iamteacher/rails-start.media
+MEDIA_GITHUB_REPO = ghcr.io/the-teacher/rails-start.media
 
 # Main image source (can be 'dockerhub' or 'ghcr')
 # dockerhub: iamteacher/rails-start.main:latest (Docker Hub)
@@ -35,6 +37,8 @@ media-image-arm64-build:
 		-t $(MEDIA_IMAGE_NAME):arm64 \
 		-f $(MEDIA_DOCKERFILE) \
 		--platform linux/arm64 \
+		--build-arg TARGETPLATFORM="linux/arm64" \
+		--build-arg TARGETARCH="arm64" \
 		--build-arg BASE_IMAGE=$(MAIN_IMAGE) \
 		.
 
@@ -44,6 +48,8 @@ media-image-amd64-build:
 		-t $(MEDIA_IMAGE_NAME):amd64 \
 		-f $(MEDIA_DOCKERFILE) \
 		--platform linux/amd64 \
+		--build-arg TARGETPLATFORM="linux/amd64" \
+		--build-arg TARGETARCH="amd64" \
 		--build-arg BASE_IMAGE=$(MAIN_IMAGE) \
 		.
 
@@ -75,7 +81,7 @@ media-images-update:
 	make media-images-push
 	make media-images-manifest-create
 	make media-images-manifest-push
-	@echo "media images built and published successfully!"
+	@echo "Media images built and published successfully!"
 
 # Run shell in ARM64 media image
 media-image-arm64-shell:
@@ -111,35 +117,69 @@ media-image-amd64-root-shell:
 		$(MEDIA_IMAGE_NAME):amd64 \
 		/bin/bash
 
-# Run Rails app in container on ARM64
-media-image-arm64-rails-run:
-	docker run --rm -it \
-		--platform linux/arm64 \
-		-v $(PWD):/app \
-		-p 3000:3000 \
-		$(MEDIA_IMAGE_NAME):arm64 \
-		bash -c "cd /app && bundle install && rails server -b 0.0.0.0"
-
-# Run Rails app in container on AMD64
-media-image-amd64-rails-run:
-	docker run --rm -it \
-		--platform linux/amd64 \
-		-v $(PWD):/app \
-		-p 3000:3000 \
-		$(MEDIA_IMAGE_NAME):amd64 \
-		bash -c "cd /app && bundle install && rails server -b 0.0.0.0"
-
-# Clean main docker images related to this project
+# Clean media docker images related to this project
 media-images-clean:
 	@echo "Cleaning media images..."
 	@echo "Removing tagged images..."
 	-docker rmi $(MEDIA_IMAGE_NAME):arm64 $(MEDIA_IMAGE_NAME):amd64 $(MEDIA_IMAGE_NAME):latest
-	@echo "media images cleanup completed!" 
+	@echo "Media images cleanup completed!"
 
 media-images-pull:
 	@echo "Pulling latest media image from Docker Hub..."
 	docker pull $(MEDIA_IMAGE_NAME):latest
-	@echo "media images pulled successfully!"
+	@echo "Media images pulled successfully!"
+
+# Download the most recent version of media images and check architecture
+media-images-arch-check:
+	@echo "=============================================================="
+	@echo "Checking architectures of media images"
+	@echo "=============================================================="
+	@echo ""
+	@echo "Cleaning up old local images..."
+	-docker rmi $(MEDIA_DOCKER_HUB_REPO):latest $(MEDIA_DOCKER_HUB_REPO):arm64 $(MEDIA_DOCKER_HUB_REPO):amd64 2>/dev/null || true
+	-docker rmi $(MEDIA_GITHUB_REPO):latest $(MEDIA_GITHUB_REPO):arm64 $(MEDIA_GITHUB_REPO):amd64 2>/dev/null || true
+	@echo ""
+	@echo "Pulling latest images from Docker Hub..."
+	@echo "--------------------------------------------------------------"
+	docker pull --platform linux/arm64 $(MEDIA_DOCKER_HUB_REPO):latest
+	docker pull --platform linux/amd64 $(MEDIA_DOCKER_HUB_REPO):latest
+	@echo ""
+	@echo "Pulling latest images from GitHub Container Registry..."
+	@echo "--------------------------------------------------------------"
+	docker pull --platform linux/arm64 $(MEDIA_GITHUB_REPO):latest
+	docker pull --platform linux/amd64 $(MEDIA_GITHUB_REPO):latest
+	@echo ""
+	@echo "=============================================================="
+	@echo "Architecture verification results:"
+	@echo "=============================================================="
+	@echo ""
+	@echo "Docker Hub (arm64):"
+	@printf "  Expected: arm64 | Actual: "
+	@docker inspect --format='{{.Architecture}}' $(MEDIA_DOCKER_HUB_REPO):latest | grep -q arm64 && echo "arm64 ✓" || (docker inspect --format='{{.Architecture}}' $(MEDIA_DOCKER_HUB_REPO):latest && echo "✗ MISMATCH!")
+	@echo ""
+	@echo "Docker Hub (amd64):"
+	@printf "  Expected: amd64 | Actual: "
+	@docker inspect --format='{{.Architecture}}' $(MEDIA_DOCKER_HUB_REPO):latest | grep -q amd64 && echo "amd64 ✓" || (docker inspect --format='{{.Architecture}}' $(MEDIA_DOCKER_HUB_REPO):latest && echo "✗ MISMATCH!")
+	@echo ""
+	@echo "GitHub Container Registry (arm64):"
+	@printf "  Expected: arm64 | Actual: "
+	@docker inspect --format='{{.Architecture}}' $(MEDIA_GITHUB_REPO):latest | grep -q arm64 && echo "arm64 ✓" || (docker inspect --format='{{.Architecture}}' $(MEDIA_GITHUB_REPO):latest && echo "✗ MISMATCH!")
+	@echo ""
+	@echo "GitHub Container Registry (amd64):"
+	@printf "  Expected: amd64 | Actual: "
+	@docker inspect --format='{{.Architecture}}' $(MEDIA_GITHUB_REPO):latest | grep -q amd64 && echo "amd64 ✓" || (docker inspect --format='{{.Architecture}}' $(MEDIA_GITHUB_REPO):latest && echo "✗ MISMATCH!")
+	@echo ""
+	@echo "=============================================================="
+	@echo "Full manifest inspection:"
+	@echo "=============================================================="
+	@echo ""
+	@echo "Docker Hub manifest:"
+	@docker manifest inspect $(MEDIA_DOCKER_HUB_REPO):latest | grep -E '"architecture"|"os"'
+	@echo ""
+	@echo "GitHub Container Registry manifest:"
+	@docker manifest inspect $(MEDIA_GITHUB_REPO):latest | grep -E '"architecture"|"os"'
+	@echo ""
+	@echo "=============================================================="
 
 # ===============================================================
 # Buildx commands (modern multi-architecture approach)
@@ -194,24 +234,28 @@ media-images-buildx-update:
 # Help for media image building commands
 media-images-help:
 	@echo "=============================================================="
-	@echo "media image building commands:"
+	@echo "Media image building commands:"
 	@echo "=============================================================="
+	@echo ""
+	@echo "Main image selection (set MAIN_IMAGE_SOURCE):"
+	@echo "  make media-image-arm64-build MAIN_IMAGE_SOURCE=dockerhub"
+	@echo "  make media-image-arm64-build MAIN_IMAGE_SOURCE=ghcr"
+	@echo ""
 	@echo "Single architecture commands (media-image-*):"
 	@echo "  make media-image-arm64-build         - Build media image for ARM64"
 	@echo "  make media-image-amd64-build         - Build media image for AMD64"
-	@echo "  make media-image-arm64-shell         - Enter shell of main ARM64 image"
-	@echo "  make media-image-amd64-shell         - Enter shell of main AMD64 image"
-	@echo "  make media-image-arm64-root-shell    - Enter shell of main ARM64 image as root user"
-	@echo "  make media-image-amd64-root-shell    - Enter shell of main AMD64 image as root user"
-	@echo "  make media-image-arm64-rails-run     - Run Rails app in ARM64 container"
-	@echo "  make media-image-amd64-rails-run     - Run Rails app in AMD64 container"
+	@echo "  make media-image-arm64-shell         - Enter shell of media ARM64 image"
+	@echo "  make media-image-amd64-shell         - Enter shell of media AMD64 image"
+	@echo "  make media-image-arm64-root-shell    - Enter shell of media ARM64 image as root user"
+	@echo "  make media-image-amd64-root-shell    - Enter shell of media AMD64 image as root user"
 	@echo ""
 	@echo "Multi-architecture commands (media-images-*):"
 	@echo "  make media-images-build              - Build media image for all platforms"
 	@echo "  make media-images-manifest-create    - Create manifest for media image"
 	@echo "  make media-images-push               - Push media images to Docker Hub"
 	@echo "  make media-images-manifest-push      - Push manifest to Docker Hub"
-	@echo "  make media-images-clean              - Remove all main project images"
+	@echo "  make media-images-clean              - Remove all media project images"
+	@echo "  make media-images-arch-check         - Check architectures of media images"
 	@echo ""
 	@echo "Buildx commands (modern multi-arch approach):"
 	@echo "  make media-images-buildx-setup       - Setup buildx builder for multi-platform builds"
@@ -224,4 +268,8 @@ media-images-help:
 	@echo "Complete workflow:"
 	@echo "  make media-images-update             - Build, push images and manifest (classic)"
 	@echo "  make media-images-buildx-update      - Build and push multi-arch image (modern)"
+	@echo ""
+	@echo "Environment variables:"
+	@echo "  MAIN_IMAGE_SOURCE=dockerhub          - Use Docker Hub main image (default)"
+	@echo "  MAIN_IMAGE_SOURCE=ghcr               - Use GitHub Container Registry main image"
 	@echo "=============================================================="

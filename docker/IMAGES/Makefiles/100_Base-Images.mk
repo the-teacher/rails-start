@@ -12,12 +12,11 @@
 # https://hub.docker.com/r/iamteacher/rails-start.base/tags
 # ===============================================================
 
-DOCKER_HUB_REPO = iamteacher/rails-start.base
-GITHUB_REPO = ghcr.io/the-teacher/rails-start.base
-
 # Variables for building images
 BASE_DOCKERFILE = ./_Base.Dockerfile
 IMAGE_NAME = iamteacher/rails-start.base
+DOCKER_HUB_REPO = iamteacher/rails-start.base
+GITHUB_REPO = ghcr.io/the-teacher/rails-start.base
 
 # Debian version for the base image
 # https://hub.docker.com/_/debian/tags?name=bookworm
