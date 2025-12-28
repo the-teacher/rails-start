@@ -154,20 +154,28 @@ media-images-arch-check:
 	@echo "=============================================================="
 	@echo ""
 	@echo "Docker Hub (arm64):"
-	@printf "  Expected: arm64 | Actual: "
-	@docker inspect --format='{{.Architecture}}' $(MEDIA_DOCKER_HUB_REPO):latest | grep -q arm64 && echo "arm64 ✓" || (docker inspect --format='{{.Architecture}}' $(MEDIA_DOCKER_HUB_REPO):latest && echo "✗ MISMATCH!")
+	@printf "  Expected: aarch64 | Actual: "
+	@ARCH=$$(docker run --rm --platform linux/arm64 $(MEDIA_DOCKER_HUB_REPO):latest uname -m); \
+		echo -n "$$ARCH"; \
+		if [ "$$ARCH" = "aarch64" ]; then echo " ✓"; else echo " ✗ MISMATCH!"; fi
 	@echo ""
 	@echo "Docker Hub (amd64):"
-	@printf "  Expected: amd64 | Actual: "
-	@docker inspect --format='{{.Architecture}}' $(MEDIA_DOCKER_HUB_REPO):latest | grep -q amd64 && echo "amd64 ✓" || (docker inspect --format='{{.Architecture}}' $(MEDIA_DOCKER_HUB_REPO):latest && echo "✗ MISMATCH!")
+	@printf "  Expected: x86_64 | Actual: "
+	@ARCH=$$(docker run --rm --platform linux/amd64 $(MEDIA_DOCKER_HUB_REPO):latest uname -m); \
+		echo -n "$$ARCH"; \
+		if [ "$$ARCH" = "x86_64" ]; then echo " ✓"; else echo " ✗ MISMATCH!"; fi
 	@echo ""
 	@echo "GitHub Container Registry (arm64):"
-	@printf "  Expected: arm64 | Actual: "
-	@docker inspect --format='{{.Architecture}}' $(MEDIA_GITHUB_REPO):latest | grep -q arm64 && echo "arm64 ✓" || (docker inspect --format='{{.Architecture}}' $(MEDIA_GITHUB_REPO):latest && echo "✗ MISMATCH!")
+	@printf "  Expected: aarch64 | Actual: "
+	@ARCH=$$(docker run --rm --platform linux/arm64 $(MEDIA_GITHUB_REPO):latest uname -m); \
+		echo -n "$$ARCH"; \
+		if [ "$$ARCH" = "aarch64" ]; then echo " ✓"; else echo " ✗ MISMATCH!"; fi
 	@echo ""
 	@echo "GitHub Container Registry (amd64):"
-	@printf "  Expected: amd64 | Actual: "
-	@docker inspect --format='{{.Architecture}}' $(MEDIA_GITHUB_REPO):latest | grep -q amd64 && echo "amd64 ✓" || (docker inspect --format='{{.Architecture}}' $(MEDIA_GITHUB_REPO):latest && echo "✗ MISMATCH!")
+	@printf "  Expected: x86_64 | Actual: "
+	@ARCH=$$(docker run --rm --platform linux/amd64 $(MEDIA_GITHUB_REPO):latest uname -m); \
+		echo -n "$$ARCH"; \
+		if [ "$$ARCH" = "x86_64" ]; then echo " ✓"; else echo " ✗ MISMATCH!"; fi
 	@echo ""
 	@echo "=============================================================="
 	@echo "Full manifest inspection:"
