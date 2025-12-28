@@ -17,6 +17,8 @@
 # ===============================================================
 MAIN_DOCKERFILE = ./_Main.Dockerfile
 MAIN_IMAGE_NAME = iamteacher/rails-start.main
+MAIN_DOCKER_HUB_REPO = iamteacher/rails-start.main
+MAIN_GITHUB_REPO = ghcr.io/the-teacher/rails-start.main
 
 # Base image source (can be 'dockerhub' or 'ghcr')
 # dockerhub: iamteacher/rails-start.base:latest (Docker Hub)
@@ -35,6 +37,8 @@ main-image-arm64-build:
 		-t $(MAIN_IMAGE_NAME):arm64 \
 		-f $(MAIN_DOCKERFILE) \
 		--platform linux/arm64 \
+		--build-arg TARGETPLATFORM="linux/arm64" \
+		--build-arg TARGETARCH="arm64" \
 		--build-arg BASE_IMAGE=$(BASE_IMAGE) \
 		.
 
@@ -44,6 +48,8 @@ main-image-amd64-build:
 		-t $(MAIN_IMAGE_NAME):amd64 \
 		-f $(MAIN_DOCKERFILE) \
 		--platform linux/amd64 \
+		--build-arg TARGETPLATFORM="linux/amd64" \
+		--build-arg TARGETARCH="amd64" \
 		--build-arg BASE_IMAGE=$(BASE_IMAGE) \
 		.
 
@@ -141,6 +147,58 @@ main-images-pull:
 	docker pull $(MAIN_IMAGE_NAME):latest
 	@echo "Main images pulled successfully!"
 
+# Download the most recent version of main images and check architecture
+main-images-arch-check:
+	@echo "=============================================================="
+	@echo "Checking architectures of main images"
+	@echo "=============================================================="
+	@echo ""
+	@echo "Cleaning up old local images..."
+	-docker rmi $(MAIN_DOCKER_HUB_REPO):latest $(MAIN_DOCKER_HUB_REPO):arm64 $(MAIN_DOCKER_HUB_REPO):amd64 2>/dev/null || true
+	-docker rmi $(MAIN_GITHUB_REPO):latest $(MAIN_GITHUB_REPO):arm64 $(MAIN_GITHUB_REPO):amd64 2>/dev/null || true
+	@echo ""
+	@echo "Pulling latest images from Docker Hub..."
+	@echo "--------------------------------------------------------------"
+	docker pull --platform linux/arm64 $(MAIN_DOCKER_HUB_REPO):latest
+	docker pull --platform linux/amd64 $(MAIN_DOCKER_HUB_REPO):latest
+	@echo ""
+	@echo "Pulling latest images from GitHub Container Registry..."
+	@echo "--------------------------------------------------------------"
+	docker pull --platform linux/arm64 $(MAIN_GITHUB_REPO):latest
+	docker pull --platform linux/amd64 $(MAIN_GITHUB_REPO):latest
+	@echo ""
+	@echo "=============================================================="
+	@echo "Architecture verification results:"
+	@echo "=============================================================="
+	@echo ""
+	@echo "Docker Hub (arm64):"
+	@printf "  Expected: arm64 | Actual: "
+	@docker inspect --format='{{.Architecture}}' $(MAIN_DOCKER_HUB_REPO):latest | grep -q arm64 && echo "arm64 ✓" || (docker inspect --format='{{.Architecture}}' $(MAIN_DOCKER_HUB_REPO):latest && echo "✗ MISMATCH!")
+	@echo ""
+	@echo "Docker Hub (amd64):"
+	@printf "  Expected: amd64 | Actual: "
+	@docker inspect --format='{{.Architecture}}' $(MAIN_DOCKER_HUB_REPO):latest | grep -q amd64 && echo "amd64 ✓" || (docker inspect --format='{{.Architecture}}' $(MAIN_DOCKER_HUB_REPO):latest && echo "✗ MISMATCH!")
+	@echo ""
+	@echo "GitHub Container Registry (arm64):"
+	@printf "  Expected: arm64 | Actual: "
+	@docker inspect --format='{{.Architecture}}' $(MAIN_GITHUB_REPO):latest | grep -q arm64 && echo "arm64 ✓" || (docker inspect --format='{{.Architecture}}' $(MAIN_GITHUB_REPO):latest && echo "✗ MISMATCH!")
+	@echo ""
+	@echo "GitHub Container Registry (amd64):"
+	@printf "  Expected: amd64 | Actual: "
+	@docker inspect --format='{{.Architecture}}' $(MAIN_GITHUB_REPO):latest | grep -q amd64 && echo "amd64 ✓" || (docker inspect --format='{{.Architecture}}' $(MAIN_GITHUB_REPO):latest && echo "✗ MISMATCH!")
+	@echo ""
+	@echo "=============================================================="
+	@echo "Full manifest inspection:"
+	@echo "=============================================================="
+	@echo ""
+	@echo "Docker Hub manifest:"
+	@docker manifest inspect $(MAIN_DOCKER_HUB_REPO):latest | grep -E '"architecture"|"os"'
+	@echo ""
+	@echo "GitHub Container Registry manifest:"
+	@docker manifest inspect $(MAIN_GITHUB_REPO):latest | grep -E '"architecture"|"os"'
+	@echo ""
+	@echo "=============================================================="
+
 # ===============================================================
 # Buildx commands (modern multi-architecture approach)
 # ===============================================================
@@ -217,6 +275,7 @@ main-images-help:
 	@echo "  make main-images-push               - Push main images to Docker Hub"
 	@echo "  make main-images-manifest-push      - Push manifest to Docker Hub"
 	@echo "  make main-images-clean              - Remove all main project images"
+	@echo "  make main-images-arch-check         - Check architectures of main images"
 	@echo ""
 	@echo "Buildx commands (modern multi-arch approach):"
 	@echo "  make main-images-buildx-setup       - Setup buildx builder for multi-platform builds"
