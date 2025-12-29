@@ -165,7 +165,7 @@ make db-migrate        # Выполняется напрямую
 
 ```bash
 # Вместо сложной команды:
-docker compose -f ./docker/docker-compose.yml exec rails bundle exec rails db:migrate
+docker-compose -f ./docker/docker-compose.yml exec rails bundle exec rails db:migrate
 
 # Достаточно:
 make rails-db-migrate
@@ -191,10 +191,10 @@ make rails-production-help  # Продакшн команды
 ```makefile
 # На хосте (Makefiles/200_Rails.mk)
 rails-console:
-	docker compose -f $(COMPOSE_FILE) exec rails make console
+	docker-compose -f $(COMPOSE_FILE) exec rails make console
 
 rails-db-migrate:
-	docker compose -f $(COMPOSE_FILE) exec rails make db-migrate
+	docker-compose -f $(COMPOSE_FILE) exec rails make db-migrate
 
 # В контейнере (__RailsApp__/Makefiles/200_Rails.mk)
 console:

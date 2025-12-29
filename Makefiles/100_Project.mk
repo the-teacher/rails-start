@@ -15,7 +15,7 @@ COMPOSE_FILE := ./docker/docker-compose.yml
 start:
 	make project-setup-structure
 	make env-setup-development
-	docker compose -f $(COMPOSE_FILE) up -d
+	docker-compose -f $(COMPOSE_FILE) up -d
 
 # Start containers
 up:
@@ -23,7 +23,7 @@ up:
 
 # Stop containers
 stop:
-	docker compose -f $(COMPOSE_FILE) down
+	docker-compose -f $(COMPOSE_FILE) down
 
 # Stop containers
 down:
@@ -31,28 +31,28 @@ down:
 
 # Stop containers and remove images, volumes, and orphans
 image-reset:
-	docker compose -f $(COMPOSE_FILE) down --rmi all --volumes --remove-orphans
+	docker-compose -f $(COMPOSE_FILE) down --rmi all --volumes --remove-orphans
 
 # Show running containers status
 status:
 	@echo "Running containers:"
-	@docker compose -f $(COMPOSE_FILE) ps --format "table {{.Name}}\t{{.Image}}\t{{.Service}}\t{{.Status}}\t{{.Ports}}"
+	@docker-compose -f $(COMPOSE_FILE) ps --format "table {{.Name}}\t{{.Image}}\t{{.Service}}\t{{.Status}}\t{{.Ports}}"
 
 # Build or rebuild containers
 build:
-	docker compose -f $(COMPOSE_FILE) build
+	docker-compose -f $(COMPOSE_FILE) build
 
 # Rebuild containers
 rebuild:
-	docker compose -f $(COMPOSE_FILE) build --no-cache
+	docker-compose -f $(COMPOSE_FILE) build --no-cache
 
 # Open shell in rails container as root user
 root-shell:
-	docker compose -f $(COMPOSE_FILE) exec --user root rails bash
+	docker-compose -f $(COMPOSE_FILE) exec --user root rails bash
 
 # Open shell in rails container
 shell:
-	docker compose -f $(COMPOSE_FILE) exec rails bash
+	docker-compose -f $(COMPOSE_FILE) exec rails bash
 
 project-setup-structure:
 	mkdir -p __RailsApp__/tmp

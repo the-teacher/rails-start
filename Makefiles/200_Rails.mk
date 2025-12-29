@@ -21,67 +21,67 @@ COMPOSE_FILE := ./docker/docker-compose.yml
 
 # Development setup
 rails-setup:
-	docker compose -f $(COMPOSE_FILE) exec rails make setup
+	docker-compose -f $(COMPOSE_FILE) exec rails make setup
 
 # Development bundle commands
 rails-bundle:
-	docker compose -f $(COMPOSE_FILE) exec rails make bundle
+	docker-compose -f $(COMPOSE_FILE) exec rails make bundle
 
 # Development database commands
 rails-db-create:
-	docker compose -f $(COMPOSE_FILE) exec rails make db-create
+	docker-compose -f $(COMPOSE_FILE) exec rails make db-create
 
 rails-db-migrate:
-	docker compose -f $(COMPOSE_FILE) exec rails make db-migrate
+	docker-compose -f $(COMPOSE_FILE) exec rails make db-migrate
 
 rails-db-seed:
-	docker compose -f $(COMPOSE_FILE) exec rails make db-seed
+	docker-compose -f $(COMPOSE_FILE) exec rails make db-seed
 
 # Development server commands
 rails-server:
-	docker compose -f $(COMPOSE_FILE) exec rails bash -c "bundle exec puma -b tcp://0.0.0.0:3000"
+	docker-compose -f $(COMPOSE_FILE) exec rails bash -c "bundle exec puma -b tcp://0.0.0.0:3000"
 
 rails-server-daemon:
-	docker compose -f $(COMPOSE_FILE) exec -d rails bash -c "bundle exec puma -b tcp://0.0.0.0:3000 --pidfile tmp/pids/server.pid"
+	docker-compose -f $(COMPOSE_FILE) exec -d rails bash -c "bundle exec puma -b tcp://0.0.0.0:3000 --pidfile tmp/pids/server.pid"
 
 rails-start:
 	make up
-	docker compose -f $(COMPOSE_FILE) exec rails make bundle
-	docker compose -f $(COMPOSE_FILE) exec rails make db-create
-	docker compose -f $(COMPOSE_FILE) exec rails make db-migrate
+	docker-compose -f $(COMPOSE_FILE) exec rails make bundle
+	docker-compose -f $(COMPOSE_FILE) exec rails make db-create
+	docker-compose -f $(COMPOSE_FILE) exec rails make db-migrate
 	make rails-server-daemon
 
 rails-shell:
 	make shell
 	
 rails-stop:
-	docker compose -f $(COMPOSE_FILE) exec rails make stop
+	docker-compose -f $(COMPOSE_FILE) exec rails make stop
 
 # Development console
 rails-console:
-	docker compose -f $(COMPOSE_FILE) exec rails make console
+	docker-compose -f $(COMPOSE_FILE) exec rails make console
 
 # Development logs (delegated to container)
 rails-log-tail:
-	docker compose -f $(COMPOSE_FILE) exec rails make log-tail
+	docker-compose -f $(COMPOSE_FILE) exec rails make log-tail
 
 rails-logs:
-	docker compose -f $(COMPOSE_FILE) exec rails make logs
+	docker-compose -f $(COMPOSE_FILE) exec rails make logs
 
 rails-log-clear:
-	docker compose -f $(COMPOSE_FILE) exec rails make log-clear
+	docker-compose -f $(COMPOSE_FILE) exec rails make log-clear
 
 # Show running processes inside Rails container
 rails-status:
 	@echo "Rails container processes:"
 	@echo "=============================================================="
-	docker compose -f $(COMPOSE_FILE) exec rails bash -c "ps aux"
+	docker-compose -f $(COMPOSE_FILE) exec rails bash -c "ps aux"
 
 # Copy Ruby environment check script to rails user home and execute it
 rails-ruby-env-test:
-	docker compose -f $(COMPOSE_FILE) cp docker/IMAGES/checks/ruby-env.sh rails_app:/home/rails/ruby-env.sh
-	docker compose -f $(COMPOSE_FILE) exec -e LD_PRELOAD=/usr/lib/libjemalloc.so.2 rails bash /home/rails/ruby-env.sh
-	docker compose -f $(COMPOSE_FILE) exec rails rm -f /home/rails/ruby-env.sh
+	docker-compose -f $(COMPOSE_FILE) cp docker/IMAGES/checks/ruby-env.sh rails_app:/home/rails/ruby-env.sh
+	docker-compose -f $(COMPOSE_FILE) exec -e LD_PRELOAD=/usr/lib/libjemalloc.so.2 rails bash /home/rails/ruby-env.sh
+	docker-compose -f $(COMPOSE_FILE) exec rails rm -f /home/rails/ruby-env.sh
 
 # =============================================================================
 # Docker Container Management Commands (host-level only)
@@ -89,7 +89,7 @@ rails-ruby-env-test:
 
 # Development bash access
 rails-bash:
-	docker compose -f $(COMPOSE_FILE) exec rails bash
+	docker-compose -f $(COMPOSE_FILE) exec rails bash
 
 # Help for Rails commands
 rails-help:
