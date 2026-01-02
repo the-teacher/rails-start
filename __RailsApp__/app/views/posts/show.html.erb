@@ -1,0 +1,71 @@
+<div class="post-show">
+  <article class="post">
+    <header class="post__header">
+      <h1 class="post__title"><%= @post.title %></h1>
+
+      <div class="post__meta">
+        <span class="badge badge--<%= @post.published ? 'published' : 'draft' %>">
+          <%= @post.published ? 'Published' : 'Draft' %>
+        </span>
+        <span class="post__id">ID: <%= @post.id %></span>
+      </div>
+
+      <% if @post.author %>
+        <div class="author">
+          <span class="author__label">Author:</span>
+          <span class="author__name"><%= @post.author.name %></span>
+          <span class="author__email"><%= @post.author.email %></span>
+        </div>
+      <% end %>
+    </header>
+
+    <div class="post__body">
+      <%= simple_format(@post.body) %>
+    </div>
+
+    <div class="post__actions">
+      <a href="<%= posts_path %>" class="post__action">← Back to Posts</a>
+    </div>
+
+    <footer class="post__footer">
+      <div class="cache-key">
+        Cache Key: <%= @post.cache_key_with_version %>
+      </div>
+
+      <div class="rendered-at">
+        Post Rendered At: <%= Time.current.strftime("%B %d, %Y %H:%M:%S") %>
+      </div>
+    </footer>
+  </article>
+
+  <section class="comments">
+    <h2 class="comments__title">Comments (<%= @post.comments.count %>)</h2>
+
+    <% if @post.comments.any? %>
+      <div class="comments__list">
+        <% @post.comments.each do |comment| %>
+          <article class="comment">
+            <div class="comment__header">
+              <span class="comment__author"><%= comment.author&.name || 'Anonymous' %></span>
+              <span class="comment__date"><%= comment.created_at.strftime("%B %d, %Y") %></span>
+            </div>
+
+            <div class="comment__body">
+              <%= simple_format(comment.body) %>
+            </div>
+
+            <div class="cache-key">
+              Cache Key: <%= comment.cache_key_with_version %>
+            </div>
+
+            <div class="rendered-at">
+              Comment Rendered At: <%= Time.current.strftime("%B %d, %Y %H:%M:%S") %>
+            </div>
+          </article>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="comments__empty">No comments yet.</p>
+    <% end %>
+  </section>
+</div>

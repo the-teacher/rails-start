@@ -16,6 +16,8 @@
       <p><strong>Ruby version:</strong> <%= @ruby_description %></p>
       <p><strong>YJIT:</strong> <%= @yjit_enabled ? 'enabled' : 'disabled' %></p>
       <p><strong>ZJIT:</strong> <%= @zjit_enabled ? 'enabled' : 'disabled' %></p>
+      <p><strong>Cache Enabled:</strong> <%= @cache_enabled ? 'Yes' : 'No' %></p>
+      <p><strong>Environment:</strong> <%= Rails.env %></p>
     </div>
   </div>
 </div>

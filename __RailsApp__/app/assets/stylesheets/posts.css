@@ -1,0 +1,279 @@
+/* ===== COMMON ===== */
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* ===== POSTS ===== */
+
+.posts {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.posts__title {
+  color: #2c3e50;
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  font-weight: 700;
+}
+
+/* ===== POST ===== */
+
+.post {
+  background: #ffffff;
+  border: 2px solid grey;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.post:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.post__header {
+  border-bottom: 2px solid #e1e8ed;
+}
+
+.post__title {
+  margin: 0 0 0.75rem 0;
+  font-size: 1.5rem;
+  line-height: 1.3;
+}
+
+.post-show .post__title {
+  font-size: 2.5rem;
+  margin: 0 0 1rem 0;
+  line-height: 1.2;
+}
+
+.post__link {
+  color: #1a73e8;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.post__link:hover {
+  color: #0d47a1;
+}
+
+.post__meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  color: #657786;
+  font-size: 0.875rem;
+}
+
+.post__id {
+  margin-left: 0.25rem;
+}
+
+.post__body {
+  color: #3c4858;
+  line-height: 1.6;
+  font-size: 1rem;
+}
+
+.post-show .post__body {
+  line-height: 1.8;
+  font-size: 1.125rem;
+}
+
+.post__footer {
+  padding-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  border-top: 1px solid #e1e8ed;
+}
+
+.post__read-more {
+  color: #1a73e8;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.post__read-more:hover {
+  color: #0d47a1;
+  text-decoration: underline;
+}
+
+.post__actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.post__action {
+  color: #1a73e8;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.post__action:hover {
+  color: #0d47a1;
+  text-decoration: underline;
+}
+
+/* ===== BADGE ===== */
+
+.badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badge--published {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.badge--draft {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+/* ===== POST SHOW ===== */
+
+.post-show {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+/* ===== AUTHOR ===== */
+
+.author {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  font-size: 0.875rem;
+}
+
+.author__label {
+  font-weight: 600;
+  color: #495057;
+}
+
+.author__name {
+  color: #2c3e50;
+  font-weight: 500;
+}
+
+.author__email {
+  color: #657786;
+}
+
+/* ===== COMMENTS ===== */
+
+.comments {
+  background: #ffffff;
+  border: 1px solid #e1e8ed;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.comments__title {
+  color: #2c3e50;
+  font-size: 1.5rem;
+  margin: 0 0 1.5rem 0;
+  font-weight: 700;
+}
+
+.comments__list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.comments__empty {
+  color: #657786;
+  font-style: italic;
+  text-align: center;
+  padding: 2rem 0;
+}
+
+/* ===== COMMENT ===== */
+
+.comment {
+  background: #f8f9fa;
+  border-left: 3px solid #1a73e8;
+  border-radius: 4px;
+  padding: 1rem 1.25rem;
+}
+
+.comment__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.comment__author {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.comment__date {
+  color: #657786;
+  font-size: 0.875rem;
+}
+
+.comment__body {
+  color: #3c4858;
+  line-height: 1.6;
+  margin-bottom: 0.75rem;
+}
+
+.comment__cache_key {
+  font-family: "Courier New", monospace;
+  font-size: 0.7rem;
+  color: black;
+  font-weight: bold;
+  padding-top: 0.5rem;
+  border-top: 1px solid #dee2e6;
+}
+
+/* ===== CACHE KEY ===== */
+
+.cache-key {
+  font-family: "Courier New", monospace;
+  font-size: 1rem;
+  color: black;
+  font-weight: bold;
+  padding: 0.75rem;
+  background-color: aliceblue;
+  border-radius: 8px;
+}
+
+/* ===== RENDERED AT ===== */
+.rendered-at {
+  font-family: "Courier New", monospace;
+  color: black;
+  font-weight: bold;
+  padding: 0.75rem;
+  background-color: aliceblue;
+  border-radius: 8px;
+}

@@ -1,0 +1,52 @@
+<div class="posts">
+  <h1 class="posts__title">Posts (<%= @posts.count %>)</h1>
+
+  <div class="rendered-at">
+    Posts Are Rendered At: <%= Time.current.strftime("%B %d, %Y %H:%M:%S") %>
+  </div>
+
+  <br />
+
+  <% @posts.each do |post| %>
+    <article class="post">
+      <header class="post__header">
+        <h2 class="post__title">
+          <a href="<%= post_path(post) %>" class="post__link"><%= post.title %></a>
+        </h2>
+
+        <div class="post__meta">
+          <span class="badge badge--<%= post.published ? 'published' : 'draft' %>">
+            <%= post.published ? 'Published' : 'Draft' %>
+          </span>
+          <span class="post__id">ID: <%= post.id %></span>
+        </div>
+
+        <% if post.author %>
+          <div class="author">
+            <span class="author__label">Author:</span>
+            <span class="author__name"><%= post.author.name %></span>
+            <span class="author__email"><%= post.author.email %></span>
+          </div>
+        <% end %>
+      </header>
+
+      <div class="post__body">
+        <%= truncate(post.body, length: 200) %>
+      </div>
+
+      <div class="post__actions">
+        <a href="<%= post_path(post) %>" class="post__action">Read more →</a>
+      </div>
+
+      <footer class="post__footer">
+        <div class="cache-key">
+          Cache Key: <%= post.cache_key_with_version %>
+        </div>
+
+        <div class="rendered-at">
+          Post Rendered At: <%= Time.current.strftime("%B %d, %Y %H:%M:%S") %>
+        </div>
+      </footer>
+    </article>
+  <% end %>
+</div>

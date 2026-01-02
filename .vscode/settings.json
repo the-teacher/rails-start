@@ -1,0 +1,57 @@
+{
+  // Default editor settings
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.detectIndentation": false,
+
+  // Remove trailing whitespace on save
+  "files.trimTrailingWhitespace": true,
+
+  // Insert final newline at the end of file
+  "files.insertFinalNewline": true,
+
+  // Remove extra blank lines at the end of file
+  "files.trimFinalNewlines": true,
+
+  // Specific settings for Ruby files
+  "[ruby]": {
+    "editor.tabSize": 2,
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true,
+    "editor.formatOnSave": true
+  },
+
+  // Specific settings for ERB files
+  "[erb]": {
+    "editor.tabSize": 2,
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true
+  },
+
+  // Settings for HTML with ERB
+  "[html]": {
+    "editor.tabSize": 2,
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true
+  },
+
+  // Settings for CSS
+  "[css]": {
+    "editor.tabSize": 2
+  },
+
+  // Settings for JavaScript
+  "[javascript]": {
+    "editor.tabSize": 2
+  },
+
+  // Settings for JSON
+  "[json]": {
+    "editor.tabSize": 2
+  },
+
+  // Settings for YAML
+  "[yaml]": {
+    "editor.tabSize": 2
+  }
+}
