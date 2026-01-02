@@ -1,0 +1,25 @@
+<h1>Posts (<%= @posts.count %>)</h1>
+
+<% @posts.each do |post| %>
+  <div class="post">
+    <h2>
+      <a href="<%= post_path(post) %>"><%= post.title %></a>
+    </h2>
+  
+    <div class="post-meta">
+      <span class="badge <%= post.published ? 'badge-published' : 'badge-draft' %>">
+          <%= post.published ? 'Published' : 'Draft' %>
+      </span>
+      | ID: <%= post.id %>
+      </div>
+
+      <div class="post-body">
+          <%= truncate(post.body, length: 200) %>
+      </div>
+      
+      <p>
+          <a href="<%= post_path(post) %>">Read more →</a>
+      </p>
+    </div>
+  </div>
+<% end %>
