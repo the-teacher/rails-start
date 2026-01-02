@@ -6,5 +6,6 @@ class HomeController < ApplicationController
     @ruby_description = RUBY_DESCRIPTION
     @yjit_enabled = defined?(RubyVM::YJIT) && RubyVM::YJIT.enabled?
     @zjit_enabled = defined?(RubyVM::ZJIT) && RubyVM::ZJIT.enabled?
+    @cache_enabled = Rails.configuration.action_controller.perform_caching
   end
 end
