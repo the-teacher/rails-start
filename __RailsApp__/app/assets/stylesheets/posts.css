@@ -92,6 +92,15 @@ body {
   text-decoration: underline;
 }
 
+.post__cache_key {
+  font-family: "Courier New", monospace;
+  font-size: 0.75rem;
+  color: #8899a6;
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #e1e8ed;
+}
+
 /* ===== BADGE ===== */
 
 .badge {

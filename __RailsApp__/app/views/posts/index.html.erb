@@ -21,6 +21,10 @@
       <p class="post__footer">
           <a href="<%= post_path(post) %>" class="post__read-more">Read more →</a>
       </p>
+
+      <div class="post__cache_key">
+        Cache Key: <%= post.cache_key_with_version %>
+      </div>
     </article>
   <% end %>
 </div>
