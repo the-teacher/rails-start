@@ -1,4 +1,9 @@
 <div class="post-show">
+  <div class="post__actions">
+    <a href="<%= posts_path %>" class="post__action">← Back to Posts</a>
+  </div>
+  <br />
+
   <article class="post">
     <header class="post__header">
       <h1 class="post__title"><%= @post.title %></h1>
@@ -21,10 +26,6 @@
 
     <div class="post__body">
       <%= simple_format(@post.body) %>
-    </div>
-
-    <div class="post__actions">
-      <a href="<%= posts_path %>" class="post__action">← Back to Posts</a>
     </div>
 
     <footer class="post__footer">

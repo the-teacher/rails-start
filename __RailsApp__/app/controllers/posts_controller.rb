@@ -4,7 +4,16 @@ class PostsController < ApplicationController
   end
 
   def show
-    @post = Post.includes(:comments, :author).find(params[:id])
+    post_id = params[:id].to_i
+
+    puts "Post Cache Key: #{post.cache_key_with_version}"
+    puts "Cache Exists? #{Rails.cache.exist?(post.cache_key_with_version)}"
+    puts "Cache Read: #{Rails.cache.read(post.cache_key_with_version).inspect}"
+
+    @post = Rails.cache.fetch(post.cache_key_with_version, expires_in: 10.minutes) do
+      puts "Fetching post #{post_id} from database"
+      Post.includes(:comments, :author).find(post_id)
+    end
   end
 
   def new
@@ -13,7 +22,7 @@ class PostsController < ApplicationController
 
   def create
     @post = Post.new(post_params)
-    
+
     if @post.save
       redirect_to @post, notice: 'Post created successfully.'
     else
@@ -27,7 +36,7 @@ class PostsController < ApplicationController
 
   def update
     @post = Post.find(params[:id])
-    
+
     if @post.update(post_params)
       redirect_to @post, notice: 'Post updated successfully.'
     else
@@ -38,7 +47,7 @@ class PostsController < ApplicationController
   def destroy
     @post = Post.find(params[:id])
     @post.destroy
-    
+
     redirect_to posts_path, notice: 'Post deleted successfully.'
   end
 
