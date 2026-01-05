@@ -1,42 +1,45 @@
 <div class="post-show">
-  <article class="post">
-    <header class="post__header">
-      <h1 class="post__title"><%= @post.title %></h1>
+  <div class="post__actions">
+    <a href="<%= posts_path %>" class="post__action">← Back to Posts</a>
+  </div>
+  <br />
 
-      <div class="post__meta">
-        <span class="badge badge--<%= @post.published ? 'published' : 'draft' %>">
-          <%= @post.published ? 'Published' : 'Draft' %>
-        </span>
-        <span class="post__id">ID: <%= @post.id %></span>
-      </div>
+  <% cache("test-post-1", expires_in: 10.minutes) do %>
+    <article class="post">
+      <header class="post__header">
+        <h1 class="post__title"><%= @post.title %></h1>
 
-      <% if @post.author %>
-        <div class="author">
-          <span class="author__label">Author:</span>
-          <span class="author__name"><%= @post.author.name %></span>
-          <span class="author__email"><%= @post.author.email %></span>
+        <div class="post__meta">
+          <span class="badge badge--<%= @post.published ? 'published' : 'draft' %>">
+            <%= @post.published ? 'Published' : 'Draft' %>
+          </span>
+          <span class="post__id">ID: <%= @post.id %></span>
         </div>
-      <% end %>
-    </header>
 
-    <div class="post__body">
-      <%= simple_format(@post.body) %>
-    </div>
+        <% if @post.author %>
+          <div class="author">
+            <span class="author__label">Author:</span>
+            <span class="author__name"><%= @post.author.name %></span>
+            <span class="author__email"><%= @post.author.email %></span>
+          </div>
+        <% end %>
+      </header>
 
-    <div class="post__actions">
-      <a href="<%= posts_path %>" class="post__action">← Back to Posts</a>
-    </div>
-
-    <footer class="post__footer">
-      <div class="cache-key">
-        Cache Key: <%= @post.cache_key_with_version %>
+      <div class="post__body">
+        <%= simple_format(@post.body) %>
       </div>
 
-      <div class="rendered-at">
-        Post Rendered At: <%= Time.current.strftime("%B %d, %Y %H:%M:%S") %>
-      </div>
-    </footer>
-  </article>
+      <footer class="post__footer">
+        <div class="cache-key">
+          Cache Key: <%= @post_cache_key %>
+        </div>
+
+        <div class="rendered-at">
+          Post Rendered At: <%= Time.current.strftime("%B %d, %Y %H:%M:%S") %>
+        </div>
+      </footer>
+    </article>
+  <% end %>
 
   <section class="comments">
     <h2 class="comments__title">Comments (<%= @post.comments.count %>)</h2>

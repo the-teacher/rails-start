@@ -1,10 +1,12 @@
 class PostsController < ApplicationController
+  POST_CACHE_EXPIRATION = 10.minutes
+
   def index
     @posts = Post.includes(:author, :comments).all
   end
 
   def show
-    @post = Post.includes(:comments, :author).find(params[:id])
+    @post = fetch_post_with_time_cache(post_id_param)
   end
 
   def new
@@ -13,7 +15,7 @@ class PostsController < ApplicationController
 
   def create
     @post = Post.new(post_params)
-    
+
     if @post.save
       redirect_to @post, notice: 'Post created successfully.'
     else
@@ -27,7 +29,7 @@ class PostsController < ApplicationController
 
   def update
     @post = Post.find(params[:id])
-    
+
     if @post.update(post_params)
       redirect_to @post, notice: 'Post updated successfully.'
     else
@@ -38,7 +40,7 @@ class PostsController < ApplicationController
   def destroy
     @post = Post.find(params[:id])
     @post.destroy
-    
+
     redirect_to posts_path, notice: 'Post deleted successfully.'
   end
 
@@ -46,5 +48,18 @@ class PostsController < ApplicationController
 
   def post_params
     params.require(:post).permit(:title, :body, :published)
+  end
+
+  def post_id_param
+    params[:id]
+  end
+
+  def fetch_post_with_time_cache(post_id)
+    post = Post.find(post_id)
+    @post_cache_key = "posts/#{post_id}"
+
+    Rails.cache.fetch(@post_cache_key, expires_in: POST_CACHE_EXPIRATION) do
+      Post.includes(:comments, :author).find(post_id)
+    end
   end
 end
