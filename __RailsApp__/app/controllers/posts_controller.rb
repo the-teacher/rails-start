@@ -1,19 +1,12 @@
 class PostsController < ApplicationController
+  POST_CACHE_EXPIRATION = 10.minutes
+
   def index
     @posts = Post.includes(:author, :comments).all
   end
 
   def show
-    post_id = params[:id].to_i
-
-    puts "Post Cache Key: #{post.cache_key_with_version}"
-    puts "Cache Exists? #{Rails.cache.exist?(post.cache_key_with_version)}"
-    puts "Cache Read: #{Rails.cache.read(post.cache_key_with_version).inspect}"
-
-    @post = Rails.cache.fetch(post.cache_key_with_version, expires_in: 10.minutes) do
-      puts "Fetching post #{post_id} from database"
-      Post.includes(:comments, :author).find(post_id)
-    end
+    @post = fetch_post_with_time_cache(post_id_param)
   end
 
   def new
@@ -55,5 +48,17 @@ class PostsController < ApplicationController
 
   def post_params
     params.require(:post).permit(:title, :body, :published)
+  end
+
+  def post_id_param
+    params[:id].to_i
+  end
+
+  def fetch_post_with_time_cache(post_id)
+    post = Post.select(:id, :updated_at).find(post_id)
+
+    Rails.cache.fetch(post.cache_key_with_version, expires_in: POST_CACHE_EXPIRATION) do
+      Post.includes(:comments, :author).find(post_id)
+    end
   end
 end
