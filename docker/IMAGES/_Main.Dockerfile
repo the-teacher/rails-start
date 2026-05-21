@@ -124,7 +124,7 @@ USER rails:rails
 # https://www.ruby-lang.org/en/downloads/
 ARG RUBY_VERSION=4.0.5
 # https://rubygems.org/gems/rubygems-update/versions
-ARG DEFAULT_GEM_VERSION=4.0.3
+ARG DEFAULT_GEM_VERSION=4.0.12
 
 # https://nodejs.org/en/download
 ARG NODE_VERSION=24.12.0

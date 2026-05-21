@@ -11,9 +11,10 @@
     <h1 class="title">Welcome to "Rails Start!"</h1>
     
     <div class="versions">
-      <p><strong>Rails version:</strong> <%= @rails_version %></p>
-      <p><strong>Rack version:</strong> <%= @rack_version %></p>
-      <p><strong>Ruby version:</strong> <%= @ruby_description %></p>
+      <p><strong>Rails version:</strong> <%= link_to @rails_version, "https://rubygems.org/gems/rails/versions", target: "_blank" %></p>
+      <p><strong>Rack version:</strong> <%= link_to @rack_version, "https://rubygems.org/gems/rack/versions", target: "_blank" %></p>
+      <p><strong>Ruby version:</strong> <%= link_to @ruby_description, "https://www.ruby-lang.org/en/downloads/releases/", target: "_blank" %></p>
+      <p><strong>Bundler version:</strong> <%= link_to @bundler_version, "https://rubygems.org/gems/bundler/versions", target: "_blank" %></p>
       <p><strong>YJIT:</strong> <%= @yjit_enabled ? 'enabled' : 'disabled' %></p>
       <p><strong>ZJIT:</strong> <%= @zjit_enabled ? 'enabled' : 'disabled' %></p>
     </div>
