@@ -1,6 +1,8 @@
 class AiSupportController < ApplicationController
   include ActionController::Live
 
+  skip_before_action :verify_authenticity_token
+
   # ---------------------------------------------------------------------------
   # POST /ai/agent
   # body: { input: "What is your return policy?" }
