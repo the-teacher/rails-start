@@ -57,7 +57,17 @@ docker compose -f ./docker/docker-compose.yml exec rails make db-migrate
 | ------------------------------ | ----------------------------------------------------- |
 | https://nodejs.org/en/download | `docker/IMAGES/_Main.Dockerfile` → `ARG NODE_VERSION` |
 
-After updating — rebuild the image.
+Node.js is installed via **nvm** for the `rails` user. The `PATH` in the Dockerfile points to the versioned nvm binary directory and is updated automatically on rebuild.
+
+After updating `ARG NODE_VERSION` — rebuild the image.
+
+To verify after rebuild:
+
+```bash
+docker compose -f ./docker/docker-compose.yml exec rails node --version
+```
+
+> When updating Node.js, also check if **npm** and **nvm** versions need updating (see sections below).
 
 ---
 
@@ -67,7 +77,13 @@ After updating — rebuild the image.
 | --------------------------------- | ---------------------------------------------------- |
 | https://www.npmjs.com/package/npm | `docker/IMAGES/_Main.Dockerfile` → `ARG NPM_VERSION` |
 
-After updating — rebuild the image.
+npm is upgraded globally via nvm after Node.js installation. Update `ARG NPM_VERSION` and rebuild the image.
+
+To verify after rebuild:
+
+```bash
+docker compose -f ./docker/docker-compose.yml exec rails npm --version
+```
 
 ---
 
@@ -77,7 +93,13 @@ After updating — rebuild the image.
 | -------------------------------------- | ---------------------------------------------------- |
 | https://github.com/nvm-sh/nvm/releases | `docker/IMAGES/_Main.Dockerfile` → `ARG NVM_VERSION` |
 
-After updating — rebuild the image.
+nvm is installed via the official install script using the version specified in `ARG NVM_VERSION`. After updating — rebuild the image.
+
+To verify after rebuild:
+
+```bash
+docker compose -f ./docker/docker-compose.yml exec rails bash -c '. ~/.nvm/nvm.sh && nvm --version'
+```
 
 ---
 
