@@ -122,7 +122,7 @@ RUN groupadd --system --gid 1000 rails && \
 USER rails:rails
 
 # https://www.ruby-lang.org/en/downloads/
-ARG RUBY_VERSION=4.0.0
+ARG RUBY_VERSION=4.0.5
 # https://rubygems.org/gems/rubygems-update/versions
 ARG DEFAULT_GEM_VERSION=4.0.3
 
