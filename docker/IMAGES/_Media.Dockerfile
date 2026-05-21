@@ -61,7 +61,7 @@ ARG IMAGEMAGICK_VERSION=7.1.2-11
 # https://www.lcdf.org/gifsicle/
 ARG GIFSICLE_VERSION=1.96
 # https://www.sentex.net/~mwandel/jhead/
-ARG JHEAD_VERSION=3.04
+ARG JHEAD_VERSION=3.08
 # https://optipng.sourceforge.net/
 # ARG OPTIPNG_VERSION=0.7.8
 ARG OPTIPNG_VERSION=7.9.1
@@ -229,7 +229,7 @@ RUN apt-get update && apt-get install -y \
     make \
     gcc
 
-RUN wget -O jhead-${JHEAD_VERSION}.tar.gz https://www.sentex.net/~mwandel/jhead/jhead-${JHEAD_VERSION}.tar.gz
+RUN wget -O jhead-${JHEAD_VERSION}.tar.gz https://github.com/Matthias-Wandel/jhead/archive/refs/tags/${JHEAD_VERSION}.tar.gz
 RUN tar -xvzf jhead-${JHEAD_VERSION}.tar.gz
 WORKDIR /jhead-${JHEAD_VERSION}
 RUN make
