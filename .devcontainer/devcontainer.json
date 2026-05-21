@@ -1,7 +1,7 @@
 {
   "name": "Rails Development",
 
-  "service": "rails_app",
+  "service": "rails",
   "dockerComposeFile": "../docker/docker-compose.yml",
   "workspaceFolder": "/home/rails/RailsApp",
 
