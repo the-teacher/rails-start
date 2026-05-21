@@ -32,7 +32,7 @@ ARG DEBIAN_VERSION=debian:bookworm
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 # STAGE | MAIN
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-FROM --platform=$TARGETPLATFORM $DEBIAN_VERSION
+FROM $DEBIAN_VERSION
 
 # Build arguments
 ARG TARGETARCH
