@@ -4,6 +4,12 @@ class AiSupportController < ApplicationController
   skip_before_action :verify_authenticity_token
 
   # ---------------------------------------------------------------------------
+  # GET /ai/support
+  # ---------------------------------------------------------------------------
+  def index
+  end
+
+  # ---------------------------------------------------------------------------
   # POST /ai/agent
   # body: { input: "What is your return policy?" }
   # ---------------------------------------------------------------------------

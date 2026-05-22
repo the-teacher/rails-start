@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
   # ActiveHarness — AI support endpoints
+  get  "ai/support",      to: "ai_support#index",  as: :ai_support
   post "ai/agent",        to: "ai_support#agent"
   post "ai/agent_memory", to: "ai_support#agent_memory"
   post "ai/tribunal",     to: "ai_support#tribunal"
