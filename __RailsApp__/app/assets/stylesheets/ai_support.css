@@ -117,19 +117,50 @@ html {
   border: 1px solid rgba(200, 210, 230, 0.7);
   border-radius: 14px;
   padding: 1.2rem 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
 }
 
 .ah-output {
+  height: 180px;
+  overflow-y: auto;
   font-size: 1rem;
   color: #2c3e50;
   line-height: 1.65;
   white-space: pre-wrap;
+  word-break: break-word;
+  scroll-behavior: smooth;
+}
+
+.ah-output.streaming::after {
+  content: "▍";
+  display: inline-block;
+  animation: ah-blink 0.8s step-end infinite;
+  color: #7a8899;
+  font-size: 0.85em;
+  margin-left: 1px;
+}
+
+@keyframes ah-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+.ah-placeholder {
+  color: #b0bac5;
+  font-style: italic;
 }
 
 .ah-meta {
-  margin-top: 0.8rem;
   font-size: 0.8rem;
   color: #9aa5b1;
+  flex-shrink: 0;
 }
 
 .ah-back {

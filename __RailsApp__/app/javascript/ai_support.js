@@ -1,39 +1,63 @@
+const ahInput = document.getElementById("ah-input");
+if (ahInput)
+  ahInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      document.getElementById("ah-form").requestSubmit();
+    }
+  });
+
 const ahForm = document.getElementById("ah-form");
 if (ahForm)
-  ahForm.addEventListener("submit", async (e) => {
+  ahForm.addEventListener("submit", (e) => {
     e.preventDefault();
     const input = document.getElementById("ah-input").value.trim();
     if (!input) return;
 
     const btn = document.getElementById("ah-btn");
-    const result = document.getElementById("ah-result");
     const output = document.getElementById("ah-output");
     const meta = document.getElementById("ah-meta");
 
+    // Reset
+    output.textContent = "";
+    output.classList.add("streaming");
+    meta.textContent = "";
     btn.disabled = true;
     btn.textContent = "Thinking\u2026";
-    result.style.display = "none";
-    output.textContent = "";
-    meta.textContent = "";
 
-    try {
-      const res = await fetch("/ai/agent", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ input }),
-      });
+    const es = new EventSource(
+      "/ai/agent_stream?input=" + encodeURIComponent(input),
+    );
 
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
+    es.onmessage = ({ data }) => {
+      const payload = JSON.parse(data);
 
-      output.textContent = data.output;
-      meta.textContent = `Model: ${data.model} \u00b7 ${data.time ? data.time + "s" : ""}`;
-      result.style.display = "block";
-    } catch (err) {
-      output.textContent = "Error: " + err.message;
-      result.style.display = "block";
-    } finally {
+      if (payload.done) {
+        es.close();
+        output.classList.remove("streaming");
+        btn.disabled = false;
+        btn.textContent = "Ask";
+        return;
+      }
+
+      if (payload.error) {
+        output.textContent += "\nError: " + payload.error;
+        es.close();
+        output.classList.remove("streaming");
+        btn.disabled = false;
+        btn.textContent = "Ask";
+        return;
+      }
+
+      output.textContent += payload.token;
+      output.scrollTop = output.scrollHeight;
+    };
+
+    es.onerror = () => {
+      es.close();
+      output.classList.remove("streaming");
+      if (!output.textContent) output.textContent = "Connection error.";
       btn.disabled = false;
       btn.textContent = "Ask";
-    }
+    };
   });
