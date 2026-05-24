@@ -1,7 +1,3 @@
-<% content_for :head do %>
-  <script type="module">import "ai_agent_lifecycle"</script>
-<% end %>
-
 <div class="ah-container">
   <aside class="ah-sidebar">
     <p class="ah-sidebar-title">Agent Events</p>
@@ -21,7 +17,7 @@
           placeholder="What is your return policy?"
           rows="3"
           autocomplete="off"
-        ></textarea>
+        >Hello!</textarea>
         <button type="submit" class="ah-submit" id="ah-btn">Ask</button>
       </form>
 
@@ -37,3 +33,7 @@
     </div>
   </div>
 </div>
+
+<% content_for :scripts do %>
+  <%= javascript_include_tag "ai_agent_lifecycle" %>
+<% end %>

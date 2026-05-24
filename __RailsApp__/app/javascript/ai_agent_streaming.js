@@ -1,23 +1,23 @@
 // Case 02: Streaming Agent — SSE, no lifecycle sidebar
-const ahInput = document.getElementById("ah-input");
-if (ahInput)
-  ahInput.addEventListener("keydown", (e) => {
+(function () {
+  const input = document.getElementById("ah-input");
+  const form = document.getElementById("ah-form");
+  const btn = document.getElementById("ah-btn");
+  const output = document.getElementById("ah-output");
+  const meta = document.getElementById("ah-meta");
+  if (!form) return;
+
+  input.addEventListener("keydown", (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      document.getElementById("ah-form").requestSubmit();
+      form.requestSubmit();
     }
   });
 
-const ahForm = document.getElementById("ah-form");
-if (ahForm)
-  ahForm.addEventListener("submit", (e) => {
+  form.addEventListener("submit", (e) => {
     e.preventDefault();
-    const input = document.getElementById("ah-input").value.trim();
-    if (!input) return;
-
-    const btn = document.getElementById("ah-btn");
-    const output = document.getElementById("ah-output");
-    const meta = document.getElementById("ah-meta");
+    const value = input.value.trim();
+    if (!value) return;
 
     output.textContent = "";
     output.classList.add("streaming");
@@ -26,9 +26,8 @@ if (ahForm)
     btn.textContent = "Thinking\u2026";
 
     const es = new EventSource(
-      "/ai/agents/streaming/stream?input=" + encodeURIComponent(input),
+      "/ai/agents/streaming/stream?input=" + encodeURIComponent(value),
     );
-
     let streamDone = false;
 
     function closeStream() {
@@ -41,18 +40,18 @@ if (ahForm)
 
     es.onmessage = ({ data }) => {
       const payload = JSON.parse(data);
-
       if (payload.done) {
+        if (payload.model)
+          meta.textContent =
+            "Model: " + payload.model + " \u00b7 " + payload.time + "s";
         closeStream();
         return;
       }
-
       if (payload.error) {
         output.textContent += "\nError: " + payload.error;
         closeStream();
         return;
       }
-
       output.textContent += payload.token;
       output.scrollTop = output.scrollHeight;
     };
@@ -63,3 +62,4 @@ if (ahForm)
       if (!output.textContent) output.textContent = "Connection error.";
     };
   });
+})();

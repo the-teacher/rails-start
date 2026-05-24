@@ -1,7 +1,3 @@
-<% content_for :head do %>
-  <script type="module">import "ai_agent_simple"</script>
-<% end %>
-
 <div class="ah-container ah-container--centered">
   <div class="ah-card">
     <div class="ah-logo">&#x26A1;</div>
@@ -15,7 +11,7 @@
         placeholder="What is your return policy?"
         rows="3"
         autocomplete="off"
-      ></textarea>
+      >Hello!</textarea>
       <button type="submit" class="ah-submit" id="ah-btn">Ask</button>
     </form>
 
@@ -30,3 +26,7 @@
     </div>
   </div>
 </div>
+
+<% content_for :scripts do %>
+  <%= javascript_include_tag "ai_agent_simple" %>
+<% end %>

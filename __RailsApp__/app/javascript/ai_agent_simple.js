@@ -1,23 +1,23 @@
 // Case 01: Simple Agent — plain fetch POST, no streaming
-const ahInput = document.getElementById("ah-input");
-if (ahInput)
-  ahInput.addEventListener("keydown", (e) => {
+(function () {
+  const input = document.getElementById("ah-input");
+  const form = document.getElementById("ah-form");
+  const btn = document.getElementById("ah-btn");
+  const output = document.getElementById("ah-output");
+  const meta = document.getElementById("ah-meta");
+  if (!form) return;
+
+  input.addEventListener("keydown", (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      document.getElementById("ah-form").requestSubmit();
+      form.requestSubmit();
     }
   });
 
-const ahForm = document.getElementById("ah-form");
-if (ahForm)
-  ahForm.addEventListener("submit", (e) => {
+  form.addEventListener("submit", (e) => {
     e.preventDefault();
-    const input = document.getElementById("ah-input").value.trim();
-    if (!input) return;
-
-    const btn = document.getElementById("ah-btn");
-    const output = document.getElementById("ah-output");
-    const meta = document.getElementById("ah-meta");
+    const value = input.value.trim();
+    if (!value) return;
 
     output.textContent = "";
     meta.textContent = "";
@@ -27,7 +27,7 @@ if (ahForm)
     fetch("/ai/agents/simple/call", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ input }),
+      body: JSON.stringify({ input: value }),
     })
       .then((r) => r.json())
       .then(({ output: text, model, time, error }) => {
@@ -46,3 +46,4 @@ if (ahForm)
         btn.textContent = "Ask";
       });
   });
+})();
