@@ -4,26 +4,13 @@
     <h1 class="ah-title">Case 02 &mdash; Streaming Agent</h1>
     <p class="ah-subtitle">Tokens stream in real-time via SSE. Watch the response appear.</p>
 
-    <form id="ah-form" class="ah-form">
-      <textarea
-        id="ah-input"
-        class="ah-textarea"
-        placeholder="What is your return policy?"
-        rows="3"
-        autocomplete="off"
-      >Hello!</textarea>
-      <button type="submit" class="ah-submit" id="ah-btn">Ask</button>
-    </form>
-
-    <div id="ah-result" class="ah-result">
-      <div id="ah-output" class="ah-output"><span class="ah-placeholder">Response will appear here&hellip;</span></div>
-      <div id="ah-meta" class="ah-meta"></div>
-    </div>
-
-    <div class="ah-nav">
-      <%= link_to "&larr; Case 01".html_safe, ai_agents_simple_path, class: "ah-back" %>
-      <%= link_to "Case 03: Lifecycle &rarr;".html_safe, ai_agents_lifecycle_path, class: "ah-next" %>
-    </div>
+    <%= render "form" %>
+    <%= render "result" %>
+    <%= render "nav",
+         back_label: "&larr; Case 01",
+         back_path:  ai_agents_simple_path,
+         next_label: "Case 03: Lifecycle &rarr;",
+         next_path:  ai_agents_lifecycle_path %>
   </div>
 </div>
 

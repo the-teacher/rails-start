@@ -10,26 +10,13 @@
       <h1 class="ah-title">Case 03 &mdash; Lifecycle &amp; Events</h1>
       <p class="ah-subtitle">Streaming + live agent hook events in the sidebar</p>
 
-      <form id="ah-form" class="ah-form">
-        <textarea
-          id="ah-input"
-          class="ah-textarea"
-          placeholder="What is your return policy?"
-          rows="3"
-          autocomplete="off"
-        >Hello!</textarea>
-        <button type="submit" class="ah-submit" id="ah-btn">Ask</button>
-      </form>
-
-      <div id="ah-result" class="ah-result">
-        <div id="ah-output" class="ah-output"><span class="ah-placeholder">Response will appear here&hellip;</span></div>
-        <div id="ah-meta" class="ah-meta"></div>
-      </div>
-
-      <div class="ah-nav">
-        <%= link_to "&larr; Case 02".html_safe, ai_agents_streaming_path, class: "ah-back" %>
-        <%= link_to "Cases".html_safe, ai_cases_path, class: "ah-next" %>
-      </div>
+      <%= render "form" %>
+      <%= render "result" %>
+      <%= render "nav",
+           back_label: "&larr; Case 02",
+           back_path:  ai_agents_streaming_path,
+           next_label: "Cases",
+           next_path:  ai_cases_path %>
     </div>
   </div>
 </div>
