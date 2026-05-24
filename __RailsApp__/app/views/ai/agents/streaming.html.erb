@@ -1,0 +1,32 @@
+<% content_for :head do %>
+  <script type="module">import "ai_agent_streaming"</script>
+<% end %>
+
+<div class="ah-container ah-container--centered">
+  <div class="ah-card">
+    <div class="ah-logo">&#x26A1;</div>
+    <h1 class="ah-title">Case 02 &mdash; Streaming Agent</h1>
+    <p class="ah-subtitle">Tokens stream in real-time via SSE. Watch the response appear.</p>
+
+    <form id="ah-form" class="ah-form">
+      <textarea
+        id="ah-input"
+        class="ah-textarea"
+        placeholder="What is your return policy?"
+        rows="3"
+        autocomplete="off"
+      ></textarea>
+      <button type="submit" class="ah-submit" id="ah-btn">Ask</button>
+    </form>
+
+    <div id="ah-result" class="ah-result">
+      <div id="ah-output" class="ah-output"><span class="ah-placeholder">Response will appear here&hellip;</span></div>
+      <div id="ah-meta" class="ah-meta"></div>
+    </div>
+
+    <div class="ah-nav">
+      <%= link_to "&larr; Case 01".html_safe, ai_agents_simple_path, class: "ah-back" %>
+      <%= link_to "Case 03: Lifecycle &rarr;".html_safe, ai_agents_lifecycle_path, class: "ah-next" %>
+    </div>
+  </div>
+</div>

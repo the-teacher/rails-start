@@ -1,3 +1,7 @@
+<% content_for :head do %>
+  <script type="module">import "ai_agent_lifecycle"</script>
+<% end %>
+
 <div class="ah-container">
   <aside class="ah-sidebar">
     <p class="ah-sidebar-title">Agent Events</p>
@@ -7,8 +11,8 @@
   <div class="ah-main">
     <div class="ah-card">
       <div class="ah-logo">&#x26A1;</div>
-      <h1 class="ah-title">ActiveHarness AI Support</h1>
-      <p class="ah-subtitle">Ask anything &mdash; powered by ActiveHarness agents</p>
+      <h1 class="ah-title">Case 03 &mdash; Lifecycle &amp; Events</h1>
+      <p class="ah-subtitle">Streaming + live agent hook events in the sidebar</p>
 
       <form id="ah-form" class="ah-form">
         <textarea
@@ -26,7 +30,10 @@
         <div id="ah-meta" class="ah-meta"></div>
       </div>
 
-      <a href="/" class="ah-back">&larr; Back</a>
+      <div class="ah-nav">
+        <%= link_to "&larr; Case 02".html_safe, ai_agents_streaming_path, class: "ah-back" %>
+        <%= link_to "Cases".html_safe, ai_cases_path, class: "ah-next" %>
+      </div>
     </div>
   </div>
 </div>

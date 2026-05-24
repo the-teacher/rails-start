@@ -1,21 +1,36 @@
 Rails.application.routes.draw do
-  # ActiveHarness — AI support endpoints
-  get  "ai/support",      to: "ai_support#index",  as: :ai_support
+  # ── ActiveHarness demo cases ──────────────────────────────────────────────
+  namespace :ai do
+    # Cases index — entry point from home page
+    get "cases", to: "cases#index", as: :cases
+
+    # Agent examples
+    scope :agents, as: :agents do
+      # Case 1 — simple request/response
+      get  "simple",       to: "agents#simple",       as: :simple
+      post "simple/call",  to: "agents#simple_call",  as: :simple_call
+
+      # Case 2 — streaming, no lifecycle sidebar
+      get "streaming",        to: "agents#streaming",        as: :streaming
+      get "streaming/stream", to: "agents#streaming_stream", as: :streaming_stream
+
+      # Case 3 — streaming + lifecycle sidebar
+      get "lifecycle",        to: "agents#lifecycle",        as: :lifecycle
+      get "lifecycle/stream", to: "agents#lifecycle_stream", as: :lifecycle_stream
+    end
+  end
+
+  # Legacy endpoints kept for backward compatibility
+  get  "ai/support",      to: "ai_support#index",        as: :ai_support
   post "ai/agent",        to: "ai_support#agent"
   post "ai/agent_memory", to: "ai_support#agent_memory"
   post "ai/tribunal",     to: "ai_support#tribunal"
   post "ai/pipeline",     to: "ai_support#pipeline"
   get  "ai/agent_stream", to: "ai_support#agent_stream"
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
-  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
-  # Can be used by load balancers and uptime monitors to verify that the app is live.
+  # Health check
   get "up" => "rails/health#show", as: :rails_health_check
 
-  # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
-  # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
-  # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
-
-  # Defines the root path route ("/")
   root "home#index"
 end
+

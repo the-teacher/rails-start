@@ -1,3 +1,4 @@
+// Case 03: Lifecycle Agent — SSE streaming + lifecycle sidebar events
 function appendLifecycleEvent({ event, text, level }) {
   const events = document.getElementById("ah-events");
   if (!events) return;
@@ -35,19 +36,17 @@ if (ahForm)
     const btn = document.getElementById("ah-btn");
     const output = document.getElementById("ah-output");
     const meta = document.getElementById("ah-meta");
+    const events = document.getElementById("ah-events");
 
-    // Reset
     output.textContent = "";
     output.classList.add("streaming");
     meta.textContent = "";
     btn.disabled = true;
     btn.textContent = "Thinking\u2026";
-
-    const events = document.getElementById("ah-events");
     if (events) events.innerHTML = "";
 
     const es = new EventSource(
-      "/ai/agent_stream?input=" + encodeURIComponent(input),
+      "/ai/agents/lifecycle/stream?input=" + encodeURIComponent(input),
     );
 
     let streamDone = false;
@@ -81,13 +80,12 @@ if (ahForm)
     es.addEventListener("lifecycle", ({ data }) => {
       const payload = JSON.parse(data);
       appendLifecycleEvent(payload);
-      if (payload.event === "after_call" && payload.model) {
+      if (payload.event === "after_call" && payload.model)
         meta.textContent = `Model: ${payload.model} \u00b7 ${payload.time ? payload.time + "s" : ""}`;
-      }
     });
 
     es.onerror = () => {
-      if (streamDone) return; // server closed after done — ignore
+      if (streamDone) return;
       closeStream();
       if (!output.textContent) output.textContent = "Connection error.";
     };

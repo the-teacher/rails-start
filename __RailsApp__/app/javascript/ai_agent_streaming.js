@@ -1,21 +1,4 @@
-function appendLifecycleEvent({ event, text, level }) {
-  const events = document.getElementById("ah-events");
-  if (!events) return;
-  const icons = {
-    info: "\u25cf",
-    success: "\u2713",
-    warning: "\u26a0",
-    error: "\u2717",
-  };
-  const el = document.createElement("div");
-  el.className = `ah-event ah-event--${level || "info"}`;
-  el.innerHTML =
-    `<span class="ah-event-icon">${icons[level] || "\u25cf"}</span>` +
-    `<span class="ah-event-text">${text}</span>`;
-  events.appendChild(el);
-  events.scrollTop = events.scrollHeight;
-}
-
+// Case 02: Streaming Agent — SSE, no lifecycle sidebar
 const ahInput = document.getElementById("ah-input");
 if (ahInput)
   ahInput.addEventListener("keydown", (e) => {
@@ -36,18 +19,14 @@ if (ahForm)
     const output = document.getElementById("ah-output");
     const meta = document.getElementById("ah-meta");
 
-    // Reset
     output.textContent = "";
     output.classList.add("streaming");
     meta.textContent = "";
     btn.disabled = true;
     btn.textContent = "Thinking\u2026";
 
-    const events = document.getElementById("ah-events");
-    if (events) events.innerHTML = "";
-
     const es = new EventSource(
-      "/ai/agent_stream?input=" + encodeURIComponent(input),
+      "/ai/agents/streaming/stream?input=" + encodeURIComponent(input),
     );
 
     let streamDone = false;
@@ -78,16 +57,8 @@ if (ahForm)
       output.scrollTop = output.scrollHeight;
     };
 
-    es.addEventListener("lifecycle", ({ data }) => {
-      const payload = JSON.parse(data);
-      appendLifecycleEvent(payload);
-      if (payload.event === "after_call" && payload.model) {
-        meta.textContent = `Model: ${payload.model} \u00b7 ${payload.time ? payload.time + "s" : ""}`;
-      }
-    });
-
     es.onerror = () => {
-      if (streamDone) return; // server closed after done — ignore
+      if (streamDone) return;
       closeStream();
       if (!output.textContent) output.textContent = "Connection error.";
     };
