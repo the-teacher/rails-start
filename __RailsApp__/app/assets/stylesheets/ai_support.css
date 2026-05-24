@@ -170,7 +170,8 @@ html {
   font-style: italic;
 }
 
-.ah-meta {
+.ah-meta,
+.ah-tokens {
   font-size: 0.8rem;
   color: #9aa5b1;
   flex-shrink: 0;

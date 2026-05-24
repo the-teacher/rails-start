@@ -2,7 +2,7 @@
   <div class="ah-cases-hero">
     <div class="ah-cases-logo">&#x26A1;</div>
     <h1 class="ah-cases-title">ActiveHarness Examples</h1>
-    <p class="ah-cases-subtitle">Three progressive examples showing what ActiveHarness agents can do</p>
+    <p class="ah-cases-subtitle">Four progressive examples showing what ActiveHarness agents can do</p>
   </div>
 
   <div class="ah-cases-grid">
@@ -39,7 +39,7 @@
     </div>
 
     <!-- Case 3 -->
-    <div class="ah-case-card ah-case-card--featured">
+    <div class="ah-case-card">
       <div class="ah-case-number">03</div>
       <h2 class="ah-case-name">Lifecycle &amp; Events</h2>
       <p class="ah-case-desc">
@@ -51,7 +51,23 @@
         <li>event_stream</li>
         <li>sidebar events</li>
       </ul>
-      <%= link_to "Try it →", ai_agents_lifecycle_path, class: "ah-case-btn ah-case-btn--featured" %>
+      <%= link_to "Try it →", ai_agents_lifecycle_path, class: "ah-case-btn" %>
+    </div>
+
+    <!-- Case 4 -->
+    <div class="ah-case-card ah-case-card--featured">
+      <div class="ah-case-number">04</div>
+      <h2 class="ah-case-name">RubyLLM Backend</h2>
+      <p class="ah-case-desc">
+        Same as Case 3 but HTTP calls go through the <code>ruby_llm</code> gem.
+        Demonstrates the <code>ruby_llm_backend</code> DSL with streaming and lifecycle events.
+      </p>
+      <ul class="ah-case-tags">
+        <li>ruby_llm_backend</li>
+        <li>SSE streaming</li>
+        <li>lifecycle hooks</li>
+      </ul>
+      <%= link_to "Try it →", ai_agents_ruby_llm_path, class: "ah-case-btn ah-case-btn--featured" %>
     </div>
   </div>
 

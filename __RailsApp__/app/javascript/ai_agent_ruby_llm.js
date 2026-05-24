@@ -1,4 +1,4 @@
-// Case 03: Lifecycle Agent — SSE streaming + lifecycle sidebar events.
+// Case 04: RubyLLM Backend — SSE streaming + lifecycle sidebar events.
 function appendLifecycleEvent(p) {
   var el2 = document.getElementById("ah-events");
   if (!el2) return;
@@ -45,7 +45,7 @@ function appendLifecycleEvent(p) {
     if (sdb) sdb.innerHTML = "";
 
     var es = new EventSource(
-      "/ai/agents/lifecycle/stream?input=" + encodeURIComponent(val),
+      "/ai/agents/ruby_llm/stream?input=" + encodeURIComponent(val),
     );
     var done = false;
 
@@ -90,7 +90,7 @@ function appendLifecycleEvent(p) {
         var metParts = [];
         if (p.model) metParts.push("Model: " + p.model);
         if (p.time) metParts.push(p.time + "s");
-        met.textContent = metParts.join(" \u00b7 ");
+        met.textContent = metParts.join(" · ");
         var tokens = document.getElementById("ah-tokens");
         var u = p.usage;
         if (u && tokens)

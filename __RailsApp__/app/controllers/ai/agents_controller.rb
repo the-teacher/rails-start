@@ -15,12 +15,14 @@ module Ai
     # POST /ai/agents/simple
     def simple_call
       agent = SimpleAgent.call(input: params.require(:input))
-      
-      render json: { 
-        output: agent.result.output,
-        model:  agent.result.model,
-        time:   agent.result.execution_time
-      }   
+
+      result = agent.result
+      render json: {
+        output: result.output,
+        model:  result.model,
+        time:   result.execution_time,
+        usage:  result.usage
+      }
     end
 
     # ---------------------------------------------------------------------------
@@ -47,7 +49,8 @@ module Ai
         token_stream: token_stream
       )
 
-      sse.write({ done: true, model: agent.result.model, time: agent.result.execution_time }.to_json)
+      result = agent.result
+      sse.write({ done: true, model: result.model, time: result.execution_time, usage: result.usage }.to_json)
     rescue ActionController::Live::ClientDisconnected
     rescue StandardError => e
       sse.write({ error: "#{e.class.name.split('::').last}: #{e.message}" }.to_json) rescue nil
@@ -77,13 +80,49 @@ module Ai
       token_stream = build_token_stream(sse_tokens)
       event_stream  = build_event_stream(sse_lifecycle)
 
-      SupportAgent.call(
+      agent = SupportAgent.call(
         input:        input,
         token_stream: token_stream,
         event_stream: event_stream
       )
 
-      sse_tokens.write({ done: true }.to_json)
+      sse_tokens.write({ done: true, usage: agent.result.usage }.to_json)
+    rescue ActionController::Live::ClientDisconnected
+    rescue StandardError => e
+      sse_tokens.write({ error: "#{e.class.name.split('::').last}: #{e.message}" }.to_json) rescue nil
+      sse_tokens.write({ done: true }.to_json) rescue nil
+    ensure
+      sse_tokens.close
+    end
+
+    # ---------------------------------------------------------------------------
+    # GET /ai/agents/ruby_llm
+    # Case 4: ruby_llm backend — streaming + lifecycle sidebar.
+    # Same as Case 3 but HTTP calls go through the ruby_llm gem.
+    # ---------------------------------------------------------------------------
+    def ruby_llm
+    end
+
+    # GET /ai/agents/ruby_llm/stream?input=...
+    def ruby_llm_stream
+      prepare_sse_response
+
+      input = params.require(:input)
+
+      stream        = response.stream
+      sse_tokens    = ActionController::Live::SSE.new(stream, event: "message")
+      sse_lifecycle = ActionController::Live::SSE.new(stream, event: "lifecycle")
+
+      token_stream = build_token_stream(sse_tokens)
+      event_stream  = build_event_stream(sse_lifecycle)
+
+      agent = SupportRubyLLMAgent.call(
+        input:        input,
+        token_stream: token_stream,
+        event_stream: event_stream
+      )
+
+      sse_tokens.write({ done: true, usage: agent.result.usage }.to_json)
     rescue ActionController::Live::ClientDisconnected
     rescue StandardError => e
       sse_tokens.write({ error: "#{e.class.name.split('::').last}: #{e.message}" }.to_json) rescue nil
@@ -144,7 +183,8 @@ module Ai
           text:  "Response received (#{result.execution_time}s)",
           level: "success",
           model: result.model,
-          time:  result.execution_time }
+          time:  result.execution_time,
+          usage: result.usage }
       when :retry
         entry, error = args
         { event: "retry",

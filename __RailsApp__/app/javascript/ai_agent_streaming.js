@@ -22,6 +22,7 @@
     output.textContent = "";
     output.classList.add("streaming");
     meta.textContent = "";
+    document.getElementById("ah-tokens").textContent = "";
     btn.disabled = true;
     btn.textContent = "Thinking\u2026";
 
@@ -41,9 +42,14 @@
     es.onmessage = ({ data }) => {
       const payload = JSON.parse(data);
       if (payload.done) {
-        if (payload.model)
-          meta.textContent =
-            "Model: " + payload.model + " \u00b7 " + payload.time + "s";
+        const metaParts = [];
+        if (payload.model) metaParts.push("Model: " + payload.model);
+        if (payload.time) metaParts.push(payload.time + "s");
+        meta.textContent = metaParts.join(" \u00b7 ");
+        const tokens = document.getElementById("ah-tokens");
+        const u = payload.usage;
+        if (u && tokens)
+          tokens.textContent = `Tokens: ${u.input_tokens} in / ${u.output_tokens} out / ${u.total_tokens} total`;
         closeStream();
         return;
       }

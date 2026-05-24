@@ -1,11 +1,17 @@
 /* ── Cases index page ─────────────────────────────────────────── */
 
+/* ai_support.css sets overflow:hidden globally — undo it for this page */
+html:has(.ah-cases-page),
+body:has(.ah-cases-page) {
+  overflow: auto;
+  height: auto;
+}
+
 .ah-cases-page {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   padding: 3rem 1.5rem;
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   font-family:

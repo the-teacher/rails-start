@@ -17,6 +17,10 @@ Rails.application.routes.draw do
       # Case 3 — streaming + lifecycle sidebar
       get "lifecycle",        to: "agents#lifecycle",        as: :lifecycle
       get "lifecycle/stream", to: "agents#lifecycle_stream", as: :lifecycle_stream
+
+      # Case 4 — ruby_llm backend + streaming + lifecycle sidebar
+      get "ruby_llm",        to: "agents#ruby_llm",        as: :ruby_llm
+      get "ruby_llm/stream", to: "agents#ruby_llm_stream", as: :ruby_llm_stream
     end
   end
 
