@@ -131,6 +131,52 @@ module Ai
       sse_tokens.close
     end
 
+    # ---------------------------------------------------------------------------
+    # GET /ai/agents/fallback
+    # Case 5: Fallback chain demo — 2 intentionally broken models prepended via
+    # agent.models.prepend, then SupportRubyLLMAgent's own chain takes over.
+    # The lifecycle sidebar shows :retry events for each failed model before
+    # the first working model succeeds.
+    # ---------------------------------------------------------------------------
+    def fallback
+    end
+
+    # GET /ai/agents/fallback/stream?input=...
+    def fallback_stream
+      prepare_sse_response
+
+      input = params.require(:input)
+
+      stream        = response.stream
+      sse_tokens    = ActionController::Live::SSE.new(stream, event: "message")
+      sse_lifecycle = ActionController::Live::SSE.new(stream, event: "lifecycle")
+
+      token_stream = build_token_stream(sse_tokens)
+      event_stream  = build_event_stream(sse_lifecycle)
+
+      agent = SupportRubyLLMAgent.new(
+        input:        input,
+        token_stream: token_stream,
+        event_stream: event_stream
+      )
+
+      # Prepend 2 broken models — they will fail and trigger :retry events in the sidebar.
+      agent.models.prepend([
+        { provider: :openrouter, model: "fake-provider/broken-model-one" },
+        { provider: :openrouter, model: "fake-provider/broken-model-two" }
+      ])
+
+      agent.call
+
+      sse_tokens.write({ done: true, usage: agent.result&.usage }.to_json)
+    rescue ActionController::Live::ClientDisconnected
+    rescue StandardError => e
+      sse_tokens.write({ error: "#{e.class.name.split('::').last}: #{e.message}" }.to_json) rescue nil
+      sse_tokens.write({ done: true }.to_json) rescue nil
+    ensure
+      sse_tokens.close
+    end
+
     private
 
     def prepare_sse_response

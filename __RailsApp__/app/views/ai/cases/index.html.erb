@@ -2,73 +2,15 @@
   <div class="ah-cases-hero">
     <div class="ah-cases-logo">&#x26A1;</div>
     <h1 class="ah-cases-title">ActiveHarness Examples</h1>
-    <p class="ah-cases-subtitle">Four progressive examples showing what ActiveHarness agents can do</p>
+    <p class="ah-cases-subtitle">Five progressive examples showing what ActiveHarness agents can do</p>
   </div>
 
   <div class="ah-cases-grid">
-    <!-- Case 1 -->
-    <div class="ah-case-card">
-      <div class="ah-case-number">01</div>
-      <h2 class="ah-case-name">Simple Agent</h2>
-      <p class="ah-case-desc">
-        A bare-bones agent with only a system prompt and model config.
-        Send a question, get a response. No hooks, no streaming.
-      </p>
-      <ul class="ah-case-tags">
-        <li>system_prompt</li>
-        <li>model config</li>
-        <li>request / response</li>
-      </ul>
-      <%= link_to "Try it →", ai_agents_simple_path, class: "ah-case-btn" %>
-    </div>
-
-    <!-- Case 2 -->
-    <div class="ah-case-card">
-      <div class="ah-case-number">02</div>
-      <h2 class="ah-case-name">Streaming Agent</h2>
-      <p class="ah-case-desc">
-        Same simple agent, but tokens stream in real-time via Server-Sent Events.
-        Watch the answer appear word by word.
-      </p>
-      <ul class="ah-case-tags">
-        <li>SSE streaming</li>
-        <li>EventSource</li>
-        <li>token-by-token</li>
-      </ul>
-      <%= link_to "Try it →", ai_agents_streaming_path, class: "ah-case-btn" %>
-    </div>
-
-    <!-- Case 3 -->
-    <div class="ah-case-card">
-      <div class="ah-case-number">03</div>
-      <h2 class="ah-case-name">Lifecycle &amp; Events</h2>
-      <p class="ah-case-desc">
-        Streaming plus a live sidebar showing every agent lifecycle hook:
-        setup, system prompt build, call start, response, retries, failures.
-      </p>
-      <ul class="ah-case-tags">
-        <li>lifecycle hooks</li>
-        <li>event_stream</li>
-        <li>sidebar events</li>
-      </ul>
-      <%= link_to "Try it →", ai_agents_lifecycle_path, class: "ah-case-btn" %>
-    </div>
-
-    <!-- Case 4 -->
-    <div class="ah-case-card ah-case-card--featured">
-      <div class="ah-case-number">04</div>
-      <h2 class="ah-case-name">RubyLLM Backend</h2>
-      <p class="ah-case-desc">
-        Same as Case 3 but HTTP calls go through the <code>ruby_llm</code> gem.
-        Demonstrates the <code>ruby_llm_backend</code> DSL with streaming and lifecycle events.
-      </p>
-      <ul class="ah-case-tags">
-        <li>ruby_llm_backend</li>
-        <li>SSE streaming</li>
-        <li>lifecycle hooks</li>
-      </ul>
-      <%= link_to "Try it →", ai_agents_ruby_llm_path, class: "ah-case-btn ah-case-btn--featured" %>
-    </div>
+    <%= render "case_01" %>
+    <%= render "case_02" %>
+    <%= render "case_03" %>
+    <%= render "case_04" %>
+    <%= render "case_05" %>
   </div>
 
   <%= link_to "&larr; Back".html_safe, root_path, class: "ah-cases-back" %>

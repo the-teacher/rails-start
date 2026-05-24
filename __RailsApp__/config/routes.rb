@@ -21,6 +21,10 @@ Rails.application.routes.draw do
       # Case 4 — ruby_llm backend + streaming + lifecycle sidebar
       get "ruby_llm",        to: "agents#ruby_llm",        as: :ruby_llm
       get "ruby_llm/stream", to: "agents#ruby_llm_stream", as: :ruby_llm_stream
+
+      # Case 5 — fallback chain: 2 broken models prepended, watch retries in sidebar
+      get "fallback",        to: "agents#fallback",        as: :fallback
+      get "fallback/stream", to: "agents#fallback_stream", as: :fallback_stream
     end
   end
 
