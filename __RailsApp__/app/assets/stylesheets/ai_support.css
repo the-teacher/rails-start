@@ -262,3 +262,25 @@ html {
 .ah-event--error {
   color: #c53030;
 }
+
+.ah-event-source {
+  flex-shrink: 0;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.1rem 0.35rem;
+  border-radius: 3px;
+  margin-top: 0.1rem;
+  line-height: 1.2;
+}
+
+.ah-event-source--tribunal {
+  background: #ebf4ff;
+  color: #2b6cb0;
+}
+
+.ah-event-source--agent {
+  background: #f0fff4;
+  color: #276749;
+}

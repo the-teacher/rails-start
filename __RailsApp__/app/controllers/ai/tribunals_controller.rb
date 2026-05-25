@@ -59,13 +59,24 @@ module Ai
       sse_events = ActionController::Live::SSE.new(stream, event: "lifecycle")
       sse_done   = ActionController::Live::SSE.new(stream, event: "message")
 
-      event_stream = ->(name, *args) do
-        sse_events.write(tribunal_event_message(name, args).to_json)
+      tribunal_stream = ->(name, *args) do
+        logger.debug "[Tribunal] event=#{name} args=#{args.inspect}"
+        sse_events.write(tribunal_event_message(name, args).merge(source: "tribunal").to_json)
       rescue IOError, ActionController::Live::ClientDisconnected
       end
 
-      tribunal = PolitenessLifecycleTribunal.new(input: input, event_stream: event_stream)
-      event_stream.call(:tribunal_start, PolitenessTribunal::MODELS.size)
+      agent_stream = ->(name, *args) do
+        logger.debug "[Agent] event=#{name} args=#{args.inspect}"
+        sse_events.write(agent_event_message(name, args).merge(source: "agent").to_json)
+      rescue IOError, ActionController::Live::ClientDisconnected
+      end
+
+      tribunal = PolitenessLifecycleTribunal.new(
+        input:                 input,
+        tribunal_event_stream: tribunal_stream,
+        agent_event_stream:    agent_stream
+      )
+      tribunal_stream.call(:tribunal_start, PolitenessTribunal::MODELS.size)
       tribunal.call
 
       sse_done.write({
@@ -79,6 +90,27 @@ module Ai
       sse_done.write({ done: true }.to_json) rescue nil
     ensure
       sse_done.close
+    end
+
+    def agent_event_message(event, args)
+      case event
+      when :llm_request
+        { event: "llm_request",
+          text:  "#{args[0]&.split('::')&.last}: sending request…",
+          level: "info" }
+      when :llm_response
+        result = args[0]
+        { event: "llm_response",
+          text:  "#{result.model}: response received (#{result.execution_time}s)",
+          level: "success" }
+      when :llm_retry
+        model, err = args
+        { event: "llm_retry",
+          text:  "#{model}: retrying — #{err.message}",
+          level: "warning" }
+      else
+        { event: event.to_s, text: event.to_s, level: "info" }
+      end
     end
 
     private

@@ -4,21 +4,23 @@ require_relative "politeness_tribunal"
 # Same as PolitenessTribunal but wires lifecycle hooks to an event_stream,
 # enabling a live sidebar in the browser (Case T-02).
 class PolitenessLifecycleTribunal < ActiveHarness::Tribunal
-  on(:before_agent) { |agent, index| @event_stream&.call(:agent_start, index) }
-  on(:after_agent)  { |result, index| @event_stream&.call(:agent_done, result, index) }
-  on(:agent_error)  { |name, err, index| @event_stream&.call(:agent_error, name, err, index) }
-  on(:after_call)   { |results, _errors| @event_stream&.call(:all_done) }
-  on(:after_verdict){ |verdict| @event_stream&.call(:verdict, verdict) }
+  on(:before_agent) { |agent, index| @tribunal_event_stream&.call(:agent_start, index) }
+  on(:after_agent)  { |result, index| @tribunal_event_stream&.call(:agent_done, result, index) }
+  on(:agent_error)  { |name, err, index| @tribunal_event_stream&.call(:agent_error, name, err, index) }
+  on(:after_call)   { |results, _errors| @tribunal_event_stream&.call(:all_done) }
+  on(:after_verdict){ |verdict| @tribunal_event_stream&.call(:verdict, verdict) }
 
-  def initialize(input:, event_stream: nil)
+  def initialize(input:, tribunal_event_stream: nil, agent_event_stream: nil)
     agents = PolitenessTribunal::MODELS.map do |model|
       PolitenessAgent.new(models: [{ provider: :openrouter, model: model }])
     end
 
-    super(input: input, agents: agents, event_stream: event_stream)
+    super(input: input, agents: agents,
+          tribunal_event_stream: tribunal_event_stream,
+          agent_event_stream:    agent_event_stream)
   end
 
-  process do |results|
-    results.all? { |r| r.parsed["result"] == true }
+  verdict :majority, may_fail: 1 do |result|
+    result.parsed["result"] == true
   end
 end

@@ -17,7 +17,7 @@ class PolitenessTribunal < ActiveHarness::Tribunal
     super(input: input, agents: agents)
   end
 
-  process do |results|
-    results.all? { |r| r.parsed["result"] == true }
+  verdict :unanimous do |result|
+    result.parsed["result"] == true
   end
 end

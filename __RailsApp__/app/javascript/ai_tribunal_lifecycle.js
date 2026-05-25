@@ -3,12 +3,21 @@ function appendTribunalEvent(p) {
   var sdb = document.getElementById("ah-events");
   if (!sdb) return;
   var icons = { info: "●", success: "✓", warning: "⚠", error: "✗" };
+  var sourceLabels = { tribunal: "tribunal", agent: "agent" };
   var el = document.createElement("div");
   el.className = "ah-event ah-event--" + (p.level || "info");
+  var sourceBadge = p.source
+    ? '<span class="ah-event-source ah-event-source--' +
+      p.source +
+      '">' +
+      (sourceLabels[p.source] || p.source) +
+      "</span>"
+    : "";
   el.innerHTML =
     '<span class="ah-event-icon">' +
     (icons[p.level] || "●") +
     "</span>" +
+    sourceBadge +
     '<span class="ah-event-text">' +
     p.text +
     "</span>";
