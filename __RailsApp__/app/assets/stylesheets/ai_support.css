@@ -171,7 +171,8 @@ html {
 }
 
 .ah-meta,
-.ah-tokens {
+.ah-tokens,
+.ah-cost {
   font-size: 0.8rem;
   color: #9aa5b1;
   flex-shrink: 0;

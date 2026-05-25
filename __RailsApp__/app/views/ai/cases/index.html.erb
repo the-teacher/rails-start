@@ -1,16 +1,32 @@
+<% content_for :styles do %>
+  <%= stylesheet_link_tag "ai_tribunals" %>
+<% end %>
+
 <div class="ah-cases-page">
   <div class="ah-cases-hero">
     <div class="ah-cases-logo">&#x26A1;</div>
     <h1 class="ah-cases-title">ActiveHarness Examples</h1>
-    <p class="ah-cases-subtitle">Five progressive examples showing what ActiveHarness agents can do</p>
+    <p class="ah-cases-subtitle">Progressive examples showing what ActiveHarness can do</p>
   </div>
 
+  <div class="ah-section-title">Agents</div>
   <div class="ah-cases-grid">
     <%= render "case_01" %>
     <%= render "case_02" %>
     <%= render "case_03" %>
     <%= render "case_04" %>
     <%= render "case_05" %>
+  </div>
+
+  <div class="ah-section-title">Tribunals</div>
+  <div class="ah-cases-grid ah-cases-grid--fixed">
+    <%= render "tribunal_01" %>
+    <%= render "tribunal_02" %>
+  </div>
+
+  <div class="ah-section-title">Costs</div>
+  <div class="ah-cases-grid ah-cases-grid--fixed">
+    <%= render "costs_01" %>
   </div>
 
   <%= link_to "&larr; Back".html_safe, root_path, class: "ah-cases-back" %>

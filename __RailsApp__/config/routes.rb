@@ -26,6 +26,20 @@ Rails.application.routes.draw do
       get "fallback",        to: "agents#fallback",        as: :fallback
       get "fallback/stream", to: "agents#fallback_stream", as: :fallback_stream
     end
+
+    # Costs — model pricing reference
+    get "costs", to: "costs#index", as: :costs
+
+    # Tribunal examples
+    scope :tribunals, as: :tribunals do
+      # Tribunal 1 — politeness: 1 agent × 3 models, parallel verdict
+      get  "politeness",      to: "tribunals#politeness",      as: :politeness
+      post "politeness/call", to: "tribunals#politeness_call", as: :politeness_call
+
+      # Tribunal 2 — politeness with live lifecycle event sidebar
+      get "politeness/lifecycle",        to: "tribunals#politeness_lifecycle",        as: :politeness_lifecycle
+      get "politeness/lifecycle/stream", to: "tribunals#politeness_lifecycle_stream", as: :politeness_lifecycle_stream
+    end
   end
 
   # Legacy endpoints kept for backward compatibility

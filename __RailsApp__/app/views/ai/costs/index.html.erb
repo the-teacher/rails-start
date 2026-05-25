@@ -1,0 +1,217 @@
+<% content_for :styles do %>
+  <%= stylesheet_link_tag "ai_costs" %>
+<% end %>
+
+<div class="ah-costs-page">
+
+  <div class="ah-costs-hero">
+    <div class="ah-costs-icon">&#x1F4B0;</div>
+    <h1 class="ah-costs-title">Model Pricing</h1>
+    <p class="ah-costs-subtitle">
+      <%= @providers.values.sum(&:size) %> models across
+      <%= @providers.size %> providers &mdash; sorted by output price
+    </p>
+  </div>
+
+  <%# ── Provider filter ──────────────────────────────────────────────── %>
+  <div class="ah-costs-filter" id="ah-costs-filter">
+    <button class="ah-filter-tag ah-filter-tag--active" data-provider="*" id="ah-filter-all">All</button>
+    <button class="ah-filter-tag ah-filter-tag--special" data-special="cheapest" id="ah-filter-cheapest">&#x1F4B8; 30 Cheapest</button>
+    <button class="ah-filter-tag ah-filter-tag--special" data-special="free" id="ah-filter-free">&#x1F7E2; Free (<%= @free_models.size %>)</button>
+    <% @providers.each_key do |provider| %>
+      <button class="ah-filter-tag ah-filter-tag--active" data-provider="<%= provider %>"><%= provider %></button>
+    <% end %>
+    <button class="ah-filter-reset" id="ah-filter-reset">Reset</button>
+  </div>
+
+  <%# ── Special sections (hidden by default, shown via JS) ──────────── %>
+  <section class="ah-costs-section ah-costs-section--special" data-special="cheapest" style="display:none; width:100%; max-width:1100px;">
+    <div class="ah-costs-provider-header">
+      <span class="ah-costs-provider-name">&#x1F4B8; 30 Cheapest paid models</span>
+      <span class="ah-costs-provider-count">sorted by output price</span>
+    </div>
+    <div class="ah-costs-table-wrap">
+      <table class="ah-costs-table">
+        <thead>
+          <tr>
+            <th>Provider</th>
+            <th>Model ID</th>
+            <th>Name</th>
+            <th class="ah-num">Input / 1M</th>
+            <th class="ah-num">Output / 1M</th>
+            <th class="ah-num">Cache read</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @cheapest.each do |m| %>
+            <tr>
+              <td class="ah-col-provider"><span class="ah-provider-badge"><%= m.provider %></span></td>
+              <td class="ah-model-id"><code><%= m.id %></code></td>
+              <td class="ah-model-name"><%= m.name %></td>
+              <td class="ah-num"><%= m.input_per_million  ? "$#{'%.3g' % m.input_per_million}"  : '—' %></td>
+              <td class="ah-num ah-col-output"><%= "$#{'%.3g' % m.output_per_million}" %></td>
+              <td class="ah-num ah-col-cache"><%= m.cache_read_input_per_million ? "$#{'%.3g' % m.cache_read_input_per_million}" : '—' %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="ah-costs-section ah-costs-section--special" data-special="free" style="display:none; width:100%; max-width:1100px;">
+    <div class="ah-costs-provider-header">
+      <span class="ah-costs-provider-name">&#x1F7E2; Free models (<%= @free_models.size %>)</span>
+      <span class="ah-costs-provider-count">output = $0 or no pricing data</span>
+    </div>
+    <div class="ah-costs-table-wrap">
+      <table class="ah-costs-table">
+        <thead>
+          <tr>
+            <th>Provider</th>
+            <th>Model ID</th>
+            <th>Name</th>
+            <th class="ah-num">Input / 1M</th>
+            <th class="ah-num">Output / 1M</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @free_models.each do |m| %>
+            <tr>
+              <td class="ah-col-provider"><span class="ah-provider-badge"><%= m.provider %></span></td>
+              <td class="ah-model-id"><code><%= m.id %></code></td>
+              <td class="ah-model-name"><%= m.name %></td>
+              <td class="ah-num"><%= m.input_per_million ? "$#{'%.3g' % m.input_per_million}" : '—' %></td>
+              <td class="ah-num ah-col-free"><%= m.output_per_million ? '$0' : '—' %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="ah-costs-body" id="ah-costs-body">
+
+    <% @providers.each do |provider, models| %>
+      <section class="ah-costs-section" data-provider="<%= provider %>">
+
+        <div class="ah-costs-provider-header">
+          <span class="ah-costs-provider-name"><%= provider %></span>
+          <span class="ah-costs-provider-count"><%= models.size %> models</span>
+        </div>
+
+        <div class="ah-costs-table-wrap">
+          <table class="ah-costs-table">
+            <thead>
+              <tr>
+                <th>Model ID</th>
+                <th>Name</th>
+                <th class="ah-num">Input / 1M</th>
+                <th class="ah-num">Output / 1M</th>
+                <th class="ah-num">Cache read</th>
+                <th class="ah-num">Cache write</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% models.each do |m| %>
+                <tr>
+                  <td class="ah-model-id"><code><%= m.id %></code></td>
+                  <td class="ah-model-name"><%= m.name %></td>
+                  <td class="ah-num"><%= m.input_per_million  ? "$#{"%.3g" % m.input_per_million}"  : "—" %></td>
+                  <td class="ah-num ah-col-output"><%= m.output_per_million ? "$#{"%.3g" % m.output_per_million}" : "—" %></td>
+                  <td class="ah-num ah-col-cache"><%= m.cache_read_input_per_million  ? "$#{"%.3g" % m.cache_read_input_per_million}"  : "—" %></td>
+                  <td class="ah-num ah-col-cache"><%= m.cache_write_input_per_million ? "$#{"%.3g" % m.cache_write_input_per_million}" : "—" %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+
+      </section>
+    <% end %>
+
+  </div>
+
+  <%= link_to "&larr; Back".html_safe, ai_cases_path, class: "ah-costs-back" %>
+</div>
+
+<script>
+(function () {
+  const filter        = document.getElementById('ah-costs-filter');
+  const allBtn        = document.getElementById('ah-filter-all');
+  const resetBtn      = document.getElementById('ah-filter-reset');
+  const cheapestBtn   = document.getElementById('ah-filter-cheapest');
+  const freeBtn       = document.getElementById('ah-filter-free');
+  const body          = document.getElementById('ah-costs-body');
+  const providerTags  = Array.from(filter.querySelectorAll('.ah-filter-tag[data-provider]:not([data-provider="*"])'));
+  const providerSecs  = Array.from(document.querySelectorAll('.ah-costs-section[data-provider]'));
+  const specialSecs   = Array.from(document.querySelectorAll('.ah-costs-section[data-special]'));
+
+  // State
+  let active  = new Set();   // active provider names
+  let special = null;        // 'cheapest' | 'free' | null
+
+  function applyFilter() {
+    const inSpecial    = special !== null;
+    const allProviders = active.size === 0;
+
+    // Special sections
+    specialSecs.forEach(s => {
+      s.style.display = (s.dataset.special === special) ? '' : 'none';
+    });
+
+    // Provider body visibility
+    body.style.display = inSpecial ? 'none' : '';
+
+    if (!inSpecial) {
+      providerSecs.forEach(s => {
+        s.style.display = (allProviders || active.has(s.dataset.provider)) ? '' : 'none';
+      });
+    }
+
+    // Button states
+    allBtn.classList.toggle('ah-filter-tag--active', !inSpecial && allProviders);
+    cheapestBtn.classList.toggle('ah-filter-tag--special--active', special === 'cheapest');
+    freeBtn.classList.toggle('ah-filter-tag--special--active', special === 'free');
+    providerTags.forEach(t => {
+      t.classList.toggle('ah-filter-tag--active', !inSpecial && (allProviders || active.has(t.dataset.provider)));
+    });
+  }
+
+  allBtn.addEventListener('click', () => {
+    special = null;
+    active.clear();
+    applyFilter();
+  });
+
+  cheapestBtn.addEventListener('click', () => {
+    special = special === 'cheapest' ? null : 'cheapest';
+    if (!special) active.clear();
+    applyFilter();
+  });
+
+  freeBtn.addEventListener('click', () => {
+    special = special === 'free' ? null : 'free';
+    if (!special) active.clear();
+    applyFilter();
+  });
+
+  providerTags.forEach(tag => {
+    tag.addEventListener('click', () => {
+      special = null;
+      const p = tag.dataset.provider;
+      if (active.has(p)) {
+        active.delete(p);
+      } else {
+        active.add(p);
+      }
+      applyFilter();
+    });
+  });
+
+  resetBtn.addEventListener('click', () => {
+    special = null;
+    active.clear();
+    applyFilter();
+  });
+}());
+</script>

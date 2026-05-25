@@ -23,6 +23,7 @@
     output.classList.add("streaming");
     meta.textContent = "";
     document.getElementById("ah-tokens").textContent = "";
+    document.getElementById("ah-cost").textContent = "";
     btn.disabled = true;
     btn.textContent = "Thinking\u2026";
 
@@ -50,6 +51,10 @@
         const u = payload.usage;
         if (u && tokens)
           tokens.textContent = `Tokens: ${u.input_tokens} in / ${u.output_tokens} out / ${u.total_tokens} total`;
+        const costEl = document.getElementById("ah-cost");
+        const c = payload.cost;
+        if (c && costEl)
+          costEl.textContent = `Cost: $${c.total_cost.toFixed(6)} (in: $${c.input_cost.toFixed(6)} / out: $${c.output_cost.toFixed(6)})`;
         closeStream();
         return;
       }

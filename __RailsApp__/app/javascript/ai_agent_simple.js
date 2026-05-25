@@ -22,6 +22,7 @@
     output.textContent = "";
     meta.textContent = "";
     document.getElementById("ah-tokens").textContent = "";
+    document.getElementById("ah-cost").textContent = "";
     btn.disabled = true;
     btn.textContent = "Thinking\u2026";
 
@@ -31,7 +32,7 @@
       body: JSON.stringify({ input: value }),
     })
       .then((r) => r.json())
-      .then(({ output: text, model, time, usage, error }) => {
+      .then(({ output: text, model, time, usage, cost, error }) => {
         if (error) {
           output.textContent = "Error: " + error;
         } else {
@@ -43,6 +44,9 @@
           const tokens = document.getElementById("ah-tokens");
           if (usage && tokens)
             tokens.textContent = `Tokens: ${usage.input_tokens} in / ${usage.output_tokens} out / ${usage.total_tokens} total`;
+          const costEl = document.getElementById("ah-cost");
+          if (cost && costEl)
+            costEl.textContent = `Cost: $${cost.total_cost.toFixed(6)} (in: $${cost.input_cost.toFixed(6)} / out: $${cost.output_cost.toFixed(6)})`;
         }
       })
       .catch(() => {

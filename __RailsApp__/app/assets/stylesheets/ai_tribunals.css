@@ -1,0 +1,263 @@
+/* ── Tribunal pages ──────────────────────────────────────────────────────── */
+
+html:has(.ah-tribunal-page),
+body:has(.ah-tribunal-page) {
+  overflow: auto;
+  height: auto;
+}
+
+.ah-tribunal-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 3rem 1.5rem 4rem;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  gap: 2rem;
+}
+
+/* ── Hero ── */
+.ah-tribunal-hero {
+  text-align: center;
+}
+
+.ah-tribunal-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0.4rem 0 0;
+}
+
+.ah-tribunal-subtitle {
+  margin-top: 0.5rem;
+  font-size: 1rem;
+  color: #6b7a8d;
+  line-height: 1.5;
+}
+
+/* ── Form ── */
+.ah-tribunal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  width: 100%;
+  max-width: 640px;
+}
+
+.ah-tribunal-textarea {
+  width: 100%;
+  padding: 0.9rem 1.1rem;
+  font-size: 1rem;
+  font-family: inherit;
+  border: 1.5px solid rgba(200, 210, 230, 0.9);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.75);
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.ah-tribunal-textarea:focus {
+  border-color: rgba(100, 130, 200, 0.6);
+}
+
+.ah-tribunal-submit {
+  align-self: flex-end;
+  padding: 0.65rem 2rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: inherit;
+  color: #fff;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition:
+    opacity 0.2s,
+    transform 0.2s;
+}
+
+.ah-tribunal-submit:hover {
+  opacity: 0.88;
+  transform: translateY(-1px);
+}
+
+.ah-tribunal-submit:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ── Three panels ── */
+.ah-tribunal-panels {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.2rem;
+  width: 100%;
+  max-width: 900px;
+}
+
+.ah-tribunal-panel {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1.5px solid rgba(255, 255, 255, 0.85);
+  border-radius: 18px;
+  padding: 1.5rem 1.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transition:
+    border-color 0.3s,
+    background 0.3s;
+}
+
+.ah-tribunal-panel--waiting {
+  border-color: rgba(150, 170, 200, 0.3);
+  background: rgba(248, 250, 255, 0.55);
+  opacity: 0.75;
+}
+
+.ah-tribunal-panel--polite {
+  border-color: rgba(52, 199, 89, 0.45);
+  background: rgba(240, 255, 245, 0.65);
+}
+
+.ah-tribunal-panel--rude {
+  border-color: rgba(255, 59, 48, 0.35);
+  background: rgba(255, 245, 245, 0.65);
+}
+
+.ah-panel-badge {
+  font-size: 1.5rem;
+  font-weight: 700;
+  min-height: 1.8rem;
+}
+
+.ah-panel-badge--polite {
+  color: #34c759;
+}
+.ah-panel-badge--rude {
+  color: #ff3b30;
+}
+
+.ah-panel-model {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #9aa5b1;
+  word-break: break-all;
+}
+
+.ah-panel-result {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #2c3e50;
+}
+
+.ah-panel-result--polite {
+  color: #34c759;
+}
+.ah-panel-result--rude {
+  color: #ff3b30;
+}
+
+.ah-panel-reason {
+  font-size: 0.88rem;
+  color: #5a6878;
+  line-height: 1.5;
+  flex: 1;
+  margin: 0;
+}
+
+.ah-panel-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  font-size: 0.75rem;
+  color: #9aa5b1;
+  margin-top: 0.3rem;
+}
+
+/* ── Final verdict ── */
+.ah-tribunal-verdict {
+  width: 100%;
+  max-width: 900px;
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 2px solid rgba(200, 210, 230, 0.7);
+  border-radius: 20px;
+  padding: 1.8rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  transition:
+    border-color 0.3s,
+    background 0.3s;
+}
+
+.ah-tribunal-verdict--polite {
+  border-color: rgba(52, 199, 89, 0.5);
+  background: rgba(240, 255, 245, 0.65);
+}
+
+.ah-tribunal-verdict--rude {
+  border-color: rgba(255, 59, 48, 0.4);
+  background: rgba(255, 245, 245, 0.65);
+}
+
+.ah-verdict-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #9aa5b1;
+}
+
+.ah-verdict-value {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #2c3e50;
+  transition: color 0.3s;
+}
+
+.ah-verdict-value--polite {
+  color: #34c759;
+}
+.ah-verdict-value--rude {
+  color: #ff3b30;
+}
+
+.ah-verdict-time {
+  font-size: 0.8rem;
+  color: #9aa5b1;
+}
+
+/* ── Nav ── */
+.ah-tribunal-nav {
+  margin-top: 0.5rem;
+}
+
+/* ── Section headings on cases index ───────────────────────────────────── */
+.ah-section-title {
+  width: 100%;
+  max-width: 960px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #5a6878;
+  padding-bottom: 0.75rem;
+  border-bottom: 1.5px solid rgba(200, 210, 230, 0.6);
+  margin-bottom: 0.5rem;
+}
+
+/* Grid variant: cards keep fixed width instead of stretching */
+.ah-cases-grid--fixed {
+  grid-template-columns: repeat(auto-fill, minmax(280px, 320px));
+  justify-content: start;
+}

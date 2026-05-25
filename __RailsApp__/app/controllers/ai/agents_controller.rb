@@ -21,7 +21,8 @@ module Ai
         output: result.output,
         model:  result.model,
         time:   result.execution_time,
-        usage:  result.usage
+        usage:  result.usage,
+        cost:   result.cost
       }
     end
 
@@ -50,7 +51,7 @@ module Ai
       )
 
       result = agent.result
-      sse.write({ done: true, model: result.model, time: result.execution_time, usage: result.usage }.to_json)
+      sse.write({ done: true, model: result.model, time: result.execution_time, usage: result.usage, cost: result.cost }.to_json)
     rescue ActionController::Live::ClientDisconnected
     rescue StandardError => e
       sse.write({ error: "#{e.class.name.split('::').last}: #{e.message}" }.to_json) rescue nil
