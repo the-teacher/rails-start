@@ -13,7 +13,23 @@ class PolitenessAgent < ActiveHarness::Agent
     fallback provider: :openrouter, model: "gryphe/mythomax-l2-13b"
   end
 
-  on(:before_call) { @event_stream&.call(:llm_request, self.class.name) }
-  on(:after_call)  { |result| @event_stream&.call(:llm_response, result) }
-  on(:retry)       { |entry, err| @event_stream&.call(:llm_retry, entry[:model], err) }
+  on(:before_call) do
+    @otel_span = AiTracer.start_span("agent.call", attributes: { "agent.class" => self.class.name })
+    @event_stream&.call(:llm_request, self.class.name)
+  end
+
+  on(:after_call) do |result|
+    if @otel_span
+      @otel_span.set_attribute("llm.model",  result.model.to_s)
+      @otel_span.set_attribute("llm.time_s", result.execution_time.to_s)
+      @otel_span.finish
+      @otel_span = nil
+    end
+    @event_stream&.call(:llm_response, result)
+  end
+
+  on(:retry) do |entry, err|
+    @otel_span&.add_event("retry", attributes: { "model" => entry[:model].to_s, "error" => err&.message.to_s })
+    @event_stream&.call(:llm_retry, entry[:model], err)
+  end
 end

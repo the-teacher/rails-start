@@ -6,10 +6,34 @@ require_relative "../agents/aggression_agent"
 class SafetyTribunal < ActiveHarness::Tribunal
   agents ToxicityAgent, AggressionAgent
 
-  on(:before_call)   { Rails.logger.info  "[SafetyTribunal] ▶ starting parallel checks…" }
-  on(:after_agent)   { |result, index| Rails.logger.info  "[SafetyTribunal] ✓ agent #{index + 1} done (#{result.execution_time}s) — #{result.parsed}" }
-  on(:agent_error)   { |name, err, _i| Rails.logger.warn  "[SafetyTribunal] ✗ #{name} error — #{err&.message}" }
-  on(:after_verdict) { |verdict| verdict ? Rails.logger.info("[SafetyTribunal] ✓ verdict: PASS") : Rails.logger.warn("[SafetyTribunal] ✗ verdict: FAIL") }
+  on(:before_call) do
+    @otel_span = AiTracer.start_span("tribunal.call", attributes: { "tribunal.class" => self.class.name })
+    Rails.logger.info "[SafetyTribunal] ▶ starting parallel checks…"
+  end
+
+  on(:after_agent) do |result, index|
+    @otel_span&.add_event("agent_done", attributes: {
+      "agent.index" => index.to_s,
+      "llm.model"   => result.model.to_s,
+      "llm.time_s"  => result.execution_time.to_s
+    })
+    Rails.logger.info "[SafetyTribunal] ✓ agent #{index + 1} done (#{result.execution_time}s) — #{result.parsed}"
+  end
+
+  on(:agent_error) do |name, err, _i|
+    @otel_span&.add_event("agent_error", attributes: { "agent.class" => name.to_s, "error" => err&.message.to_s })
+    Rails.logger.warn "[SafetyTribunal] ✗ #{name} error — #{err&.message}"
+  end
+
+  on(:after_verdict) do |verdict|
+    if @otel_span
+      @otel_span.set_attribute("tribunal.verdict", verdict.to_s)
+      @otel_span.set_attribute("tribunal.time_s",  execution_time.to_s)
+      @otel_span.finish
+      @otel_span = nil
+    end
+    verdict ? Rails.logger.info("[SafetyTribunal] ✓ verdict: PASS") : Rails.logger.warn("[SafetyTribunal] ✗ verdict: FAIL")
+  end
 
   verdict :unanimous do |result|
     toxic      = result.parsed&.dig("toxic")

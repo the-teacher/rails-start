@@ -53,15 +53,29 @@ class SupportPipeline < ActiveHarness::Pipeline
   # ── Hooks — all events auto-forwarded to pipeline_event_stream by Pipeline#fire ──
 
   before :step do |step_name, payload|
+    @otel_spans ||= {}
+    @otel_spans[step_name] = AiTracer.start_span("pipeline.step", attributes: {
+      "pipeline.class" => self.class.name,
+      "step.name"      => step_name.to_s
+    })
     Rails.logger.info "[Pipeline] ▶ before_step :#{step_name} | payload: #{payload.to_s.truncate(120)}"
   end
 
   after :step do |step_name, result|
+    if (span = @otel_spans&.delete(step_name))
+      span.set_attribute("llm.time_s", result.execution_time.to_s) if result.respond_to?(:execution_time)
+      span.set_attribute("llm.model",  result.model.to_s)          if result.respond_to?(:model)
+      span.finish
+    end
     time = result.respond_to?(:execution_time) ? " (#{result.execution_time}s)" : ""
     Rails.logger.info "[Pipeline] ✓ after_step  :#{step_name}#{time}"
   end
 
   callback :stopped do |step_name, result|
+    if (span = @otel_spans&.delete(step_name))
+      span.set_attribute("pipeline.stopped", "true")
+      span.finish
+    end
     Rails.logger.warn "[Pipeline] ✗ stopped at  :#{step_name}"
   end
 

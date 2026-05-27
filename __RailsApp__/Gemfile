@@ -43,6 +43,8 @@ gem "image_processing", "~> 1.2"
 # AI agents DSL
 gem "dotenv-rails"
 gem "ruby_llm"
+gem "opentelemetry-sdk"
+gem "opentelemetry-exporter-otlp"
 
 _active_harness_local = "/home/rails/ActiveHarness2"
 if File.directory?(_active_harness_local)
