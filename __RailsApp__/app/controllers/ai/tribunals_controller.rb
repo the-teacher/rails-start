@@ -72,9 +72,8 @@ module Ai
       end
 
       tribunal = PolitenessLifecycleTribunal.new(
-        input:                 input,
-        tribunal_event_stream: tribunal_stream,
-        agent_event_stream:    agent_stream
+        input:   input,
+        streams: { tribunal: tribunal_stream, agent: agent_stream }
       )
       tribunal_stream.call(:tribunal_start, PolitenessTribunal::MODELS.size)
       tribunal.call

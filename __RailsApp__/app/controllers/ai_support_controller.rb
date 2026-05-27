@@ -103,9 +103,8 @@ class AiSupportController < ApplicationController
     end
 
     SupportAgent.call(
-      input:        input,
-      token_stream: token_stream,
-      event_stream: event_stream
+      input:   input,
+      streams: { token: token_stream, agent: event_stream }
     )
 
     sse_tokens.write({ done: true }.to_json)

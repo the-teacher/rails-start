@@ -22,9 +22,11 @@
 
     <%# Per-page assets (must come after importmap so bare specifiers resolve) %>
     <%= yield :head %>
+    <%= yield :styles %>
   </head>
 
   <body>
     <%= yield %>
+    <%= yield :scripts %>
   </body>
 </html>

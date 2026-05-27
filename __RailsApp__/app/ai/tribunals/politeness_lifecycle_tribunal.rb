@@ -10,14 +10,12 @@ class PolitenessLifecycleTribunal < ActiveHarness::Tribunal
   on(:after_call)   { |results, _errors| @tribunal_event_stream&.call(:all_done) }
   on(:after_verdict){ |verdict| @tribunal_event_stream&.call(:verdict, verdict) }
 
-  def initialize(input:, tribunal_event_stream: nil, agent_event_stream: nil)
+  def initialize(input:, streams: {})
     agents = PolitenessTribunal::MODELS.map do |model|
       PolitenessAgent.new(models: [{ provider: :openrouter, model: model }])
     end
 
-    super(input: input, agents: agents,
-          tribunal_event_stream: tribunal_event_stream,
-          agent_event_stream:    agent_event_stream)
+    super(input: input, agents: agents, streams: streams)
   end
 
   verdict :majority, may_fail: 1 do |result|

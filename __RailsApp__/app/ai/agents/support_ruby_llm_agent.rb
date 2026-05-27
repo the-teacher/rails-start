@@ -11,13 +11,16 @@ class SupportRubyLLMAgent < ActiveHarness::Agent
   model do
     use      provider: :openrouter, model: "mistralai/mistral-nemo",                  temperature: 0.5
     fallback provider: :openrouter, model: "meta-llama/llama-3.1-8b-instruct"
-    fallback provider: :openrouter, model: "meta-llama/llama-3.3-70b-instruct:free"
+    fallback provider: :openrouter, model: "sao10k/l3-lunaris-8b"
+    fallback provider: :openrouter, model: "google/gemma-3-4b-it"
+    fallback provider: :openrouter, model: "mistralai/mistral-small-24b-instruct-2501"
+    fallback provider: :openrouter, model: "gryphe/mythomax-l2-13b"
   end
 
   # The block receives BackendParams with fields: model, provider, temperature.
   # It must return a RubyLLM::Chat instance.
   # assume_model_exists: true is required for models not in the RubyLLM registry.
-  ruby_llm_backend do |params|
+  custom_llm_backend do |params|
     RubyLLM.chat(
       model:               params.model,
       provider:            params.provider,
@@ -25,12 +28,10 @@ class SupportRubyLLMAgent < ActiveHarness::Agent
     ).tap { |chat| chat.with_temperature(params.temperature) if params.temperature }
   end
 
-  # Lifecycle hooks — publish events via @event_stream set on the instance.
-  on(:setup)             { @event_stream&.call(:setup) }
-  before(:system_prompt) { @event_stream&.call(:before_system_prompt) }
-  after(:system_prompt)  { @event_stream&.call(:after_system_prompt) }
-  before(:call)          { @event_stream&.call(:before_call) }
-  after(:call)           { |r| @event_stream&.call(:after_call, r) }
-  callback(:retry)       { |entry, err| @event_stream&.call(:retry, entry, err) }
-  callback(:failure)     { |attempts| @event_stream&.call(:failure, attempts) }
+  # Lifecycle hooks — side-effects only; event_stream is auto-fired by Agent#fire.
+  on(:setup)             { Rails.logger.info  "[SupportRubyLLM] setup" }
+  before(:call)          { Rails.logger.info  "[SupportRubyLLM] ▶ calling…" }
+  after(:call)           { |r| Rails.logger.info  "[SupportRubyLLM] ✓ done (#{r.execution_time}s)" }
+  callback(:retry)       { |entry, err| Rails.logger.warn  "[SupportRubyLLM] ↺ retry #{entry&.dig(:model)} — #{err&.message}" }
+  callback(:failure)     { |attempts| Rails.logger.error "[SupportRubyLLM] ✗ all models failed" }
 end

@@ -3,17 +3,17 @@ require_relative "../prompts/support_prompt"
 class SupportAgent < ActiveHarness::Agent
   system_prompt SupportPrompt
 
-  # Lifecycle hooks — publish events via @event_stream set on the instance.
-  on(:setup)             { @event_stream&.call(:setup) }
-  before(:system_prompt) { @event_stream&.call(:before_system_prompt) }
-  after(:system_prompt)  { @event_stream&.call(:after_system_prompt) }
-  before(:call)          { @event_stream&.call(:before_call) }
-  after(:call)           { |r| @event_stream&.call(:after_call, r) }
-  callback(:retry)       { |entry, err| @event_stream&.call(:retry, entry, err) }
-  callback(:failure)     { |attempts| @event_stream&.call(:failure, attempts) }
+  before(:call)      { Rails.logger.info  "[Support] ▶ calling…" }
+  after(:call)       { |r| Rails.logger.info  "[Support] ✓ done (#{r.execution_time}s)" }
+  callback(:retry)   { |entry, err| Rails.logger.warn  "[Support] ↺ retry #{entry&.dig(:model)} — #{err&.message}" }
+  callback(:failure) { |attempts| Rails.logger.error "[Support] ✗ all models failed" }
 
   model do
     use      provider: :openrouter, model: "mistralai/mistral-nemo"
     fallback provider: :openrouter, model: "meta-llama/llama-3.1-8b-instruct"
+    fallback provider: :openrouter, model: "sao10k/l3-lunaris-8b"
+    fallback provider: :openrouter, model: "google/gemma-3-4b-it"
+    fallback provider: :openrouter, model: "mistralai/mistral-small-24b-instruct-2501"
+    fallback provider: :openrouter, model: "gryphe/mythomax-l2-13b"
   end
 end

@@ -40,6 +40,13 @@ Rails.application.routes.draw do
       get "politeness/lifecycle",        to: "tribunals#politeness_lifecycle",        as: :politeness_lifecycle
       get "politeness/lifecycle/stream", to: "tribunals#politeness_lifecycle_stream", as: :politeness_lifecycle_stream
     end
+
+    # Pipeline examples
+    scope :pipelines, as: :pipelines do
+      # Pipeline 1 — 6-step support pipeline with live event log
+      get "support",        to: "pipelines#support",        as: :support
+      get "support/stream", to: "pipelines#support_stream", as: :support_stream
+    end
   end
 
   # Legacy endpoints kept for backward compatibility

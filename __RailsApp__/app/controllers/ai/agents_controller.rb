@@ -46,8 +46,8 @@ module Ai
       token_stream = build_token_stream(sse)
 
       agent = SimpleAgent.call(
-        input:        input,
-        token_stream: token_stream
+        input:   input,
+        streams: { token: token_stream }
       )
 
       result = agent.result
@@ -82,9 +82,8 @@ module Ai
       event_stream  = build_event_stream(sse_lifecycle)
 
       agent = SupportAgent.call(
-        input:        input,
-        token_stream: token_stream,
-        event_stream: event_stream
+        input:   input,
+        streams: { token: token_stream, agent: event_stream }
       )
 
       sse_tokens.write({ done: true, usage: agent.result.usage }.to_json)
@@ -118,9 +117,8 @@ module Ai
       event_stream  = build_event_stream(sse_lifecycle)
 
       agent = SupportRubyLLMAgent.call(
-        input:        input,
-        token_stream: token_stream,
-        event_stream: event_stream
+        input:   input,
+        streams: { token: token_stream, agent: event_stream }
       )
 
       sse_tokens.write({ done: true, usage: agent.result.usage }.to_json)
@@ -156,9 +154,8 @@ module Ai
       event_stream  = build_event_stream(sse_lifecycle)
 
       agent = SupportRubyLLMAgent.new(
-        input:        input,
-        token_stream: token_stream,
-        event_stream: event_stream
+        input:   input,
+        streams: { token: token_stream, agent: event_stream }
       )
 
       # Prepend 2 broken models — they will fail and trigger :retry events in the sidebar.
