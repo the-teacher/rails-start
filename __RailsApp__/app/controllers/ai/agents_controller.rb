@@ -1,6 +1,7 @@
 module Ai
   class AgentsController < ApplicationController
     include ActionController::Live
+    include Ai::AgentEvents
     layout "ai"
 
     skip_before_action :verify_authenticity_token
@@ -40,10 +41,10 @@ module Ai
 
       input = params.require(:input)
 
-      stream = response.stream
-      sse    = ActionController::Live::SSE.new(stream, event: "message")
+      stream   = response.stream
+      sse_done = ActionController::Live::SSE.new(stream, event: "completion")
 
-      token_stream = build_token_stream(sse)
+      token_stream = build_token_stream(sse_done)
 
       agent = SimpleAgent.call(
         input:   input,
@@ -51,13 +52,13 @@ module Ai
       )
 
       result = agent.result
-      sse.write({ done: true, model: result.model, time: result.execution_time, usage: result.usage, cost: result.cost }.to_json)
+      sse_done.write({ done: true, model: result.model, time: result.execution_time, usage: result.usage, cost: result.cost }.to_json)
     rescue ActionController::Live::ClientDisconnected
     rescue StandardError => e
-      sse.write({ error: "#{e.class.name.split('::').last}: #{e.message}" }.to_json) rescue nil
-      sse.write({ done: true }.to_json) rescue nil
+      sse_done.write({ error: "#{e.class.name.split('::').last}: #{e.message}" }.to_json) rescue nil
+      sse_done.write({ done: true }.to_json) rescue nil
     ensure
-      sse.close
+      sse_done.close
     end
 
     # ---------------------------------------------------------------------------
@@ -74,25 +75,25 @@ module Ai
 
       input = params.require(:input)
 
-      stream        = response.stream
-      sse_tokens    = ActionController::Live::SSE.new(stream, event: "message")
-      sse_lifecycle = ActionController::Live::SSE.new(stream, event: "lifecycle")
+      stream   = response.stream
+      sse      = ActionController::Live::SSE.new(stream, event: "processing")
+      sse_done = ActionController::Live::SSE.new(stream, event: "completion")
 
-      token_stream = build_token_stream(sse_tokens)
-      event_stream  = build_event_stream(sse_lifecycle)
+      token_stream = build_token_stream(sse_done)
+      event_stream = build_agent_event_stream(sse)
 
       agent = SupportAgent.call(
         input:   input,
         streams: { token: token_stream, agent: event_stream }
       )
 
-      sse_tokens.write({ done: true, usage: agent.result.usage }.to_json)
+      sse_done.write({ done: true, usage: agent.result.usage }.to_json)
     rescue ActionController::Live::ClientDisconnected
     rescue StandardError => e
-      sse_tokens.write({ error: "#{e.class.name.split('::').last}: #{e.message}" }.to_json) rescue nil
-      sse_tokens.write({ done: true }.to_json) rescue nil
+      sse_done.write({ error: "#{e.class.name.split('::').last}: #{e.message}" }.to_json) rescue nil
+      sse_done.write({ done: true }.to_json) rescue nil
     ensure
-      sse_tokens.close
+      sse_done.close
     end
 
     # ---------------------------------------------------------------------------
@@ -109,25 +110,25 @@ module Ai
 
       input = params.require(:input)
 
-      stream        = response.stream
-      sse_tokens    = ActionController::Live::SSE.new(stream, event: "message")
-      sse_lifecycle = ActionController::Live::SSE.new(stream, event: "lifecycle")
+      stream   = response.stream
+      sse      = ActionController::Live::SSE.new(stream, event: "processing")
+      sse_done = ActionController::Live::SSE.new(stream, event: "completion")
 
-      token_stream = build_token_stream(sse_tokens)
-      event_stream  = build_event_stream(sse_lifecycle)
+      token_stream = build_token_stream(sse_done)
+      event_stream = build_agent_event_stream(sse)
 
       agent = SupportRubyLLMAgent.call(
         input:   input,
         streams: { token: token_stream, agent: event_stream }
       )
 
-      sse_tokens.write({ done: true, usage: agent.result.usage }.to_json)
+      sse_done.write({ done: true, usage: agent.result.usage }.to_json)
     rescue ActionController::Live::ClientDisconnected
     rescue StandardError => e
-      sse_tokens.write({ error: "#{e.class.name.split('::').last}: #{e.message}" }.to_json) rescue nil
-      sse_tokens.write({ done: true }.to_json) rescue nil
+      sse_done.write({ error: "#{e.class.name.split('::').last}: #{e.message}" }.to_json) rescue nil
+      sse_done.write({ done: true }.to_json) rescue nil
     ensure
-      sse_tokens.close
+      sse_done.close
     end
 
     # ---------------------------------------------------------------------------
@@ -146,12 +147,12 @@ module Ai
 
       input = params.require(:input)
 
-      stream        = response.stream
-      sse_tokens    = ActionController::Live::SSE.new(stream, event: "message")
-      sse_lifecycle = ActionController::Live::SSE.new(stream, event: "lifecycle")
+      stream   = response.stream
+      sse      = ActionController::Live::SSE.new(stream, event: "processing")
+      sse_done = ActionController::Live::SSE.new(stream, event: "completion")
 
-      token_stream = build_token_stream(sse_tokens)
-      event_stream  = build_event_stream(sse_lifecycle)
+      token_stream = build_token_stream(sse_done)
+      event_stream = build_agent_event_stream(sse)
 
       agent = SupportRubyLLMAgent.new(
         input:   input,
@@ -166,13 +167,13 @@ module Ai
 
       agent.call
 
-      sse_tokens.write({ done: true, usage: agent.result&.usage }.to_json)
+      sse_done.write({ done: true, usage: agent.result&.usage }.to_json)
     rescue ActionController::Live::ClientDisconnected
     rescue StandardError => e
-      sse_tokens.write({ error: "#{e.class.name.split('::').last}: #{e.message}" }.to_json) rescue nil
-      sse_tokens.write({ done: true }.to_json) rescue nil
+      sse_done.write({ error: "#{e.class.name.split('::').last}: #{e.message}" }.to_json) rescue nil
+      sse_done.write({ done: true }.to_json) rescue nil
     ensure
-      sse_tokens.close
+      sse_done.close
     end
 
     private
@@ -194,55 +195,6 @@ module Ai
 
     def build_token_stream(sse)
       ->(token) { sse.write({ token: token }.to_json) }
-    end
-
-    def build_event_stream(sse)
-      ->(name, *args) do
-        sse.write(lifecycle_event_message(name, args).to_json)
-      rescue IOError, ActionController::Live::ClientDisconnected
-      end
-    end
-
-    def lifecycle_event_message(event, args)
-      case event
-      when :setup
-        { event: "setup",
-          text:  "Agent initialized",
-          level: "info" }
-      when :before_system_prompt
-        { event: "before_system_prompt",
-          text:  "Building system prompt…",
-          level: "info" }
-      when :after_system_prompt
-        { event: "after_system_prompt",
-          text:  "System prompt ready",
-          level: "info" }
-      when :before_call
-        { event: "before_call",
-          text:  "Sending request…",
-          level: "info" }
-      when :after_call
-        result = args[0]
-        { event: "after_call",
-          text:  "Response received (#{result.execution_time}s)",
-          level: "success",
-          model: result.model,
-          time:  result.execution_time,
-          usage: result.usage }
-      when :retry
-        entry, error = args
-        { event: "retry",
-          text:  "Retry: #{entry[:model]} — #{error.class.name.split('::').last}",
-          level: "warning" }
-      when :failure
-        { event: "failure",
-          text:  "All models failed",
-          level: "error" }
-      else
-        { event: event.to_s,
-          text:  event.to_s,
-          level: "info" }
-      end
     end
   end
 end

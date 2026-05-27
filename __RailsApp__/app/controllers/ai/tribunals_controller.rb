@@ -1,6 +1,7 @@
 module Ai
   class TribunalsController < ApplicationController
     include ActionController::Live
+    include Ai::TribunalEvents
     layout "ai"
 
     skip_before_action :verify_authenticity_token
@@ -56,20 +57,11 @@ module Ai
       input = params.require(:input)
 
       stream     = response.stream
-      sse_events = ActionController::Live::SSE.new(stream, event: "lifecycle")
-      sse_done   = ActionController::Live::SSE.new(stream, event: "message")
+      sse_events = ActionController::Live::SSE.new(stream, event: "processing")
+      sse_done   = ActionController::Live::SSE.new(stream, event: "completion")
 
-      tribunal_stream = ->(name, *args) do
-        logger.debug "[Tribunal] event=#{name} args=#{args.inspect}"
-        sse_events.write(tribunal_event_message(name, args).merge(source: "tribunal").to_json)
-      rescue IOError, ActionController::Live::ClientDisconnected
-      end
-
-      agent_stream = ->(name, *args) do
-        logger.debug "[Agent] event=#{name} args=#{args.inspect}"
-        sse_events.write(agent_event_message(name, args).merge(source: "agent").to_json)
-      rescue IOError, ActionController::Live::ClientDisconnected
-      end
+      tribunal_stream = build_tribunal_stream(sse_events)
+      agent_stream     = build_tribunal_agent_stream(sse_events)
 
       tribunal = PolitenessLifecycleTribunal.new(
         input:   input,
@@ -91,27 +83,6 @@ module Ai
       sse_done.close
     end
 
-    def agent_event_message(event, args)
-      case event
-      when :llm_request
-        { event: "llm_request",
-          text:  "#{args[0]&.split('::')&.last}: sending request…",
-          level: "info" }
-      when :llm_response
-        result = args[0]
-        { event: "llm_response",
-          text:  "#{result.model}: response received (#{result.execution_time}s)",
-          level: "success" }
-      when :llm_retry
-        model, err = args
-        { event: "llm_retry",
-          text:  "#{model}: retrying — #{err.message}",
-          level: "warning" }
-      else
-        { event: event.to_s, text: event.to_s, level: "info" }
-      end
-    end
-
     private
 
     def prepare_sse_response
@@ -120,54 +91,6 @@ module Ai
       response.headers["Cache-Control"]     = "no-cache"
       response.headers["X-Accel-Buffering"] = "no"
     end
-
-    def tribunal_event_message(event, args)
-      case event
-      when :tribunal_start
-        count = args[0]
-        { event: "tribunal_start",
-          text:  "Tribunal started — launching #{count} agents in parallel…",
-          level: "info" }
-      when :agent_start
-        index = args[0]
-        model = PolitenessTribunal::MODELS[index]
-        { event: "agent_start",
-          text:  "Agent #{index + 1} launched: #{model}",
-          level: "info",
-          index: index,
-          model: model }
-      when :agent_done
-        result, index = args
-        polite = result.parsed&.dig("result") == true
-        { event: "agent_done",
-          text:  "Agent #{index + 1} done: #{result.model} (#{result.execution_time}s) — #{polite ? "Polite" : "Not polite"}",
-          level: polite ? "success" : "warning",
-          index: index,
-          model: result.model,
-          time:  result.execution_time,
-          usage: result.usage,
-          cost:  result.cost,
-          result: result.parsed&.dig("result"),
-          reason: result.parsed&.dig("reason") }
-      when :agent_error
-        name, err, index = args
-        { event: "agent_error",
-          text:  "Agent #{(index || 0) + 1} error (#{name.to_s.split("::").last}): #{err.message}",
-          level: "error",
-          index: index }
-      when :all_done
-        { event: "all_done",
-          text:  "All agents finished — computing verdict…",
-          level: "info" }
-      when :verdict
-        verdict = args[0]
-        { event: "verdict",
-          text:    verdict ? "✓ Polite" : "✗ Not polite",
-          level:   verdict ? "success" : "error",
-          verdict: verdict }
-      else
-        { event: event.to_s, text: event.to_s, level: "info" }
-      end
-    end
   end
 end
+

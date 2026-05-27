@@ -40,7 +40,7 @@
       btn.textContent = "Ask";
     }
 
-    es.onmessage = ({ data }) => {
+    es.addEventListener("completion", ({ data }) => {
       const payload = JSON.parse(data);
       if (payload.done) {
         const metaParts = [];
@@ -65,7 +65,7 @@
       }
       output.textContent += payload.token;
       output.scrollTop = output.scrollHeight;
-    };
+    });
 
     es.onerror = () => {
       if (streamDone) return;

@@ -58,7 +58,7 @@ function appendLifecycleEvent(p) {
       btn.textContent = "Ask";
     }
 
-    es.onmessage = function (ev) {
+    es.addEventListener("completion", function (ev) {
       var p = JSON.parse(ev.data);
       if (p.done) {
         var tokens = document.getElementById("ah-tokens");
@@ -82,9 +82,9 @@ function appendLifecycleEvent(p) {
       }
       out.textContent += p.token;
       out.scrollTop = out.scrollHeight;
-    };
+    });
 
-    es.addEventListener("lifecycle", function (ev) {
+    es.addEventListener("processing", function (ev) {
       var p = JSON.parse(ev.data);
       appendLifecycleEvent(p);
       if (p.event === "after_call") {

@@ -133,7 +133,7 @@ function populatePanel(i, p) {
     }
 
     // Final done event — update total time, surface any partial errors
-    es.onmessage = function (ev) {
+    es.addEventListener("completion", function (ev) {
       var p = JSON.parse(ev.data);
       if (p.done) {
         var vt = document.getElementById("ah-verdict-time");
@@ -154,10 +154,10 @@ function populatePanel(i, p) {
         }
         closeStream();
       }
-    };
+    });
 
     // Lifecycle sidebar + live panel population
-    es.addEventListener("lifecycle", function (ev) {
+    es.addEventListener("processing", function (ev) {
       var p = JSON.parse(ev.data);
       appendTribunalEvent(p);
 
