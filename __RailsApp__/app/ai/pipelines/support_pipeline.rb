@@ -1,10 +1,3 @@
-require_relative "../agents/injection_guard_agent"
-require_relative "../agents/translation_agent"
-require_relative "../agents/compaction_agent"
-require_relative "../tribunals/safety_tribunal"
-require_relative "../agents/relevance_agent"
-require_relative "../agents/support_agent"
-
 # 6-step pipeline:
 #   1. injection_guard  — block prompt-injection attempts
 #   2. translate        — normalise to English for downstream steps
@@ -21,6 +14,8 @@ require_relative "../agents/support_agent"
 #     token:     token stream forwarded to agents
 #   }
 class SupportPipeline < ActiveHarness::Pipeline
+  include PipelineTracing
+
   STEPS = %i[injection_guard translate compact safety_tribunal relevance_guard respond].freeze
 
   # Step 1 — GUARD: detect prompt injection before wasting tokens
@@ -50,61 +45,22 @@ class SupportPipeline < ActiveHarness::Pipeline
   # Step 6 — RESPOND: final answer on a clean, safe, on-topic, compact request
   step :respond, SupportAgent
 
-  # ── Hooks — all events auto-forwarded to pipeline_event_stream by Pipeline#fire ──
+  # ── Hooks ──
 
   before :step do |step_name, payload|
-    @otel_spans ||= {}
-
-    # Create the root pipeline span once on the first step.
-    unless @otel_pipeline_span
-      @otel_pipeline_span = AiTracer.start_span("pipeline", attributes: {
-        "pipeline.class" => self.class.name
-      })
-      @otel_pipeline_ctx = AiTracer.span_context(@otel_pipeline_span)
-    end
-
-    # Each step span is a child of the root pipeline span.
-    step_span = AiTracer.start_span("pipeline.step", attributes: {
-      "pipeline.class" => self.class.name,
-      "step.name"      => step_name.to_s
-    }, parent_ctx: @otel_pipeline_ctx)
-    @otel_spans[step_name] = step_span
-
-    # Inject step span context into @context so agents/tribunals become children.
-    @context[:otel_ctx] = AiTracer.span_context(step_span)
-
     Rails.logger.info "[Pipeline] ▶ before_step :#{step_name} | payload: #{payload.to_s.truncate(120)}"
   end
 
   after :step do |step_name, result|
-    if (span = @otel_spans&.delete(step_name))
-      span.set_attribute("llm.time_s", result.execution_time.to_s) if result.respond_to?(:execution_time)
-      span.set_attribute("llm.model",  result.model.to_s)          if result.respond_to?(:model)
-      span.finish
-    end
     time = result.respond_to?(:execution_time) ? " (#{result.execution_time}s)" : ""
     Rails.logger.info "[Pipeline] ✓ after_step  :#{step_name}#{time}"
   end
 
-  callback :stopped do |step_name, result|
-    if (span = @otel_spans&.delete(step_name))
-      span.set_attribute("pipeline.stopped", "true")
-      span.finish
-    end
-    if @otel_pipeline_span
-      @otel_pipeline_span.set_attribute("pipeline.stopped_at", step_name.to_s)
-      @otel_pipeline_span.finish
-      @otel_pipeline_span = nil
-    end
+  callback :stopped do |step_name, _result|
     Rails.logger.warn "[Pipeline] ✗ stopped at  :#{step_name}"
   end
 
-  callback :complete do |last_result|
-    if @otel_pipeline_span
-      @otel_pipeline_span.set_attribute("pipeline.time_s", execution_time.to_s)
-      @otel_pipeline_span.finish
-      @otel_pipeline_span = nil
-    end
+  callback :complete do |_last_result|
     Rails.logger.info "[Pipeline] ✓ complete"
   end
 end

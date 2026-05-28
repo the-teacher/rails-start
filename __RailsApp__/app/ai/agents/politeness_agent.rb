@@ -1,8 +1,9 @@
-require_relative "../prompts/politeness_prompt"
-
 # Single agent, three instances with different models are built by the tribunal.
 class PolitenessAgent < ActiveHarness::Agent
+  include AgentTracing
+  
   system_prompt PolitenessPrompt
+  
   format :json
 
   model do
@@ -13,23 +14,15 @@ class PolitenessAgent < ActiveHarness::Agent
     fallback provider: :openrouter, model: "gryphe/mythomax-l2-13b"
   end
 
-  on(:before_call) do
-    @otel_span = AiTracer.start_span("agent.call", attributes: { "agent.class" => self.class.name }, parent_ctx: @context[:otel_ctx])
+  before(:call) do
     @event_stream&.call(:llm_request, self.class.name)
   end
 
-  on(:after_call) do |result|
-    if @otel_span
-      @otel_span.set_attribute("llm.model",  result.model.to_s)
-      @otel_span.set_attribute("llm.time_s", result.execution_time.to_s)
-      @otel_span.finish
-      @otel_span = nil
-    end
+  after(:call) do |result|
     @event_stream&.call(:llm_response, result)
   end
 
-  on(:retry) do |entry, err|
-    @otel_span&.add_event("retry", attributes: { "model" => entry[:model].to_s, "error" => err&.message.to_s })
-    @event_stream&.call(:llm_retry, entry[:model], err)
+  callback(:retry) do |entry, error|
+    @event_stream&.call(:llm_retry, entry[:model], error)
   end
 end
