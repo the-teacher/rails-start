@@ -7,7 +7,7 @@ class SafetyTribunal < ActiveHarness::Tribunal
   agents ToxicityAgent, AggressionAgent
 
   on(:before_call) do
-    @otel_span = AiTracer.start_span("tribunal.call", attributes: { "tribunal.class" => self.class.name })
+    @otel_span = AiTracer.start_span("tribunal.call", attributes: { "tribunal.class" => self.class.name }, parent_ctx: @context[:otel_ctx])
     Rails.logger.info "[SafetyTribunal] ▶ starting parallel checks…"
   end
 

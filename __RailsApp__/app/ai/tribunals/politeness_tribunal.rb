@@ -3,7 +3,7 @@ require_relative "../agents/politeness_agent"
 # Runs the same PolitenessAgent with three different models in parallel.
 # Verdict is true (polite) when all three agree.
 class PolitenessTribunal < ActiveHarness::Tribunal
-  on(:before_call)   { @otel_span = AiTracer.start_span("tribunal.call", attributes: { "tribunal.class" => self.class.name }) }
+  on(:before_call)   { @otel_span = AiTracer.start_span("tribunal.call", attributes: { "tribunal.class" => self.class.name }, parent_ctx: @context[:otel_ctx]) }
 
   on(:after_verdict) do |verdict|
     if @otel_span

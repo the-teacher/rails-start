@@ -5,7 +5,7 @@ require_relative "../agents/support_guard_agent"
 class SupportGuardTribunal < ActiveHarness::Tribunal
   agents SupportGuardAgent
 
-  on(:before_call)   { @otel_span = AiTracer.start_span("tribunal.call", attributes: { "tribunal.class" => self.class.name }) }
+  on(:before_call)   { @otel_span = AiTracer.start_span("tribunal.call", attributes: { "tribunal.class" => self.class.name }, parent_ctx: @context[:otel_ctx]) }
 
   on(:after_verdict) do |verdict|
     if @otel_span

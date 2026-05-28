@@ -4,7 +4,7 @@ class CompactionAgent < ActiveHarness::Agent
   system_prompt CompactionPrompt
 
   before(:call) do
-    @otel_span = AiTracer.start_span("agent.call", attributes: { "agent.class" => self.class.name })
+    @otel_span = AiTracer.start_span("agent.call", attributes: { "agent.class" => self.class.name }, parent_ctx: @context[:otel_ctx])
     Rails.logger.info "[Compaction] ▶ calling…"
   end
 

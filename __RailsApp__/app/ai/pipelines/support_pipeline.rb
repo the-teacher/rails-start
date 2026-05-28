@@ -54,10 +54,25 @@ class SupportPipeline < ActiveHarness::Pipeline
 
   before :step do |step_name, payload|
     @otel_spans ||= {}
-    @otel_spans[step_name] = AiTracer.start_span("pipeline.step", attributes: {
+
+    # Create the root pipeline span once on the first step.
+    unless @otel_pipeline_span
+      @otel_pipeline_span = AiTracer.start_span("pipeline", attributes: {
+        "pipeline.class" => self.class.name
+      })
+      @otel_pipeline_ctx = AiTracer.span_context(@otel_pipeline_span)
+    end
+
+    # Each step span is a child of the root pipeline span.
+    step_span = AiTracer.start_span("pipeline.step", attributes: {
       "pipeline.class" => self.class.name,
       "step.name"      => step_name.to_s
-    })
+    }, parent_ctx: @otel_pipeline_ctx)
+    @otel_spans[step_name] = step_span
+
+    # Inject step span context into @context so agents/tribunals become children.
+    @context[:otel_ctx] = AiTracer.span_context(step_span)
+
     Rails.logger.info "[Pipeline] ▶ before_step :#{step_name} | payload: #{payload.to_s.truncate(120)}"
   end
 
@@ -76,10 +91,20 @@ class SupportPipeline < ActiveHarness::Pipeline
       span.set_attribute("pipeline.stopped", "true")
       span.finish
     end
+    if @otel_pipeline_span
+      @otel_pipeline_span.set_attribute("pipeline.stopped_at", step_name.to_s)
+      @otel_pipeline_span.finish
+      @otel_pipeline_span = nil
+    end
     Rails.logger.warn "[Pipeline] ✗ stopped at  :#{step_name}"
   end
 
   callback :complete do |last_result|
+    if @otel_pipeline_span
+      @otel_pipeline_span.set_attribute("pipeline.time_s", execution_time.to_s)
+      @otel_pipeline_span.finish
+      @otel_pipeline_span = nil
+    end
     Rails.logger.info "[Pipeline] ✓ complete"
   end
 end

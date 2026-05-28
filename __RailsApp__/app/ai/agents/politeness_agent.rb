@@ -14,7 +14,7 @@ class PolitenessAgent < ActiveHarness::Agent
   end
 
   on(:before_call) do
-    @otel_span = AiTracer.start_span("agent.call", attributes: { "agent.class" => self.class.name })
+    @otel_span = AiTracer.start_span("agent.call", attributes: { "agent.class" => self.class.name }, parent_ctx: @context[:otel_ctx])
     @event_stream&.call(:llm_request, self.class.name)
   end
 

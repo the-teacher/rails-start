@@ -5,7 +5,7 @@ require_relative "politeness_tribunal"
 # enabling a live sidebar in the browser (Case T-02).
 class PolitenessLifecycleTribunal < ActiveHarness::Tribunal
   on(:before_call) do
-    @otel_span = AiTracer.start_span("tribunal.call", attributes: { "tribunal.class" => self.class.name })
+    @otel_span = AiTracer.start_span("tribunal.call", attributes: { "tribunal.class" => self.class.name }, parent_ctx: @context[:otel_ctx])
   end
 
   on(:before_agent) { |agent, index| @tribunal_event_stream&.call(:agent_start, index) }

@@ -16,14 +16,21 @@ OpenTelemetry::SDK.configure do |c|
   )
 end
 
-# Thin helper — returns a memoised tracer and wraps start_span so
-# attribute values are always strings (OTel requires string/bool/numeric).
+# Thin helper around the OTel tracer.
 module AiTracer
   def self.tracer
     @tracer ||= OpenTelemetry.tracer_provider.tracer("active_harness")
   end
 
-  def self.start_span(name, attributes: {})
-    tracer.start_span(name, attributes: attributes.transform_values(&:to_s))
+  # Start a span, optionally as a child of parent_ctx.
+  # parent_ctx is an OpenTelemetry::Context returned by span_context(span).
+  def self.start_span(name, attributes: {}, parent_ctx: nil)
+    ctx = parent_ctx || OpenTelemetry::Context.current
+    tracer.start_span(name, with_parent: ctx, attributes: attributes.transform_values(&:to_s))
+  end
+
+  # Wrap a span into an OTel Context so it can be passed as parent_ctx:.
+  def self.span_context(span)
+    OpenTelemetry::Trace.context_with_span(span)
   end
 end

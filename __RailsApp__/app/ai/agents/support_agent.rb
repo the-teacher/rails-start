@@ -4,7 +4,7 @@ class SupportAgent < ActiveHarness::Agent
   system_prompt SupportPrompt
 
   before(:call) do
-    @otel_span = AiTracer.start_span("agent.call", attributes: { "agent.class" => self.class.name })
+    @otel_span = AiTracer.start_span("agent.call", attributes: { "agent.class" => self.class.name }, parent_ctx: @context[:otel_ctx])
     Rails.logger.info "[Support] ▶ calling…"
   end
 

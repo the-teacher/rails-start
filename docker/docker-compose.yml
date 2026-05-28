@@ -11,9 +11,39 @@ services:
 
   jaeger:
     image: jaegertracing/all-in-one:latest
+    user: root
     ports:
       - "16686:16686" # UI
-      - "4318:4318" # DATA
+      - "4318:4318" # OTLP HTTP
+    environment:
+      METRICS_STORAGE_TYPE: prometheus
+      PROMETHEUS_SERVER_URL: http://prometheus:9090
+      SPAN_STORAGE_TYPE: badger
+      BADGER_EPHEMERAL: "false"
+      BADGER_DIRECTORY_VALUE: /badger/data
+      BADGER_DIRECTORY_KEY: /badger/key
+    volumes:
+      - jaeger_data:/badger
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9091:9090"
+    volumes:
+      - ./services/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "4300:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: "admin"
+      GF_SECURITY_ADMIN_PASSWORD: "admin"
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - ./services/grafana/provisioning:/etc/grafana/provisioning:ro
+      - grafana_data:/var/lib/grafana
 
   rails:
     tty: true
@@ -30,3 +60,8 @@ services:
       - ../../ActiveHarness2:/home/rails/ActiveHarness2
     working_dir: /home/rails/RailsApp
     command: sleep infinity
+
+volumes:
+  jaeger_data:
+  prometheus_data:
+  grafana_data:

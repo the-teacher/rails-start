@@ -5,7 +5,7 @@ require_relative "../prompts/support_prompt"
 class SimpleAgent < ActiveHarness::Agent
   system_prompt SupportPrompt
 
-  before(:call)      { @otel_span = AiTracer.start_span("agent.call", attributes: { "agent.class" => self.class.name }) }
+  before(:call)      { @otel_span = AiTracer.start_span("agent.call", attributes: { "agent.class" => self.class.name }, parent_ctx: @context[:otel_ctx]) }
 
   after(:call) do |r|
     if @otel_span
