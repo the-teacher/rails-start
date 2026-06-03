@@ -26,11 +26,62 @@ module AiTracer
   # parent_ctx is an OpenTelemetry::Context returned by span_context(span).
   def self.start_span(name, attributes: {}, parent_ctx: nil)
     ctx = parent_ctx || OpenTelemetry::Context.current
-    tracer.start_span(name, with_parent: ctx, attributes: attributes.transform_values(&:to_s))
+    span = tracer.start_span(name, with_parent: ctx, attributes: attributes.transform_values(&:to_s))
+    SpanWrapper.new(span)
   end
 
   # Wrap a span into an OTel Context so it can be passed as parent_ctx:.
   def self.span_context(span)
+    span = span.unwrap if span.is_a?(SpanWrapper)
     OpenTelemetry::Trace.context_with_span(span)
+  end
+
+  # Wrapper for elegant span API
+  class SpanWrapper
+    def initialize(span)
+      @span = span
+    end
+
+    def unwrap
+      @span
+    end
+
+    # Set multiple attributes at once
+    def attrs(hash)
+      hash.each { |k, v| @span.set_attribute(k, v.to_s) }
+      self
+    end
+
+    # Add event with nested attribute structure
+    def event(name, **attrs)
+      flat_attrs = flatten_attrs(attrs)
+      @span.add_event(name, attributes: flat_attrs)
+      self
+    end
+
+    # Finish the span
+    def finish
+      @span.finish
+      self
+    end
+
+    # Delegate all other methods to underlying span
+    def method_missing(method, *args, **kwargs)
+      if @span.respond_to?(method)
+        @span.public_send(method, *args, **kwargs)
+      else
+        super
+      end
+    end
+
+    def respond_to_missing?(method, include_private = false)
+      @span.respond_to?(method) || super
+    end
+
+    private
+
+    def flatten_attrs(attrs)
+      attrs.transform_values { |v| v.to_s }
+    end
   end
 end
