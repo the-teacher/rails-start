@@ -49,7 +49,7 @@ body:has(.ah-costs-page) {
   align-items: center;
   gap: 0.5rem;
   width: 100%;
-  max-width: 1100px;
+  max-width: 1400px;
   margin-bottom: 2rem;
 }
 
@@ -112,7 +112,7 @@ body:has(.ah-costs-page) {
 /* ── Body layout ───────────────────────────────────────────────────── */
 .ah-costs-body {
   width: 100%;
-  max-width: 1100px;
+  max-width: 1400px;
   display: flex;
   flex-direction: column;
   gap: 2.5rem;
@@ -179,6 +179,8 @@ body:has(.ah-costs-page) {
   color: #8a96a3;
   border-bottom: 1px solid rgba(200, 210, 230, 0.5);
   white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
 }
 
 .ah-costs-table td {
@@ -262,6 +264,56 @@ body:has(.ah-costs-page) {
 .ah-col-free {
   font-weight: 600;
   color: #2e7d32;
+}
+
+/* ── Capability filter ─────────────────────────────────────────────── */
+.ah-cat-filter {
+  margin-top: -1rem;
+  margin-bottom: 2rem;
+}
+
+.ah-filter-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #9aa5b1;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  margin-right: 0.25rem;
+  white-space: nowrap;
+  align-self: center;
+}
+
+.ah-cat-tag {
+  padding: 0.3rem 0.85rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  font-family: inherit;
+  letter-spacing: 0.4px;
+  border-radius: 50px;
+  border: 1.5px solid rgba(100, 180, 170, 0.45);
+  background: rgba(255, 255, 255, 0.45);
+  color: #8a96a3;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.ah-cat-tag:hover {
+  background: rgba(255, 255, 255, 0.75);
+  border-color: rgba(30, 160, 145, 0.6);
+  color: #2e7d6e;
+}
+
+.ah-cat-tag--active {
+  background: rgba(20, 160, 140, 0.12);
+  border-color: rgba(20, 160, 140, 0.55);
+  color: #0a6655;
+}
+
+.ah-cat-tag--active:hover {
+  background: rgba(20, 160, 140, 0.2);
 }
 
 /* ── Back link ─────────────────────────────────────────────────────── */

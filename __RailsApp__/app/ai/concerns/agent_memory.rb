@@ -1,9 +1,5 @@
 module AgentMemory
   def self.included(base)
-    base.callback(:setup) do
-      @memory = @context[:memory]
-    end
-
     base.before(:call) do
       @memory&.load
     end

@@ -193,8 +193,8 @@ module Ai
       mem = AppMemory.new(file_name: "sessions/#{memory_session_id}")
 
       agent = MemoryAgent.call(
-        input:   params.require(:input),
-        context: { memory: mem }
+        input:  params.require(:input),
+        memory: mem
       )
 
       result = agent.result
