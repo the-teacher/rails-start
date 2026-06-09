@@ -33,7 +33,7 @@ class SupportPipeline < ActiveHarness::Pipeline
   # Step 4 — TRIBUNAL: parallel toxicity + aggression check on compact English text
   step :safety_tribunal do
     use SafetyTribunal
-    stop_if ->(result) { result.verdict == false }
+    stop_if ->(result) { result.processed["verdict"] == false }
   end
 
   # Step 5 — GUARD: topic relevance check
