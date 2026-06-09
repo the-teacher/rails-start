@@ -176,7 +176,54 @@ module Ai
       sse_done.close
     end
 
+    # ---------------------------------------------------------------------------
+    # GET /ai/agents/memory
+    # Case 6: Memory agent — conversation history persisted via JsonFile.
+    # Each browser session gets its own memory file under storage/ai/memory/sessions/.
+    # ---------------------------------------------------------------------------
+    def memory
+      @session_id = memory_session_id
+      mem = AppMemory.new(file_name: "sessions/#{@session_id}")
+      mem.load
+      @history = mem.turns
+    end
+
+    # POST /ai/agents/memory/call
+    def memory_call
+      mem = AppMemory.new(file_name: "sessions/#{memory_session_id}")
+
+      agent = MemoryAgent.call(
+        input:   params.require(:input),
+        context: { memory: mem }
+      )
+
+      result = agent.result
+      render json: {
+        output: result.output,
+        model:  result.model,
+        time:   result.execution_time,
+        usage:  result.usage,
+        cost:   result.cost
+      }
+    end
+
+    # POST /ai/agents/memory/clear
+    def memory_clear
+      sid = session[:ai_memory_id]
+      if sid
+        mem = AppMemory.new(file_name: "sessions/#{sid}")
+        mem.load
+        mem.delete
+        session.delete(:ai_memory_id)
+      end
+      redirect_to ai_agents_memory_path
+    end
+
     private
+
+    def memory_session_id
+      session[:ai_memory_id] ||= SecureRandom.hex(8)
+    end
 
     def prepare_sse_response
       # ActionDispatch::ServerTiming crashes with ActionController::Live on Rails 8

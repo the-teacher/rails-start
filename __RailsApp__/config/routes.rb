@@ -25,6 +25,11 @@ Rails.application.routes.draw do
       # Case 5 — fallback chain: 2 broken models prepended, watch retries in sidebar
       get "fallback",        to: "agents#fallback",        as: :fallback
       get "fallback/stream", to: "agents#fallback_stream", as: :fallback_stream
+
+      # Case 6 — memory agent: conversation history persisted via JsonFile
+      get  "memory",        to: "agents#memory",        as: :memory
+      post "memory/call",   to: "agents#memory_call",   as: :memory_call
+      post "memory/clear",  to: "agents#memory_clear",  as: :memory_clear
     end
 
     # Costs — model pricing reference

@@ -284,3 +284,122 @@ html {
   background: #f0fff4;
   color: #276749;
 }
+
+/* ── Memory chat (Case 06) ───────────────────────────────── */
+
+.ah-card--chat {
+  width: min(600px, 96vw);
+  padding: 2.4rem 2.8rem;
+}
+
+.ah-card--chat code {
+  font-size: 0.82rem;
+  color: #7a8899;
+  background: rgba(200, 210, 230, 0.25);
+  padding: 0.05rem 0.3rem;
+  border-radius: 4px;
+}
+
+.ah-chat {
+  width: 100%;
+  height: 280px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 0.8rem;
+  background: rgba(255, 255, 255, 0.45);
+  border: 1px solid rgba(200, 210, 230, 0.7);
+  border-radius: 14px;
+  scroll-behavior: smooth;
+}
+
+.ah-chat-empty {
+  color: #b0bac5;
+  font-style: italic;
+  font-size: 0.95rem;
+  text-align: center;
+  margin: auto;
+}
+
+.ah-chat-msg {
+  max-width: 82%;
+  padding: 0.6rem 0.9rem;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  word-break: break-word;
+  animation: ah-slide-in 0.18s ease;
+  position: relative;
+}
+
+.ah-chat-msg--user {
+  align-self: flex-end;
+  background: rgba(100, 130, 200, 0.18);
+  color: #2c3e50;
+  border-bottom-right-radius: 4px;
+}
+
+.ah-chat-msg--assistant {
+  align-self: flex-start;
+  background: rgba(255, 255, 255, 0.75);
+  color: #2c3e50;
+  border: 1px solid rgba(200, 210, 230, 0.6);
+  border-bottom-left-radius: 4px;
+}
+
+.ah-chat-msg--loading {
+  color: #9aa5b1;
+  font-size: 1.2rem;
+  letter-spacing: 2px;
+  animation: ah-blink 0.9s step-end infinite;
+}
+
+.ah-chat-msg--error {
+  background: rgba(197, 48, 48, 0.08);
+  border: 1px solid rgba(197, 48, 48, 0.2);
+  color: #c53030;
+}
+
+.ah-chat-meta {
+  display: block;
+  font-size: 0.7rem;
+  color: #9aa5b1;
+  margin-top: 0.3rem;
+}
+
+.ah-chat-footer {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+.ah-session-id {
+  font-size: 0.78rem;
+  color: #9aa5b1;
+}
+
+.ah-clear-btn {
+  font-size: 0.78rem;
+  color: #9aa5b1;
+  background: transparent;
+  border: 1px solid rgba(200, 210, 230, 0.7);
+  border-radius: 20px;
+  padding: 0.3rem 0.9rem;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+
+.ah-clear-btn:hover {
+  color: #c53030;
+  border-color: rgba(197, 48, 48, 0.4);
+  background: rgba(197, 48, 48, 0.05);
+}
+
+/* button_to wraps in a form — strip default form margins */
+.ah-chat-footer form {
+  margin: 0;
+}

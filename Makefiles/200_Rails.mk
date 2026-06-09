@@ -57,6 +57,9 @@ rails-shell:
 rails-stop:
 	docker compose -f $(COMPOSE_FILE) exec rails make stop
 
+rails-backend-stop:
+	docker compose -f $(COMPOSE_FILE) exec rails make stop
+
 # Development console
 rails-console:
 	docker compose -f $(COMPOSE_FILE) exec rails make console
@@ -107,10 +110,11 @@ rails-help:
 	@echo "  make rails-db-seed           - Seed development database"
 	@echo ""
 	@echo "Server:"
-	@echo "  make rails-server            - Start Rails server (interactive mode)" 
+	@echo "  make rails-server            - Start Rails server (interactive mode)"
 	@echo "  make rails-server-daemon     - Start Rails server (daemon mode)"
 	@echo "  make rails-start             - Full setup + start server in daemon mode"
 	@echo "  make rails-stop              - Stop Rails development server"
+	@echo "  make rails-backend-stop      - Stop Rails development server (alias)"
 	@echo ""
 	@echo "Console & Logs:"
 	@echo "  make rails-console           - Open development Rails console"
