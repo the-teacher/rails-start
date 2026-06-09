@@ -12,7 +12,7 @@ class PolitenessLifecycleTribunal < ActiveHarness::Tribunal
   end
 
   verdict :majority, may_fail: 1 do |result|
-    result.parsed["result"] == true
+    result.processed["result"] == true
   end
 
   on(:before_agent) do |agent, index|

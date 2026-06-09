@@ -130,13 +130,13 @@ module Ai
 
     def step_result_summary(step_name, result)
       case step_name
-      when :injection_guard  then result.parsed&.dig("detected") ? "INJECTION" : "clean"
+      when :injection_guard  then result.processed&.dig("detected") ? "INJECTION" : "clean"
       when :translate        then truncate_output(result.output, 60)
       when :compact          then truncate_output(result.output, 60)
       when :safety_tribunal
         v = result.respond_to?(:verdict) ? result.verdict : nil
         v.nil? ? nil : (v ? "SAFE" : "UNSAFE")
-      when :relevance_guard  then result.parsed&.dig("relevant") ? "relevant" : "off-topic"
+      when :relevance_guard  then result.processed&.dig("relevant") ? "relevant" : "off-topic"
       when :respond          then truncate_output(result.output, 80)
       end
     end
@@ -144,11 +144,11 @@ module Ai
     def stop_reason_text(step_name, result)
       case step_name
       when :injection_guard
-        result.parsed&.dig("reason") || "injection detected"
+        result.processed&.dig("reason") || "injection detected"
       when :safety_tribunal
         "content failed safety check"
       when :relevance_guard
-        result.parsed&.dig("reason") || "off-topic"
+        result.processed&.dig("reason") || "off-topic"
       else
         "condition met"
       end

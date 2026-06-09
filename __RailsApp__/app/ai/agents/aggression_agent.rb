@@ -6,7 +6,7 @@ class AggressionAgent < ActiveHarness::Agent
   format :json
 
   def tracing_extra_params(result)
-    { "guard.aggressive" => result.parsed&.dig("aggressive").to_s }
+    { "guard.aggressive" => result.processed&.dig("aggressive").to_s }
   end
 
   model do
@@ -23,7 +23,7 @@ class AggressionAgent < ActiveHarness::Agent
   end
 
   after(:call) do |result|
-    Rails.logger.info "[Aggression] ✓ done (#{result.execution_time}s) — aggressive: #{result.parsed&.dig('aggressive')}"
+    Rails.logger.info "[Aggression] ✓ done (#{result.execution_time}s) — aggressive: #{result.processed&.dig('aggressive')}"
   end
 
   callback(:retry) do |entry, error|

@@ -18,6 +18,6 @@ class PolitenessTribunal < ActiveHarness::Tribunal
   end
 
   verdict :unanimous do |result|
-    result.parsed["result"] == true
+    result.processed["result"] == true
   end
 end

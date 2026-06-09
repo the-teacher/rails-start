@@ -6,6 +6,6 @@ class SupportGuardTribunal < ActiveHarness::Tribunal
   agents SupportGuardAgent
 
   process do |results|
-    results.none? { |r| r.parsed["spam"] == true }
+    results.none? { |r| r.processed["spam"] == true }
   end
 end

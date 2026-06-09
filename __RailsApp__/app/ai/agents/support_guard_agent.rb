@@ -5,7 +5,7 @@ class SupportGuardAgent < ActiveHarness::Agent
   format :json
 
   def tracing_extra_params(result)
-    { "guard.spam" => result.parsed&.dig("spam").to_s }
+    { "guard.spam" => result.processed&.dig("spam").to_s }
   end
 
   model do

@@ -6,8 +6,8 @@ class SafetyTribunal < ActiveHarness::Tribunal
   agents ToxicityAgent, AggressionAgent
 
   verdict :unanimous do |result|
-    toxic      = result.parsed&.dig("toxic")
-    aggressive = result.parsed&.dig("aggressive")
+    toxic      = result.processed&.dig("toxic")
+    aggressive = result.processed&.dig("aggressive")
     toxic == false || aggressive == false
   end
 
@@ -16,7 +16,7 @@ class SafetyTribunal < ActiveHarness::Tribunal
   end
 
   on(:after_agent) do |result, index|
-    Rails.logger.info "[SafetyTribunal] ✓ agent #{index + 1} done (#{result.execution_time}s) — #{result.parsed}"
+    Rails.logger.info "[SafetyTribunal] ✓ agent #{index + 1} done (#{result.execution_time}s) — #{result.processed}"
   end
 
   on(:agent_error) do |name, error, _index|

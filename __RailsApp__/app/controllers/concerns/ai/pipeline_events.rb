@@ -110,7 +110,7 @@ module Ai
     def tribunal_after_agent_event(args, agent_names)
       result, index = args
       time         = result.respond_to?(:execution_time) ? result.execution_time : "?"
-      detail, lvl  = tribunal_agent_detail(result.respond_to?(:parsed) ? result.parsed : nil)
+      detail, lvl  = tribunal_agent_detail(result.respond_to?(:parsed) ? result.processed : nil)
       label        = agent_names[index] || "agent #{(index || 0) + 1}"
       {
         event:  "tribunal_after_agent",

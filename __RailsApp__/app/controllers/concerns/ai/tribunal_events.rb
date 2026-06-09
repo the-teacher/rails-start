@@ -22,7 +22,7 @@ module Ai
     end
 
     def tribunal_agent_done_event(result, index)
-      polite = result.parsed&.dig("result") == true
+      polite = result.processed&.dig("result") == true
       {
         event:  "agent_done",
         text:   "Agent #{index + 1} done: #{result.model} (#{result.execution_time}s) — #{polite ? "Polite" : "Not polite"}",
@@ -32,8 +32,8 @@ module Ai
         time:   result.execution_time,
         usage:  result.usage,
         cost:   result.cost,
-        result: result.parsed&.dig("result"),
-        reason: result.parsed&.dig("reason")
+        result: result.processed&.dig("result"),
+        reason: result.processed&.dig("reason")
       }
     end
 

@@ -80,8 +80,15 @@ module AiTracer
 
     private
 
-    def flatten_attrs(attrs)
-      attrs.transform_values { |v| v.to_s }
+    def flatten_attrs(hash, prefix = nil)
+      hash.each_with_object({}) do |(key, value), result|
+        full_key = prefix ? "#{prefix}.#{key}" : key.to_s
+        if value.is_a?(Hash)
+          result.merge!(flatten_attrs(value, full_key))
+        else
+          result[full_key] = value.to_s
+        end
+      end
     end
   end
 end

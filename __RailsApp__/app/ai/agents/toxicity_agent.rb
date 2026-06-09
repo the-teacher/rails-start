@@ -6,7 +6,7 @@ class ToxicityAgent < ActiveHarness::Agent
   format :json
 
   def tracing_extra_params(result)
-    { "guard.toxic" => result.parsed&.dig("toxic").to_s }
+    { "guard.toxic" => result.processed&.dig("toxic").to_s }
   end
 
   model do
@@ -24,7 +24,7 @@ class ToxicityAgent < ActiveHarness::Agent
   end
 
   after(:call) do |result|
-    Rails.logger.info "[Toxicity] ✓ done (#{result.execution_time}s) — toxic: #{result.parsed&.dig('toxic')}"
+    Rails.logger.info "[Toxicity] ✓ done (#{result.execution_time}s) — toxic: #{result.processed&.dig('toxic')}"
   end
 
   callback(:retry) do |entry, error|

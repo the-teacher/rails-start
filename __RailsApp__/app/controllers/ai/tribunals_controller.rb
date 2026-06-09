@@ -25,8 +25,8 @@ module Ai
         {
           index:  i,
           model:  r.model,
-          result: r.parsed&.dig("result"),
-          reason: r.parsed&.dig("reason"),
+          result: r.processed&.dig("result"),
+          reason: r.processed&.dig("reason"),
           time:   r.execution_time,
           usage:  r.usage,
           cost:   r.cost

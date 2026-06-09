@@ -5,7 +5,7 @@ class InjectionGuardAgent < ActiveHarness::Agent
   format :json
 
   def tracing_extra_params(result)
-    { "guard.detected" => result.parsed&.dig("detected").to_s }
+    { "guard.detected" => result.processed&.dig("detected").to_s }
   end
 
   model do
@@ -22,7 +22,7 @@ class InjectionGuardAgent < ActiveHarness::Agent
   end
 
   after(:call) do |result|
-    Rails.logger.info "[InjectionGuard] ✓ done (#{result.execution_time}s) — detected: #{result.parsed&.dig('detected')}"
+    Rails.logger.info "[InjectionGuard] ✓ done (#{result.execution_time}s) — detected: #{result.processed&.dig('detected')}"
   end
 
   callback(:retry) do |entry, error|

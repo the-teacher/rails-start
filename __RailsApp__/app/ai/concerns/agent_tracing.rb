@@ -60,7 +60,7 @@ module AgentTracing
   # Override to add domain-specific span attributes set before the span closes.
   #
   #   def tracing_extra_params(result)
-  #     { "guard.detected" => result.parsed&.dig("detected") }
+  #     { "guard.detected" => result.processed&.dig("detected") }
   #   end
   def tracing_extra_params(_result)
     {}

@@ -21,7 +21,7 @@ class SupportPipeline < ActiveHarness::Pipeline
   # Step 1 — GUARD: detect prompt injection before wasting tokens
   step :injection_guard do
     use InjectionGuardAgent
-    stop_if ->(result) { result.parsed["detected"] == true }
+    stop_if ->(result) { result.processed["detected"] == true }
   end
 
   # Step 2 — TRANSFORM: translate to English for consistent downstream processing
@@ -39,7 +39,7 @@ class SupportPipeline < ActiveHarness::Pipeline
   # Step 5 — GUARD: topic relevance check
   step :relevance_guard do
     use RelevanceAgent
-    stop_if ->(result) { result.parsed["relevant"] == false }
+    stop_if ->(result) { result.processed["relevant"] == false }
   end
 
   # Step 6 — RESPOND: final answer on a clean, safe, on-topic, compact request

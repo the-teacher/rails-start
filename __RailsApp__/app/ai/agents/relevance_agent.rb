@@ -5,7 +5,7 @@ class RelevanceAgent < ActiveHarness::Agent
   format :json
 
   def tracing_extra_params(result)
-    { "guard.relevant" => result.parsed&.dig("relevant").to_s }
+    { "guard.relevant" => result.processed&.dig("relevant").to_s }
   end
 
   model do
@@ -22,7 +22,7 @@ class RelevanceAgent < ActiveHarness::Agent
   end
 
   after(:call) do |result|
-    Rails.logger.info "[Relevance] ✓ done (#{result.execution_time}s) — relevant: #{result.parsed&.dig('relevant')}"
+    Rails.logger.info "[Relevance] ✓ done (#{result.execution_time}s) — relevant: #{result.processed&.dig('relevant')}"
   end
 
   callback(:retry) do |entry, error|
