@@ -50,11 +50,12 @@ class AiSupportController < ApplicationController
   # Returns verdict: true (safe) or false (rejected).
   # ---------------------------------------------------------------------------
   def tribunal
-    result = SupportGuardTribunal.call(input: params.require(:input))
+    tribunal = SupportGuardTribunal.new(input: params.require(:input))
+    tribunal.call
 
     render json: {
-      verdict: result.verdict,
-      time:    result.execution_time
+      verdict: tribunal.verdict,
+      time:    tribunal.execution_time
     }
   end
 

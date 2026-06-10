@@ -134,7 +134,7 @@ module Ai
       when :translate        then truncate_output(result.output, 60)
       when :compact          then truncate_output(result.output, 60)
       when :safety_tribunal
-        v = result.respond_to?(:verdict) ? result.verdict : nil
+        v = result.processed&.[]("verdict")
         v.nil? ? nil : (v ? "SAFE" : "UNSAFE")
       when :relevance_guard  then result.processed&.dig("relevant") ? "relevant" : "off-topic"
       when :respond          then truncate_output(result.output, 80)
