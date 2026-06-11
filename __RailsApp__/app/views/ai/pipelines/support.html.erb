@@ -8,7 +8,7 @@
     <div class="ah-cases-logo">&#x1F9F5;</div>
     <h1 class="ah-pl-title">Pipeline 01 &mdash; Support Pipeline</h1>
     <p class="ah-pl-subtitle">
-      6-step sequential pipeline: injection guard &rarr; translation &rarr; compaction
+      Nested pipeline: <strong>Prompt Laundry</strong> (injection guard &rarr; translation &rarr; compaction)
       &rarr; safety tribunal &rarr; relevance guard &rarr; response.
     </p>
   </div>
@@ -27,35 +27,50 @@
 
   <%# ── Step indicators ────────────────────────────────────────────────────── %>
   <div class="ah-pl-steps" id="ah-pl-steps">
-    <div class="ah-pl-step" id="ah-pl-step-injection_guard" data-step="injection_guard">
-      <div class="ah-pl-step-icon" id="ah-pl-icon-injection_guard">○</div>
-      <div class="ah-pl-step-name">Injection guard</div>
+
+    <%# Inner pipeline group %>
+    <div class="ah-pl-group" id="ah-pl-step-laundry" data-base-class="ah-pl-group">
+      <div class="ah-pl-group-header">
+        <div class="ah-pl-step-icon" id="ah-pl-icon-laundry">○</div>
+        <div class="ah-pl-group-name">Prompt Laundry</div>
+        <div class="ah-pl-group-tag">pipeline</div>
+      </div>
+      <div class="ah-pl-group-inner">
+        <div class="ah-pl-step ah-pl-step--sm" id="ah-pl-step-injection_guard" data-step="injection_guard" data-base-class="ah-pl-step ah-pl-step--sm">
+          <div class="ah-pl-step-icon" id="ah-pl-icon-injection_guard">○</div>
+          <div class="ah-pl-step-name">Injection guard</div>
+        </div>
+        <div class="ah-pl-step-arrow">›</div>
+        <div class="ah-pl-step ah-pl-step--sm" id="ah-pl-step-translate" data-step="translate" data-base-class="ah-pl-step ah-pl-step--sm">
+          <div class="ah-pl-step-icon" id="ah-pl-icon-translate">○</div>
+          <div class="ah-pl-step-name">Translation</div>
+        </div>
+        <div class="ah-pl-step-arrow">›</div>
+        <div class="ah-pl-step ah-pl-step--sm" id="ah-pl-step-compact" data-step="compact" data-base-class="ah-pl-step ah-pl-step--sm">
+          <div class="ah-pl-step-icon" id="ah-pl-icon-compact">○</div>
+          <div class="ah-pl-step-name">Compaction</div>
+        </div>
+      </div>
     </div>
-    <div class="ah-pl-step-arrow">›</div>
-    <div class="ah-pl-step" id="ah-pl-step-translate" data-step="translate">
-      <div class="ah-pl-step-icon" id="ah-pl-icon-translate">○</div>
-      <div class="ah-pl-step-name">Translation</div>
-    </div>
-    <div class="ah-pl-step-arrow">›</div>
-    <div class="ah-pl-step" id="ah-pl-step-compact" data-step="compact">
-      <div class="ah-pl-step-icon" id="ah-pl-icon-compact">○</div>
-      <div class="ah-pl-step-name">Compaction</div>
-    </div>
-    <div class="ah-pl-step-arrow">›</div>
-    <div class="ah-pl-step" id="ah-pl-step-safety_tribunal" data-step="safety_tribunal">
+
+    <div class="ah-pl-step-arrow ah-pl-step-arrow--lg">›</div>
+
+    <%# Outer pipeline steps %>
+    <div class="ah-pl-step" id="ah-pl-step-safety_tribunal" data-step="safety_tribunal" data-base-class="ah-pl-step">
       <div class="ah-pl-step-icon" id="ah-pl-icon-safety_tribunal">○</div>
       <div class="ah-pl-step-name">Safety tribunal</div>
     </div>
     <div class="ah-pl-step-arrow">›</div>
-    <div class="ah-pl-step" id="ah-pl-step-relevance_guard" data-step="relevance_guard">
+    <div class="ah-pl-step" id="ah-pl-step-relevance_guard" data-step="relevance_guard" data-base-class="ah-pl-step">
       <div class="ah-pl-step-icon" id="ah-pl-icon-relevance_guard">○</div>
       <div class="ah-pl-step-name">Relevance guard</div>
     </div>
     <div class="ah-pl-step-arrow">›</div>
-    <div class="ah-pl-step" id="ah-pl-step-respond" data-step="respond">
+    <div class="ah-pl-step" id="ah-pl-step-respond" data-step="respond" data-base-class="ah-pl-step">
       <div class="ah-pl-step-icon" id="ah-pl-icon-respond">○</div>
       <div class="ah-pl-step-name">Response</div>
     </div>
+
   </div>
 
   <%# ── Event log ──────────────────────────────────────────────────────────── %>

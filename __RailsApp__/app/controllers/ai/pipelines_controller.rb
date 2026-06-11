@@ -19,6 +19,7 @@ module Ai
       sse_done = ActionController::Live::SSE.new(response.stream, event: "completion")
 
       @step_index           = 0
+      @in_laundry           = false
       @tribunal_agent_names = {}
 
       pipeline = SupportPipeline.new(
@@ -58,7 +59,10 @@ module Ai
 
     def pipeline_stream(sse)
       lambda do |name, *args|
-        write_pipeline_event(sse, name, args, @step_index)
+        @in_laundry = true  if name == :before_step && args[0]&.to_sym == :laundry
+        @in_laundry = false if name == :after_step  && args[0]&.to_sym == :laundry
+        @in_laundry = false if name == :stopped     && args[0]&.to_sym == :laundry
+        write_pipeline_event(sse, name, args, @step_index, @in_laundry)
         @step_index += 1 if name == :before_step
       rescue IOError, ActionController::Live::ClientDisconnected
       end
@@ -78,8 +82,8 @@ module Ai
       end
     end
 
-    def write_pipeline_event(sse, name, args, step_index)
-      payload = build_pipeline_event(name, args, step_index)
+    def write_pipeline_event(sse, name, args, step_index, in_laundry = false)
+      payload = build_pipeline_event(name, args, step_index, in_laundry)
       sse.write(payload.to_json)
     end
 
@@ -94,12 +98,16 @@ module Ai
       sse.write(payload.to_json) if payload
     end
 
-    def build_pipeline_event(name, args, step_index)
+    def build_pipeline_event(name, args, step_index, in_laundry = false)
       case name
-      when :before_step then pipeline_step_start_event(args[0], step_index)
-      when :after_step  then pipeline_step_done_event(args[0], args[1])
+      when :before_step
+        source = LAUNDRY_INNER_STEPS.include?(args[0]) ? "laundry" : "pipeline"
+        pipeline_step_start_event(args[0], step_index, source)
+      when :after_step
+        source = LAUNDRY_INNER_STEPS.include?(args[0]) ? "laundry" : "pipeline"
+        pipeline_step_done_event(args[0], args[1], source)
       when :stopped     then pipeline_stopped_event(args[0], args[1])
-      when :complete    then pipeline_complete_event
+      when :complete    then pipeline_complete_event(in_laundry)
       else                   pipeline_generic_event(name)
       end
     end
@@ -130,9 +138,13 @@ module Ai
 
     def step_result_summary(step_name, result)
       case step_name
-      when :injection_guard  then result.processed&.dig("detected") ? "INJECTION" : "clean"
-      when :translate        then truncate_output(result.output, 60)
-      when :compact          then truncate_output(result.output, 60)
+      when :laundry
+        if result.processed&.dig("stopped")
+          inner = result.processed["stopped_at"]
+          "BLOCKED at #{inner}"
+        else
+          truncate_output(result.output, 60)
+        end
       when :safety_tribunal
         v = result.processed&.[]("verdict")
         v.nil? ? nil : (v ? "SAFE" : "UNSAFE")
@@ -143,8 +155,9 @@ module Ai
 
     def stop_reason_text(step_name, result)
       case step_name
-      when :injection_guard
-        result.processed&.dig("reason") || "injection detected"
+      when :laundry
+        inner = result.processed&.dig("stopped_at")
+        inner == "injection_guard" ? "injection detected" : "input blocked at #{inner}"
       when :safety_tribunal
         "content failed safety check"
       when :relevance_guard

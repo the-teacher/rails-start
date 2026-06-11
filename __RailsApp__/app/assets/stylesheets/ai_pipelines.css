@@ -99,7 +99,81 @@ body:has(.ah-pl-page) {
   flex-wrap: wrap;
   justify-content: center;
   width: 100%;
-  max-width: 900px;
+  max-width: 1000px;
+}
+
+/* ── Inner pipeline group ── */
+.ah-pl-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.65rem 0.85rem 0.75rem;
+  background: rgba(255, 255, 255, 0.45);
+  border: 1.5px dashed rgba(160, 130, 220, 0.45);
+  border-radius: 16px;
+  transition: background 0.25s, border-color 0.25s;
+}
+
+.ah-pl-group--running {
+  border-color: rgba(102, 126, 234, 0.55);
+  background: rgba(240, 244, 255, 0.55);
+}
+
+.ah-pl-group--done {
+  border-color: rgba(52, 199, 89, 0.45);
+  background: rgba(240, 255, 245, 0.5);
+}
+
+.ah-pl-group--stopped {
+  border-color: rgba(255, 59, 48, 0.4);
+  background: rgba(255, 245, 245, 0.5);
+}
+
+.ah-pl-group-header {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.ah-pl-group-name {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  color: #7c5cbf;
+}
+
+.ah-pl-group--running .ah-pl-group-name { color: #667eea; }
+.ah-pl-group--done    .ah-pl-group-name { color: #34c759; }
+.ah-pl-group--stopped .ah-pl-group-name { color: #ff3b30; }
+
+.ah-pl-group-tag {
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 0.05rem 0.3rem;
+  border-radius: 3px;
+  background: rgba(160, 130, 220, 0.12);
+  color: #9b72d0;
+  line-height: 1.4;
+}
+
+.ah-pl-group-inner {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+/* Smaller steps inside the group */
+.ah-pl-step--sm {
+  min-width: 88px;
+  padding: 0.5rem 0.7rem;
+}
+
+.ah-pl-step-arrow--lg {
+  font-size: 1.5rem;
+  color: #9b72d0;
+  padding: 0 0.15rem;
 }
 
 .ah-pl-step {
@@ -280,6 +354,11 @@ body:has(.ah-pl-page) {
 .ah-pl-badge--pipeline {
   background: #ebf4ff;
   color: #2b6cb0;
+}
+
+.ah-pl-badge--laundry {
+  background: #f5f0ff;
+  color: #7c3aed;
 }
 
 .ah-pl-badge--tribunal {
