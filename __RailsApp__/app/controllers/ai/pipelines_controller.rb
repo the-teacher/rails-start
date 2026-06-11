@@ -88,7 +88,7 @@ module Ai
     end
 
     def write_tribunal_event(sse, name, args, agent_names)
-      agent_names[args[1]] = args[0].class.name.delete_suffix("Agent") if name == :before_agent
+      agent_names[args[1]] = args[0].class.name if name == :before_agent
       payload = build_tribunal_event(name, args, agent_names)
       sse.write(payload.to_json) if payload
     end

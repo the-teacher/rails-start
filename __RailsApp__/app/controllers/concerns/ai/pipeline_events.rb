@@ -14,6 +14,11 @@ module Ai
       respond:         "Response"
     }.freeze
 
+    STEP_KINDS = {
+      laundry:         "pipeline",
+      safety_tribunal: "tribunal"
+    }.freeze
+
     STEP_DESCRIPTIONS = {
       laundry:         "Sanitising, translating and compacting input…",
       injection_guard: "Checking for prompt injection…",
@@ -32,6 +37,7 @@ module Ai
         step:   step_name,
         index:  step_index,
         label:  step_label(step_name),
+        kind:   STEP_KINDS[step_name&.to_sym],
         text:   "→ #{step_label(step_name)}: #{STEP_DESCRIPTIONS[step_name&.to_sym] || step_name}",
         level:  "info",
         source: source
@@ -40,6 +46,8 @@ module Ai
 
     def pipeline_step_done_event(step_name, result, source = "pipeline")
       time  = result.respond_to?(:execution_time) ? result.execution_time : nil
+      cost  = result.respond_to?(:cost)           ? result.cost&.dig("total_cost") : nil
+      model = result.respond_to?(:model)          ? result.model : nil
       extra = step_result_summary(step_name&.to_sym, result)
       {
         event:  "step_done",
@@ -48,6 +56,8 @@ module Ai
         text:   "✓ #{step_label(step_name)} done#{time ? " (#{time}s)" : ""}#{extra ? " — #{extra}" : ""}",
         level:  "success",
         time:   time,
+        cost:   cost,
+        model:  model,
         source: source
       }
     end
@@ -116,20 +126,29 @@ module Ai
         event:  "tribunal_before_agent",
         text:   "Tribunal: launching #{label}…",
         level:  "info",
-        source: "tribunal"
+        source: "tribunal",
+        agent:  label,
+        index:  index
       }
     end
 
     def tribunal_after_agent_event(args, agent_names)
       result, index = args
       time         = result.respond_to?(:execution_time) ? result.execution_time : "?"
+      cost         = result.respond_to?(:cost)           ? result.cost&.dig("total_cost") : nil
+      model        = result.respond_to?(:model)          ? result.model : nil
       detail, lvl  = tribunal_agent_detail(result.respond_to?(:processed) ? result.processed : nil)
       label        = agent_names[index] || "agent #{(index || 0) + 1}"
       {
         event:  "tribunal_after_agent",
         text:   "Tribunal: #{label} done (#{time}s) — #{detail}",
         level:  lvl,
-        source: "tribunal"
+        source: "tribunal",
+        agent:  label,
+        index:  index,
+        time:   time,
+        cost:   cost,
+        model:  model
       }
     end
 

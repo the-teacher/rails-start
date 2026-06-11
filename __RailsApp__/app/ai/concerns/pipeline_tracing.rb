@@ -4,9 +4,10 @@ module PipelineTracing
       @tracer_spans ||= {}
 
       unless @tracer_span_pipeline
-        @tracer_span_pipeline = AiTracer.start_span(tracing_span_name, attributes: {
-          "pipeline.class" => self.class.name
-        })
+        @tracer_span_pipeline = AiTracer.start_span(tracing_span_name,
+          attributes: { "pipeline.class" => self.class.name },
+          parent_ctx: @params[:tracer_ctx]
+        )
         @tracer_ctx_pipeline = AiTracer.span_context(@tracer_span_pipeline)
       end
 

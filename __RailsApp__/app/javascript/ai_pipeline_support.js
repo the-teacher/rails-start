@@ -15,8 +15,8 @@ var SOURCE_COLORS = {
   agent:    "ah-pl-badge--agent",
 };
 
-// Update state of a step or group element.
-// Uses data-base-class to preserve the element's base CSS class(es).
+// ── Step state ───────────────────────────────────────────────────────────────
+
 function plSetStep(stepName, state) {
   var el   = document.getElementById("ah-pl-step-" + stepName);
   var icon = document.getElementById("ah-pl-icon-" + stepName);
@@ -34,6 +34,8 @@ function plResetSteps() {
     plSetStep(s, "pending");
   });
 }
+
+// ── Event log ────────────────────────────────────────────────────────────────
 
 function plAppendLog(text, level, source) {
   var log   = document.getElementById("ah-pl-log");
@@ -69,6 +71,128 @@ function plResetOutput() {
   document.getElementById("ah-pl-output-meta").textContent = "";
 }
 
+// ── Stats tree ───────────────────────────────────────────────────────────────
+
+var plStats        = { steps: [] };
+var plCurrentGroup = null;   // name of outer step currently collecting children
+
+function plResetStats() {
+  plStats        = { steps: [] };
+  plCurrentGroup = null;
+  var wrap = document.getElementById("ah-pl-stats");
+  if (wrap) { wrap.innerHTML = ""; wrap.style.display = "none"; }
+}
+
+function plFindStep(name) {
+  return plStats.steps.find(function(s) { return s.name === name; });
+}
+
+function plSumChildCosts(children) {
+  if (!children || !children.length) return 0;
+  return children.reduce(function(acc, c) { return acc + (c.cost || 0); }, 0);
+}
+
+function plFormatTime(t) {
+  return (t != null && t !== "?") ? (+t).toFixed(2) + "s" : "?";
+}
+
+function plFormatCost(c) {
+  if (!c || c <= 0) return null;
+  if (c < 0.0001)   return "$" + c.toFixed(6);
+  if (c < 0.001)    return "$" + c.toFixed(5);
+  return "$" + c.toFixed(4);
+}
+
+function plShortModel(m) {
+  if (!m) return null;
+  var parts = ("" + m).split("/");
+  return parts[parts.length - 1];
+}
+
+function plBuildStatRow(prefix, label, time, cost, model, kind) {
+  var metaParts = [];
+  if (time != null && time !== "?") {
+    metaParts.push('<span class="ah-pl-stime">' + plFormatTime(time) + "</span>");
+  }
+  var costStr = plFormatCost(cost);
+  if (costStr) {
+    metaParts.push('<span class="ah-pl-scost">' + costStr + "</span>");
+  }
+  var modelStr = plShortModel(model);
+  if (modelStr) {
+    metaParts.push('<span class="ah-pl-smodel">' + modelStr + "</span>");
+  }
+
+  var kindBadge = "";
+  if (kind === "pipeline") {
+    kindBadge = ' <span class="ah-pl-stats-tag ah-pl-stats-tag--pipeline">pipeline</span>';
+  } else if (kind === "tribunal") {
+    kindBadge = ' <span class="ah-pl-stats-tag ah-pl-stats-tag--tribunal">tribunal</span>';
+  }
+
+  return (
+    '<div class="ah-pl-stats-row">' +
+    '<span class="ah-pl-sprefix">' + prefix + "</span>" +
+    '<span class="ah-pl-sname">' + (label || "?") + "</span>" +
+    kindBadge +
+    (metaParts.length
+      ? '<span class="ah-pl-smeta"> =&gt; ' + metaParts.join(" | ") + "</span>"
+      : "") +
+    "</div>"
+  );
+}
+
+function plRenderStats(totalTime) {
+  var wrap = document.getElementById("ah-pl-stats");
+  if (!wrap || !plStats.steps.length) return;
+
+  var pipelineName = wrap.getAttribute("data-pipeline") || "Pipeline";
+  var grandCost = 0;
+  var n = plStats.steps.length;
+  var rows = "";
+
+  plStats.steps.forEach(function(step, i) {
+    var last = i === n - 1;
+    var childCost = plSumChildCosts(step.children);
+    var displayCost = (step.cost != null && step.cost > 0) ? step.cost : childCost;
+    grandCost += displayCost || 0;
+
+    rows += plBuildStatRow(
+      last ? "└─ " : "├─ ",
+      step.label,
+      step.time,
+      displayCost,
+      step.model,
+      step.kind
+    );
+
+    if (step.children && step.children.length) {
+      var nc = step.children.length;
+      step.children.forEach(function(child, j) {
+        var clast = j === nc - 1;
+        var indent = (last ? "   " : "│  ") + (clast ? "└─ " : "├─ ");
+        rows += plBuildStatRow(indent, child.label, child.time, child.cost, child.model);
+      });
+    }
+  });
+
+  var totalCostStr = plFormatCost(grandCost);
+  var totalHtml =
+    '<div class="ah-pl-stats-total">' +
+    '<span class="ah-pl-stime">Total: ' + plFormatTime(totalTime) + "</span>" +
+    (totalCostStr ? ' <span class="ah-pl-scost">' + totalCostStr + "</span>" : "") +
+    "</div>";
+
+  wrap.innerHTML =
+    '<div class="ah-pl-stats-title">EXECUTION STATS</div>' +
+    '<div class="ah-pl-stats-tree">' +
+    '<div class="ah-pl-stats-root">' + pipelineName + '</div>' +
+    rows + totalHtml + "</div>";
+  wrap.style.display = "block";
+}
+
+// ── Main SSE loop ─────────────────────────────────────────────────────────────
+
 (function () {
   var form  = document.getElementById("ah-pl-form");
   var input = document.getElementById("ah-pl-input");
@@ -87,6 +211,7 @@ function plResetOutput() {
     plResetSteps();
     plResetLog();
     plResetOutput();
+    plResetStats();
     btn.disabled    = true;
     btn.textContent = "Running…";
 
@@ -108,9 +233,11 @@ function plResetOutput() {
         plAppendLog("Error: " + p.error, "error", "pipeline");
       } else if (p.stopped) {
         plAppendLog("Pipeline stopped at: " + p.stopped_at, "error", "pipeline");
+        plRenderStats(p.time);
       } else {
         document.getElementById("ah-pl-output").textContent = p.output || "";
         if (p.time) document.getElementById("ah-pl-output-meta").textContent = "Total: " + p.time + "s";
+        plRenderStats(p.time);
       }
       closeStream();
     });
@@ -123,17 +250,40 @@ function plResetOutput() {
 
       if (p.event === "step_start") {
         activeStep = p.step;
+
+        if (src === "laundry") {
+          // inner laundry step — add to laundry's children
+          var laundry = plFindStep("laundry");
+          if (laundry) {
+            laundry.children.push({ name: p.step, label: p.label, time: null, cost: null, model: null });
+          }
+        } else {
+          // outer pipeline step
+          plStats.steps.push({ name: p.step, label: p.label, kind: p.kind || null, time: null, cost: null, model: null, children: [] });
+          plCurrentGroup = p.step;
+        }
+
         plSetStep(p.step, "running");
         plAppendLog(p.text, "info", src);
 
       } else if (p.event === "step_done") {
+        if (src === "laundry") {
+          var laundry = plFindStep("laundry");
+          if (laundry) {
+            var inner = laundry.children.find(function(s) { return s.name === p.step; });
+            if (inner) { inner.time = p.time; inner.cost = p.cost; inner.model = p.model; }
+          }
+        } else {
+          var step = plFindStep(p.step);
+          if (step) { step.time = p.time; step.cost = p.cost; step.model = p.model; }
+        }
+
         plSetStep(p.step, "done");
         plAppendLog(p.text, "success", src);
 
       } else if (p.event === "stopped") {
         plSetStep(p.step || activeStep, "stopped");
-        // also mark laundry group stopped if an inner step stopped
-        if (p.step && ["injection_guard","translate","compact"].indexOf(p.step) !== -1) {
+        if (p.step && ["injection_guard", "translate", "compact"].indexOf(p.step) !== -1) {
           plSetStep("laundry", "stopped");
         }
         plAppendLog(p.text, "error", "pipeline");
@@ -141,8 +291,22 @@ function plResetOutput() {
       } else if (p.event === "complete" || p.event === "laundry_complete") {
         plAppendLog(p.text, "success", src);
 
+      } else if (p.event === "tribunal_before_agent") {
+        var group = plFindStep(plCurrentGroup);
+        if (group) {
+          group.children.push({ label: p.agent, index: p.index, time: null, cost: null, model: null });
+        }
+        plAppendLog(p.text || p.event, lvl, src);
+
+      } else if (p.event === "tribunal_after_agent") {
+        var group = plFindStep(plCurrentGroup);
+        if (group && p.index != null) {
+          var agent = group.children.find(function(a) { return a.index === p.index; });
+          if (agent) { agent.time = p.time; agent.cost = p.cost; agent.model = p.model; }
+        }
+        plAppendLog(p.text || p.event, lvl, src);
+
       } else {
-        // tribunal / agent sub-events
         plAppendLog(p.text || p.event, lvl, src);
       }
     });

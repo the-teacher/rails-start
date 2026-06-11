@@ -406,6 +406,111 @@ body:has(.ah-pl-page) {
   color: #9aa5b1;
 }
 
+/* ── Execution stats ── */
+.ah-pl-stats-wrap {
+  width: 100%;
+  max-width: 700px;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1.5px solid rgba(200, 210, 230, 0.7);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.ah-pl-stats-title {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #9aa5b1;
+  padding: 0.75rem 1.2rem 0.5rem;
+  border-bottom: 1px solid rgba(200, 210, 230, 0.5);
+}
+
+.ah-pl-stats-tree {
+  padding: 0.55rem 1.2rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.05rem;
+}
+
+.ah-pl-stats-root {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: #3d4a5c;
+  padding: 0.15rem 0 0.3rem;
+  letter-spacing: 0.01em;
+}
+
+.ah-pl-stats-row {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: baseline;
+  gap: 0.2rem;
+  line-height: 1.6;
+  font-size: 0.82rem;
+}
+
+.ah-pl-stats-tag {
+  display: inline-block;
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 0.05rem 0.28rem;
+  border-radius: 3px;
+  line-height: 1.5;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+.ah-pl-stats-tag--pipeline {
+  background: rgba(160, 130, 220, 0.12);
+  color: #9b72d0;
+}
+
+.ah-pl-stats-tag--tribunal {
+  background: rgba(74, 144, 217, 0.1);
+  color: #3a7cc4;
+}
+
+.ah-pl-sprefix {
+  font-family: ui-monospace, "SFMono-Regular", monospace;
+  color: #c5ccd6;
+  white-space: pre;
+  flex-shrink: 0;
+}
+
+.ah-pl-sname {
+  color: #4a5568;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.ah-pl-smeta {
+  color: #9aa5b1;
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+.ah-pl-stime  { color: #4a90d9; }
+.ah-pl-scost  { color: #34c759; }
+.ah-pl-smodel { color: #9b72d0; font-size: 0.72rem; }
+
+.ah-pl-stats-total {
+  margin-top: 0.4rem;
+  padding-top: 0.4rem;
+  border-top: 1px solid rgba(200, 210, 230, 0.45);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #4a5568;
+  display: flex;
+  gap: 0.6rem;
+  align-items: baseline;
+}
+
+.ah-pl-stats-total .ah-pl-stime { font-weight: 700; }
+.ah-pl-stats-total .ah-pl-scost { font-weight: 700; }
+
 /* ── Back link ── */
 .ah-pl-back {
   font-size: 0.9rem;
