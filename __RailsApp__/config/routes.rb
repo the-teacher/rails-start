@@ -48,9 +48,13 @@ Rails.application.routes.draw do
 
     # Pipeline examples
     scope :pipelines, as: :pipelines do
-      # Pipeline 1 — 6-step support pipeline with live event log
+      # Pipeline 1 — nested pipeline (laundry sub-pipeline) with live event log
       get "support",        to: "pipelines#support",        as: :support
       get "support/stream", to: "pipelines#support_stream", as: :support_stream
+
+      # Pipeline 2 — flat pipeline (same 6 steps, no sub-pipeline nesting)
+      get "flat",        to: "pipelines#flat",        as: :flat
+      get "flat/stream", to: "pipelines#flat_stream", as: :flat_stream
     end
   end
 

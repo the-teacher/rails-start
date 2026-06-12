@@ -10,6 +10,47 @@ module Ai
     def support
     end
 
+    # GET /ai/pipelines/flat
+    def flat
+    end
+
+    # GET /ai/pipelines/flat/stream?input=...
+    def flat_stream
+      prepare_sse_response
+
+      input    = params.require(:input)
+      sse      = ActionController::Live::SSE.new(response.stream, event: "processing")
+      sse_done = ActionController::Live::SSE.new(response.stream, event: "completion")
+
+      @step_index           = 0
+      @tribunal_agent_names = {}
+
+      pipeline = FlatSupportPipeline.new(
+        input:   input,
+        streams: {
+          pipeline: flat_pipeline_stream(sse),
+          tribunal: tribunal_stream(sse),
+          agent:    agent_stream(sse)
+        }
+      )
+      pipeline.call
+
+      sse_done.write({
+        done:       true,
+        stopped:    pipeline.stopped?,
+        stopped_at: pipeline.stopped_at,
+        output:     pipeline.output,
+        time:       pipeline.execution_time
+      }.to_json)
+    rescue ActionController::Live::ClientDisconnected
+      # ignore
+    rescue StandardError => e
+      sse_done.write({ error: "#{e.class.name.split("::").last}: #{e.message}" }.to_json) rescue nil
+      sse_done.write({ done: true }.to_json) rescue nil
+    ensure
+      sse_done.close
+    end
+
     # GET /ai/pipelines/support/stream?input=...
     def support_stream
       prepare_sse_response
@@ -55,6 +96,29 @@ module Ai
       response.headers["Content-Type"]      = "text/event-stream"
       response.headers["Cache-Control"]     = "no-cache"
       response.headers["X-Accel-Buffering"] = "no"
+    end
+
+    def flat_pipeline_stream(sse)
+      lambda do |name, *args|
+        write_flat_pipeline_event(sse, name, args, @step_index)
+        @step_index += 1 if name == :before_step
+      rescue IOError, ActionController::Live::ClientDisconnected
+      end
+    end
+
+    def write_flat_pipeline_event(sse, name, args, step_index)
+      payload = build_flat_pipeline_event(name, args, step_index)
+      sse.write(payload.to_json)
+    end
+
+    def build_flat_pipeline_event(name, args, step_index)
+      case name
+      when :before_step then pipeline_step_start_event(args[0], step_index, "pipeline")
+      when :after_step  then pipeline_step_done_event(args[0], args[1], "pipeline")
+      when :stopped     then pipeline_stopped_event(args[0], args[1])
+      when :complete    then pipeline_complete_event(false)
+      else                   pipeline_generic_event(name)
+      end
     end
 
     def pipeline_stream(sse)
@@ -136,60 +200,5 @@ module Ai
       end
     end
 
-    def step_result_summary(step_name, result)
-      case step_name
-      when :laundry
-        if result.processed&.dig("stopped")
-          inner = result.processed["stopped_at"]
-          "BLOCKED at #{inner}"
-        else
-          truncate_output(result.output, 60)
-        end
-      when :safety_tribunal
-        v = result.processed&.[]("verdict")
-        v.nil? ? nil : (v ? "SAFE" : "UNSAFE")
-      when :relevance_guard  then result.processed&.dig("relevant") ? "relevant" : "off-topic"
-      when :respond          then truncate_output(result.output, 80)
-      end
-    end
-
-    def stop_reason_text(step_name, result)
-      case step_name
-      when :laundry
-        inner = result.processed&.dig("stopped_at")
-        inner == "injection_guard" ? "injection detected" : "input blocked at #{inner}"
-      when :safety_tribunal
-        "content failed safety check"
-      when :relevance_guard
-        result.processed&.dig("reason") || "off-topic"
-      else
-        "condition met"
-      end
-    end
-
-    # Returns [text_detail, log_level] for a single tribunal agent result.
-    # Extracts the named boolean field ("toxic", "aggressive", etc.) and optional "reason".
-    def tribunal_agent_detail(parsed)
-      return ["no data", "info"] unless parsed.is_a?(Hash)
-
-      # Find the first boolean flag field (toxic, aggressive, …)
-      flag_key, flag_val = parsed.find { |k, v| v == true || v == false }
-
-      unless flag_key
-        snippet = parsed.to_s[0..50]
-        return [snippet, "info"]
-      end
-
-      reason = parsed["reason"].to_s.strip
-      reason = reason.empty? ? nil : reason[0..60]
-
-      if flag_val == false
-        detail = "#{flag_key}: ✓ ok"
-        [reason ? "#{detail} — #{reason}" : detail, "success"]
-      else
-        detail = "#{flag_key}: ✗ detected"
-        [reason ? "#{detail} — #{reason}" : detail, "warning"]
-      end
-    end
   end
 end
