@@ -55,8 +55,7 @@ module Ai
       sse_done.write({ done: true, model: result.model&.name, time: result.execution_time, usage: usage_json(result.usage), cost: result.usage&.cost&.total }.to_json)
     rescue ActionController::Live::ClientDisconnected
     rescue StandardError => e
-      sse_done.write({ error: "#{e.class.name.split('::').last}: #{e.message}" }.to_json) rescue nil
-      sse_done.write({ done: true }.to_json) rescue nil
+      sse_done.write({ done: true, error: "#{e.class.name.split('::').last}: #{e.message}" }.to_json) rescue nil
     ensure
       sse_done.close
     end
@@ -91,8 +90,7 @@ module Ai
       sse_done.write({ done: true, usage: usage_json(result.usage), cost: result.usage&.cost&.total }.to_json)
     rescue ActionController::Live::ClientDisconnected
     rescue StandardError => e
-      sse_done.write({ error: "#{e.class.name.split('::').last}: #{e.message}" }.to_json) rescue nil
-      sse_done.write({ done: true }.to_json) rescue nil
+      sse_done.write({ done: true, error: "#{e.class.name.split('::').last}: #{e.message}" }.to_json) rescue nil
     ensure
       sse_done.close
     end
@@ -127,8 +125,7 @@ module Ai
       sse_done.write({ done: true, usage: usage_json(result.usage), cost: result.usage&.cost&.total }.to_json)
     rescue ActionController::Live::ClientDisconnected
     rescue StandardError => e
-      sse_done.write({ error: "#{e.class.name.split('::').last}: #{e.message}" }.to_json) rescue nil
-      sse_done.write({ done: true }.to_json) rescue nil
+      sse_done.write({ done: true, error: "#{e.class.name.split('::').last}: #{e.message}" }.to_json) rescue nil
     ensure
       sse_done.close
     end
@@ -172,8 +169,7 @@ module Ai
       sse_done.write({ done: true, usage: usage_json(agent.result&.usage), cost: agent.result&.usage&.cost&.total }.to_json)
     rescue ActionController::Live::ClientDisconnected
     rescue StandardError => e
-      sse_done.write({ error: "#{e.class.name.split('::').last}: #{e.message}" }.to_json) rescue nil
-      sse_done.write({ done: true }.to_json) rescue nil
+      sse_done.write({ done: true, error: "#{e.class.name.split('::').last}: #{e.message}" }.to_json) rescue nil
     ensure
       sse_done.close
     end

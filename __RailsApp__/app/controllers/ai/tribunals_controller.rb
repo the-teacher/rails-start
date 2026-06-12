@@ -77,8 +77,7 @@ module Ai
       }.to_json)
     rescue ActionController::Live::ClientDisconnected
     rescue StandardError => e
-      sse_done.write({ error: "#{e.class.name.split('::').last}: #{e.message}" }.to_json) rescue nil
-      sse_done.write({ done: true }.to_json) rescue nil
+      sse_done.write({ done: true, error: "#{e.class.name.split('::').last}: #{e.message}" }.to_json) rescue nil
     ensure
       sse_done.close
     end

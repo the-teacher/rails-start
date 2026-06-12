@@ -1,7 +1,7 @@
 module Ai
   class CostsController < ApplicationController
     def index
-      all_models = ActiveHarness::Costs.all
+      all_models = ActiveHarness::Pricing.all
 
       # Group by provider, sort each group by output_per_million ascending (nil last)
       @providers = all_models
