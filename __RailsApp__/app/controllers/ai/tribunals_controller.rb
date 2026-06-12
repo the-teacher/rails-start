@@ -24,12 +24,12 @@ module Ai
       results = tribunal.results.map.with_index do |r, i|
         {
           index:  i,
-          model:  r.model,
+          model:  r.model&.name,
           result: r.processed&.dig("result"),
           reason: r.processed&.dig("reason"),
           time:   r.execution_time,
-          usage:  r.usage,
-          cost:   r.cost
+          usage:  r.usage ? { input: r.usage.tokens.input, output: r.usage.tokens.output, total: r.usage.tokens.total } : nil,
+          cost:   r.usage&.cost&.total
         }
       end
 

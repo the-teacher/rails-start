@@ -25,13 +25,13 @@ module Ai
       polite = result.processed&.dig("result") == true
       {
         event:  "agent_done",
-        text:   "Agent #{index + 1} done: #{result.model} (#{result.execution_time}s) — #{polite ? "Polite" : "Not polite"}",
+        text:   "Agent #{index + 1} done: #{result.model&.name} (#{result.execution_time}s) — #{polite ? "Polite" : "Not polite"}",
         level:  polite ? "success" : "warning",
         index:  index,
-        model:  result.model,
+        model:  result.model&.name,
         time:   result.execution_time,
-        usage:  result.usage,
-        cost:   result.cost,
+        usage:  result.usage ? { input: result.usage.tokens.input, output: result.usage.tokens.output, total: result.usage.tokens.total } : nil,
+        cost:   result.usage&.cost&.total,
         result: result.processed&.dig("result"),
         reason: result.processed&.dig("reason")
       }

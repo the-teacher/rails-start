@@ -1,4 +1,9 @@
 // Case 02: Streaming Agent — SSE, no lifecycle sidebar
+function fmtCost(c) {
+  if (!c) return "";
+  return "$" + (+c).toFixed(6);
+}
+
 (function () {
   const input = document.getElementById("ah-input");
   const form = document.getElementById("ah-form");
@@ -50,11 +55,10 @@
         const tokens = document.getElementById("ah-tokens");
         const u = payload.usage;
         if (u && tokens)
-          tokens.textContent = `Tokens: ${u.input_tokens} in / ${u.output_tokens} out / ${u.total_tokens} total`;
+          tokens.textContent = `Tokens: ${u.input} in / ${u.output} out / ${u.total} total`;
         const costEl = document.getElementById("ah-cost");
         const c = payload.cost;
-        if (c && costEl)
-          costEl.textContent = `Cost: $${c.total_cost.toFixed(6)} (in: $${c.input_cost.toFixed(6)} / out: $${c.output_cost.toFixed(6)})`;
+        if (c && costEl) costEl.textContent = fmtCost(c);
         closeStream();
         return;
       }

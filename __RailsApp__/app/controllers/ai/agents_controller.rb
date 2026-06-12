@@ -20,10 +20,10 @@ module Ai
       result = agent.result
       render json: {
         output: result.output,
-        model:  result.model,
+        model:  result.model&.name,
         time:   result.execution_time,
-        usage:  result.usage,
-        cost:   result.cost
+        usage:  usage_json(result.usage),
+        cost:   result.usage&.cost&.total
       }
     end
 
@@ -52,7 +52,7 @@ module Ai
       )
 
       result = agent.result
-      sse_done.write({ done: true, model: result.model, time: result.execution_time, usage: result.usage, cost: result.cost }.to_json)
+      sse_done.write({ done: true, model: result.model&.name, time: result.execution_time, usage: usage_json(result.usage), cost: result.usage&.cost&.total }.to_json)
     rescue ActionController::Live::ClientDisconnected
     rescue StandardError => e
       sse_done.write({ error: "#{e.class.name.split('::').last}: #{e.message}" }.to_json) rescue nil
@@ -87,7 +87,8 @@ module Ai
         streams: { token: token_stream, agent: event_stream }
       )
 
-      sse_done.write({ done: true, usage: agent.result.usage }.to_json)
+      result = agent.result
+      sse_done.write({ done: true, usage: usage_json(result.usage), cost: result.usage&.cost&.total }.to_json)
     rescue ActionController::Live::ClientDisconnected
     rescue StandardError => e
       sse_done.write({ error: "#{e.class.name.split('::').last}: #{e.message}" }.to_json) rescue nil
@@ -122,7 +123,8 @@ module Ai
         streams: { token: token_stream, agent: event_stream }
       )
 
-      sse_done.write({ done: true, usage: agent.result.usage }.to_json)
+      result = agent.result
+      sse_done.write({ done: true, usage: usage_json(result.usage), cost: result.usage&.cost&.total }.to_json)
     rescue ActionController::Live::ClientDisconnected
     rescue StandardError => e
       sse_done.write({ error: "#{e.class.name.split('::').last}: #{e.message}" }.to_json) rescue nil
@@ -167,7 +169,7 @@ module Ai
 
       agent.call
 
-      sse_done.write({ done: true, usage: agent.result&.usage }.to_json)
+      sse_done.write({ done: true, usage: usage_json(agent.result&.usage), cost: agent.result&.usage&.cost&.total }.to_json)
     rescue ActionController::Live::ClientDisconnected
     rescue StandardError => e
       sse_done.write({ error: "#{e.class.name.split('::').last}: #{e.message}" }.to_json) rescue nil
@@ -200,10 +202,10 @@ module Ai
       result = agent.result
       render json: {
         output: result.output,
-        model:  result.model,
+        model:  result.model&.name,
         time:   result.execution_time,
-        usage:  result.usage,
-        cost:   result.cost
+        usage:  usage_json(result.usage),
+        cost:   result.usage&.cost&.total
       }
     end
 
@@ -242,6 +244,11 @@ module Ai
 
     def build_token_stream(sse)
       ->(token) { sse.write({ token: token }.to_json) }
+    end
+
+    def usage_json(usage)
+      return nil unless usage
+      { input: usage.tokens.input, output: usage.tokens.output, total: usage.tokens.total }
     end
   end
 end

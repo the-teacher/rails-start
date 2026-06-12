@@ -19,7 +19,7 @@ class AiSupportController < ApplicationController
 
     render json: {
       output: agent.result.output,
-      model:  agent.result.model,
+      model:  agent.result.model&.name,
       time:   agent.result.execution_time
     }
   end
@@ -37,7 +37,7 @@ class AiSupportController < ApplicationController
 
     render json: {
       output: agent.result.output,
-      model:  agent.result.model,
+      model:  agent.result.model&.name,
       time:   agent.result.execution_time,
       turns:  memory.size
     }
@@ -159,7 +159,7 @@ class AiSupportController < ApplicationController
       { event: "after_call",
         text:  "Response received (#{result.execution_time}s)",
         level: "success",
-        model: result.model,
+        model: result.model&.name,
         time:  result.execution_time }
     when :retry
       entry, error = args

@@ -46,8 +46,8 @@ module Ai
 
     def pipeline_step_done_event(step_name, result, source = "pipeline")
       time  = result.respond_to?(:execution_time) ? result.execution_time : nil
-      cost  = result.respond_to?(:cost)           ? (result.cost&.dig(:total_cost) || result.cost&.dig("total_cost")) : nil
-      model = result.respond_to?(:model)          ? result.model : nil
+      cost  = result.respond_to?(:usage)          ? result.usage&.cost&.total : nil
+      model = result.respond_to?(:model)          ? result.model&.name : nil
       extra = step_result_summary(step_name&.to_sym, result)
       {
         event:  "step_done",
@@ -135,8 +135,8 @@ module Ai
     def tribunal_after_agent_event(args, agent_names)
       result, index = args
       time         = result.respond_to?(:execution_time) ? result.execution_time : "?"
-      cost         = result.respond_to?(:cost)           ? (result.cost&.dig(:total_cost) || result.cost&.dig("total_cost")) : nil
-      model        = result.respond_to?(:model)          ? result.model : nil
+      cost         = result.respond_to?(:usage)          ? result.usage&.cost&.total : nil
+      model        = result.respond_to?(:model)          ? result.model&.name : nil
       detail, lvl  = tribunal_agent_detail(result.respond_to?(:processed) ? result.processed : nil)
       label        = agent_names[index] || "agent #{(index || 0) + 1}"
       {

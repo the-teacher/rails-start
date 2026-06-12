@@ -43,10 +43,10 @@
           meta.textContent = metaParts.join(" \u00b7 ");
           const tokens = document.getElementById("ah-tokens");
           if (usage && tokens)
-            tokens.textContent = `Tokens: ${usage.input_tokens} in / ${usage.output_tokens} out / ${usage.total_tokens} total`;
+            tokens.textContent = `Tokens: ${usage.input} in / ${usage.output} out / ${usage.total} total`;
           const costEl = document.getElementById("ah-cost");
           if (cost && costEl)
-            costEl.textContent = `Cost: $${cost.total_cost.toFixed(6)} (in: $${cost.input_cost.toFixed(6)} / out: $${cost.output_cost.toFixed(6)})`;
+            costEl.textContent = "$" + (+cost).toFixed(6);
         }
       })
       .catch(() => {

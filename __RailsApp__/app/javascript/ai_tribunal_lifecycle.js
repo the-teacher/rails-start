@@ -55,22 +55,14 @@ function populatePanel(i, p) {
   if (p.usage)
     tokens.textContent =
       "Tokens: " +
-      p.usage.input_tokens +
+      p.usage.input +
       " in / " +
-      p.usage.output_tokens +
+      p.usage.output +
       " out / " +
-      p.usage.total_tokens +
+      p.usage.total +
       " total";
   if (p.time) time.textContent = p.time + "s";
-  if (p.cost)
-    cost.textContent =
-      "Cost: $" +
-      p.cost.total_cost.toFixed(6) +
-      " (in: $" +
-      p.cost.input_cost.toFixed(6) +
-      " / out: $" +
-      p.cost.output_cost.toFixed(6) +
-      ")";
+  if (p.cost) cost.textContent = "$" + (+p.cost).toFixed(6);
 }
 
 (function () {

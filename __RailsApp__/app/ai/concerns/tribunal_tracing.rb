@@ -14,7 +14,7 @@ module TribunalTracing
     base.on(:after_agent) do |result, index|
       @tracer_span&.event("agent_done",
         agent: { index: index },
-        llm: { model: result.model, time_s: result.execution_time }
+        llm: { model: result.model&.name, time_s: result.execution_time }
       )
     end
 

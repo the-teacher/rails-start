@@ -39,9 +39,10 @@ module Ai
         event: "after_call",
         text:  "Response received (#{result.execution_time}s)",
         level: "success",
-        model: result.model,
+        model: result.model&.name,
         time:  result.execution_time,
-        usage: result.usage
+        usage: result.usage ? { input: result.usage.tokens.input, output: result.usage.tokens.output, total: result.usage.tokens.total } : nil,
+        cost:  result.usage&.cost&.total
       }
     end
 

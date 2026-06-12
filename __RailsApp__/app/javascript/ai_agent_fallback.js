@@ -1,5 +1,10 @@
 // Case 05: Fallback Chain — SSE streaming + lifecycle sidebar events.
 // Identical to ai_agent_ruby_llm.js but points at /ai/agents/fallback/stream.
+function fmtCost(c) {
+  if (!c) return "";
+  return "$" + (+c).toFixed(6);
+}
+
 function appendLifecycleEvent(p) {
   var el2 = document.getElementById("ah-events");
   if (!el2) return;
@@ -41,6 +46,7 @@ function appendLifecycleEvent(p) {
     out.classList.add("streaming");
     met.textContent = "";
     document.getElementById("ah-tokens").textContent = "";
+    document.getElementById("ah-cost").textContent = "";
     btn.disabled = true;
     btn.textContent = "Thinking…";
     if (sdb) sdb.innerHTML = "";
@@ -66,12 +72,14 @@ function appendLifecycleEvent(p) {
         if (u && tokens)
           tokens.textContent =
             "Tokens: " +
-            u.input_tokens +
+            u.input +
             " in / " +
-            u.output_tokens +
+            u.output +
             " out / " +
-            u.total_tokens +
+            u.total +
             " total";
+        var costEl = document.getElementById("ah-cost");
+        if (p.cost && costEl) costEl.textContent = fmtCost(p.cost);
         end();
         return;
       }
@@ -97,11 +105,11 @@ function appendLifecycleEvent(p) {
         if (u && tokens)
           tokens.textContent =
             "Tokens: " +
-            u.input_tokens +
+            u.input +
             " in / " +
-            u.output_tokens +
+            u.output +
             " out / " +
-            u.total_tokens +
+            u.total +
             " total";
       }
     });

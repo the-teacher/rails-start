@@ -24,7 +24,7 @@ module PipelineTracing
       if (span = @tracer_spans&.delete(step_name))
         attrs = {}
         attrs["llm.time_s"] = result.execution_time if result.respond_to?(:execution_time)
-        attrs["llm.model"]  = result.model          if result.respond_to?(:model)
+        attrs["llm.model"]  = result.model&.name     if result.respond_to?(:model)
         span.attrs(attrs).finish unless attrs.empty?
         span.finish if attrs.empty?
       end

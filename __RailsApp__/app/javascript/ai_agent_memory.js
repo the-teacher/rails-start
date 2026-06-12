@@ -1,4 +1,9 @@
 // Case 06: Memory Agent — POST, no streaming, chat-style history
+function fmtCost(c) {
+  if (!c) return "";
+  return "$" + (+c).toFixed(6);
+}
+
 (function () {
   const form    = document.getElementById("ah-form");
   const input   = document.getElementById("ah-input");
@@ -45,18 +50,20 @@
       body: JSON.stringify({ input: value }),
     })
       .then((r) => r.json())
-      .then(({ output, model, time, error }) => {
+      .then(({ output, model, time, usage, cost, error }) => {
         loading.remove();
         if (error) {
           appendMsg("Error: " + error, "assistant error");
         } else {
           const bubble = appendMsg(output, "assistant");
-          if (model || time) {
+          const parts = [];
+          if (model) parts.push(model);
+          if (time)  parts.push(time + "s");
+          if (usage) parts.push(`${usage.input}↑ ${usage.output}↓ tok`);
+          if (cost)  parts.push(fmtCost(cost));
+          if (parts.length) {
             const meta = document.createElement("span");
             meta.className = "ah-chat-meta";
-            const parts = [];
-            if (model) parts.push(model);
-            if (time)  parts.push(time + "s");
             meta.textContent = parts.join(" · ");
             bubble.appendChild(meta);
           }

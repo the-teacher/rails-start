@@ -52,27 +52,18 @@
     if (r.usage) {
       tokens.textContent =
         "Tokens: " +
-        r.usage.input_tokens +
+        r.usage.input +
         " in / " +
-        r.usage.output_tokens +
+        r.usage.output +
         " out / " +
-        r.usage.total_tokens +
+        r.usage.total +
         " total";
     }
     if (r.time) {
       time.textContent = r.time + "s";
     }
     var cost = document.getElementById("ah-cost-" + i);
-    if (r.cost && cost) {
-      cost.textContent =
-        "Cost: $" +
-        r.cost.total_cost.toFixed(6) +
-        " (in: $" +
-        r.cost.input_cost.toFixed(6) +
-        " / out: $" +
-        r.cost.output_cost.toFixed(6) +
-        ")";
-    }
+    if (r.cost && cost) cost.textContent = "$" + (+r.cost).toFixed(6);
   }
 
   input.addEventListener("keydown", function (e) {
@@ -129,7 +120,7 @@
           vt.textContent = "Total time: " + data.time + "s";
         }
         var totalCost = (data.results || []).reduce(function (sum, r) {
-          return sum + (r.cost ? r.cost.total_cost : 0);
+          return sum + (r.cost ? +r.cost : 0);
         }, 0);
         if (totalCost > 0) {
           vc.textContent = "Total cost: $" + totalCost.toFixed(6);
