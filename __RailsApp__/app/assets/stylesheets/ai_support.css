@@ -170,6 +170,23 @@ html {
   font-style: italic;
 }
 
+/* ── Image generation (Case 07) ── */
+.ah-image-wrap {
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ah-generated-image {
+  max-width: 256px;
+  max-height: 256px;
+  width: auto;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+}
+
 .ah-meta,
 .ah-tokens,
 .ah-cost {

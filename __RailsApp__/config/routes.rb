@@ -30,10 +30,17 @@ Rails.application.routes.draw do
       get  "memory",        to: "agents#memory",        as: :memory
       post "memory/call",   to: "agents#memory_call",   as: :memory_call
       post "memory/clear",  to: "agents#memory_clear",  as: :memory_clear
+
+      # Case 7 — image generation: OpenAI Images API (dall-e-2, 256x256)
+      get  "image",      to: "agents#image",      as: :image
+      post "image/call", to: "agents#image_call", as: :image_call
     end
 
-    # Costs — model pricing reference
-    get "costs", to: "costs#index", as: :costs
+    # Prices — per-source pricing pages
+    scope :prices, as: :prices do
+      get "modelsdev",  to: "prices#modelsdev",  as: :modelsdev
+      get "openrouter", to: "prices#openrouter", as: :openrouter
+    end
 
     # Tribunal examples
     scope :tribunals, as: :tribunals do

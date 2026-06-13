@@ -205,6 +205,29 @@ module Ai
       }
     end
 
+    # ---------------------------------------------------------------------------
+    # GET /ai/agents/image
+    # Case 7: Image generation — OpenAI Images API, dall-e-2 256×256 ($0.016/img).
+    # ---------------------------------------------------------------------------
+    def image
+    end
+
+    # POST /ai/agents/image/call
+    def image_call
+      prompt = params.require(:input)
+      agent  = ImageAgent.call(input: prompt)
+      result = agent.result
+      render json: {
+        b64:   result.output,
+        model: result.model&.name,
+        time:  result.execution_time,
+        usage: usage_json(result.usage),
+        cost:  result.usage&.cost&.total
+      }
+    rescue StandardError => e
+      render json: { error: "#{e.class.name.split('::').last}: #{e.message}" }, status: :unprocessable_entity
+    end
+
     # POST /ai/agents/memory/clear
     def memory_clear
       sid = session[:ai_memory_id]

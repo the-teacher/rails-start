@@ -7,11 +7,25 @@
   <div class="ah-costs-hero">
     <div class="ah-costs-icon">&#x1F4B0;</div>
     <h1 class="ah-costs-title">Model Pricing</h1>
-    <p class="ah-costs-subtitle">
-      <%= @providers.values.sum(&:size) %> models across
-      <%= @providers.size %> providers &mdash; sorted by output price
-    </p>
   </div>
+
+  <div class="ah-prices-switcher">
+    <%= link_to ai_prices_modelsdev_path, class: "ah-prices-tab ah-prices-tab--active" do %>
+      <span class="ah-prices-tab-icon">&#x1F4CA;</span>
+      <span class="ah-prices-tab-name">models.dev</span>
+      <span class="ah-prices-tab-hint"><%= @providers.values.sum(&:size) %> models &middot; all providers</span>
+    <% end %>
+    <%= link_to ai_prices_openrouter_path, class: "ah-prices-tab" do %>
+      <span class="ah-prices-tab-icon">&#x1F30A;</span>
+      <span class="ah-prices-tab-name">OpenRouter</span>
+      <span class="ah-prices-tab-hint">image_output rate &middot; all modalities</span>
+    <% end %>
+  </div>
+
+  <p class="ah-source-note" style="max-width:1400px; margin-bottom:2rem;">
+    Text token rates (prompt&nbsp;/ completion) in USD per million tokens.
+    Image-capable models show text-equivalent rates &mdash; no separate per-modality pricing in this dataset.
+  </p>
 
   <%# ── Provider filter ──────────────────────────────────────────────── %>
   <div class="ah-costs-filter" id="ah-costs-filter">
@@ -36,7 +50,7 @@
     <button class="ah-cat-tag" data-cat="embed">&#x1F4D0; Embedding</button>
   </div>
 
-  <%# ── Special sections (hidden by default, shown via JS) ──────────── %>
+  <%# ── Cheapest special section ─────────────────────────────────────── %>
   <section class="ah-costs-section ah-costs-section--special" data-special="cheapest" style="display:none; width:100%; max-width:1400px;">
     <div class="ah-costs-provider-header">
       <span class="ah-costs-provider-name">&#x1F4B8; 30 Cheapest paid models</span>
@@ -50,7 +64,7 @@
             <th>Model ID</th>
             <th>Name</th>
             <th class="ah-num">Context</th>
-            <th class="ah-num ah-col-pages">A4 p.</th>
+            <th class="ah-num">A4 p.</th>
             <th class="ah-num">Input / 1M</th>
             <th class="ah-num">Output / 1M</th>
             <th class="ah-num">Cache read</th>
@@ -62,8 +76,8 @@
               <td class="ah-col-provider"><span class="ah-provider-badge"><%= m.provider %></span></td>
               <td class="ah-model-id"><code><%= m.id %></code></td>
               <td class="ah-model-name"><%= m.name %></td>
-              <td class="ah-num ah-col-ctx"><%= m.context_window ? number_to_human(m.context_window, units: { thousand: 'K', million: 'M' }, precision: 0) : '—' %></td>
-              <td class="ah-num ah-col-pages"><%= context_to_a4(m.context_window) || '—' %></td>
+              <td class="ah-num"><%= m.context_window ? number_to_human(m.context_window, units: { thousand: 'K', million: 'M' }, precision: 0) : '—' %></td>
+              <td class="ah-num"><%= context_to_a4(m.context_window) || '—' %></td>
               <td class="ah-num"><%= m.input_per_million  ? "$#{'%.3g' % m.input_per_million}"  : '—' %></td>
               <td class="ah-num ah-col-output"><%= "$#{'%.3g' % m.output_per_million}" %></td>
               <td class="ah-num ah-col-cache"><%= m.cache_read_input_per_million ? "$#{'%.3g' % m.cache_read_input_per_million}" : '—' %></td>
@@ -74,6 +88,7 @@
     </div>
   </section>
 
+  <%# ── Free special section ──────────────────────────────────────────── %>
   <section class="ah-costs-section ah-costs-section--special" data-special="free" style="display:none; width:100%; max-width:1400px;">
     <div class="ah-costs-provider-header">
       <span class="ah-costs-provider-name">&#x1F7E2; Free models (<%= @free_models.size %>)</span>
@@ -87,7 +102,7 @@
             <th>Model ID</th>
             <th>Name</th>
             <th class="ah-num">Context</th>
-            <th class="ah-num ah-col-pages">A4 p.</th>
+            <th class="ah-num">A4 p.</th>
             <th class="ah-num">Input / 1M</th>
             <th class="ah-num">Output / 1M</th>
           </tr>
@@ -98,8 +113,8 @@
               <td class="ah-col-provider"><span class="ah-provider-badge"><%= m.provider %></span></td>
               <td class="ah-model-id"><code><%= m.id %></code></td>
               <td class="ah-model-name"><%= m.name %></td>
-              <td class="ah-num ah-col-ctx"><%= m.context_window ? number_to_human(m.context_window, units: { thousand: 'K', million: 'M' }, precision: 0) : '—' %></td>
-              <td class="ah-num ah-col-pages"><%= context_to_a4(m.context_window) || '—' %></td>
+              <td class="ah-num"><%= m.context_window ? number_to_human(m.context_window, units: { thousand: 'K', million: 'M' }, precision: 0) : '—' %></td>
+              <td class="ah-num"><%= context_to_a4(m.context_window) || '—' %></td>
               <td class="ah-num"><%= m.input_per_million ? "$#{'%.3g' % m.input_per_million}" : '—' %></td>
               <td class="ah-num ah-col-free"><%= m.output_per_million ? '$0' : '—' %></td>
             </tr>
@@ -109,16 +124,14 @@
     </div>
   </section>
 
+  <%# ── Provider tables ──────────────────────────────────────────────── %>
   <div class="ah-costs-body" id="ah-costs-body">
-
     <% @providers.each do |provider, models| %>
       <section class="ah-costs-section" data-provider="<%= provider %>">
-
         <div class="ah-costs-provider-header">
           <span class="ah-costs-provider-name"><%= provider %></span>
           <span class="ah-costs-provider-count"><%= models.size %> models</span>
         </div>
-
         <div class="ah-costs-table-wrap">
           <table class="ah-costs-table">
             <thead>
@@ -126,7 +139,7 @@
                 <th>Model ID</th>
                 <th>Name</th>
                 <th class="ah-num">Context</th>
-                <th class="ah-num ah-col-pages">A4 p.</th>
+                <th class="ah-num">A4 p.</th>
                 <th class="ah-num">Input / 1M</th>
                 <th class="ah-num">Output / 1M</th>
                 <th class="ah-num">Cache read</th>
@@ -138,8 +151,8 @@
                 <tr data-cats="<%= m.categories.join(' ') %>">
                   <td class="ah-model-id"><code><%= m.id %></code></td>
                   <td class="ah-model-name"><%= m.name %></td>
-                  <td class="ah-num ah-col-ctx"><%= m.context_window ? number_to_human(m.context_window, units: { thousand: 'K', million: 'M' }, precision: 0) : '—' %></td>
-                  <td class="ah-num ah-col-pages"><%= context_to_a4(m.context_window) || '—' %></td>
+                  <td class="ah-num"><%= m.context_window ? number_to_human(m.context_window, units: { thousand: 'K', million: 'M' }, precision: 0) : '—' %></td>
+                  <td class="ah-num"><%= context_to_a4(m.context_window) || '—' %></td>
                   <td class="ah-num"><%= m.input_per_million  ? "$#{"%.3g" % m.input_per_million}"  : "—" %></td>
                   <td class="ah-num ah-col-output"><%= m.output_per_million ? "$#{"%.3g" % m.output_per_million}" : "—" %></td>
                   <td class="ah-num ah-col-cache"><%= m.cache_read_input_per_million  ? "$#{"%.3g" % m.cache_read_input_per_million}"  : "—" %></td>
@@ -149,10 +162,8 @@
             </tbody>
           </table>
         </div>
-
       </section>
     <% end %>
-
   </div>
 
   <%= link_to "&larr; Back".html_safe, ai_cases_path, class: "ah-costs-back" %>
@@ -172,10 +183,9 @@
   const providerSecs = Array.from(document.querySelectorAll('.ah-costs-section[data-provider]'));
   const specialSecs  = Array.from(document.querySelectorAll('.ah-costs-section[data-special]'));
 
-  // State
-  let active           = new Set();  // active provider names (empty = all)
-  let special          = null;       // 'cheapest' | 'free' | null
-  let activeCategories = new Set();  // active capability tags (empty = all)
+  let active           = new Set();
+  let special          = null;
+  let activeCategories = new Set();
 
   function filterRows(section) {
     const hasCat = activeCategories.size > 0;
@@ -194,7 +204,6 @@
     const inSpecial    = special !== null;
     const allProviders = active.size === 0;
 
-    // Special sections
     specialSecs.forEach(s => {
       const show = s.dataset.special === special;
       s.style.display = show ? '' : 'none';
@@ -204,7 +213,6 @@
       }
     });
 
-    // Provider body
     body.style.display = inSpecial ? 'none' : '';
 
     if (!inSpecial) {
@@ -216,7 +224,6 @@
       });
     }
 
-    // Button states — providers
     allBtn.classList.toggle('ah-filter-tag--active', !inSpecial && allProviders);
     cheapestBtn.classList.toggle('ah-filter-tag--special--active', special === 'cheapest');
     freeBtn.classList.toggle('ah-filter-tag--special--active', special === 'free');
@@ -224,25 +231,13 @@
       t.classList.toggle('ah-filter-tag--active', !inSpecial && (allProviders || active.has(t.dataset.provider)));
     });
 
-    // Button states — categories
     catAllBtn.classList.toggle('ah-cat-tag--active', activeCategories.size === 0);
     catTags.forEach(t => t.classList.toggle('ah-cat-tag--active', activeCategories.has(t.dataset.cat)));
   }
 
-  // Provider events
   allBtn.addEventListener('click', () => { special = null; active.clear(); applyFilter(); });
-
-  cheapestBtn.addEventListener('click', () => {
-    special = special === 'cheapest' ? null : 'cheapest';
-    if (!special) active.clear();
-    applyFilter();
-  });
-
-  freeBtn.addEventListener('click', () => {
-    special = special === 'free' ? null : 'free';
-    if (!special) active.clear();
-    applyFilter();
-  });
+  cheapestBtn.addEventListener('click', () => { special = special === 'cheapest' ? null : 'cheapest'; if (!special) active.clear(); applyFilter(); });
+  freeBtn.addEventListener('click',     () => { special = special === 'free'     ? null : 'free';     if (!special) active.clear(); applyFilter(); });
 
   providerTags.forEach(tag => {
     tag.addEventListener('click', () => {
@@ -253,13 +248,8 @@
     });
   });
 
-  resetBtn.addEventListener('click', () => {
-    special = null; active.clear(); activeCategories.clear(); applyFilter();
-  });
-
-  // Category events
+  resetBtn.addEventListener('click', () => { special = null; active.clear(); activeCategories.clear(); applyFilter(); });
   catAllBtn.addEventListener('click', () => { activeCategories.clear(); applyFilter(); });
-
   catTags.forEach(tag => {
     tag.addEventListener('click', () => {
       const c = tag.dataset.cat;
@@ -268,7 +258,25 @@
     });
   });
 
-  // ── Sortable headers ──────────────────────────────────────────────
+  document.querySelectorAll('.ah-costs-table').forEach(table => {
+    table.querySelectorAll('th').forEach((th, colIdx) => {
+      th.addEventListener('click', () => {
+        const asc = th.dataset.sort !== 'asc';
+        table.querySelectorAll('th').forEach(h => delete h.dataset.sort);
+        th.dataset.sort = asc ? 'asc' : 'desc';
+        const tbody = table.querySelector('tbody');
+        const rows  = Array.from(tbody.querySelectorAll('tr'));
+        rows.sort((a, b) => {
+          const va = cellVal(a.cells[colIdx], asc);
+          const vb = cellVal(b.cells[colIdx], asc);
+          if (typeof va === 'number' && typeof vb === 'number') return asc ? va - vb : vb - va;
+          return va < vb ? (asc ? -1 : 1) : va > vb ? (asc ? 1 : -1) : 0;
+        });
+        rows.forEach(r => tbody.appendChild(r));
+      });
+    });
+  });
+
   function cellVal(cell, asc) {
     const t = (cell ? cell.textContent : '').trim().replace(/\s+/g, ' ');
     if (!t || t === '—') return asc ? Infinity : -Infinity;
@@ -282,27 +290,5 @@
     }
     return t.toLowerCase();
   }
-
-  document.querySelectorAll('.ah-costs-table').forEach(table => {
-    table.querySelectorAll('th').forEach((th, colIdx) => {
-      th.addEventListener('click', () => {
-        const asc  = th.dataset.sort !== 'asc';
-        table.querySelectorAll('th').forEach(h => delete h.dataset.sort);
-        th.dataset.sort = asc ? 'asc' : 'desc';
-
-        const tbody = table.querySelector('tbody');
-        const rows  = Array.from(tbody.querySelectorAll('tr'));
-        rows.sort((a, b) => {
-          const va = cellVal(a.cells[colIdx], asc);
-          const vb = cellVal(b.cells[colIdx], asc);
-          if (typeof va === 'number' && typeof vb === 'number') return asc ? va - vb : vb - va;
-          if (va < vb) return asc ? -1 : 1;
-          if (va > vb) return asc ? 1 : -1;
-          return 0;
-        });
-        rows.forEach(r => tbody.appendChild(r));
-      });
-    });
-  });
 }());
 </script>
