@@ -15,14 +15,14 @@ class PolitenessAgent < ActiveHarness::Agent
   end
 
   before(:call) do
-    @event_stream&.call(:llm_request, self.class.name)
+    @stream&.call(:agent, :llm_request, self.class.name)
   end
 
   after(:call) do |result|
-    @event_stream&.call(:llm_response, result)
+    @stream&.call(:agent, :llm_response, result)
   end
 
   callback(:retry) do |entry, error|
-    @event_stream&.call(:llm_retry, entry[:model], error)
+    @stream&.call(:agent, :llm_retry, entry[:model], error)
   end
 end

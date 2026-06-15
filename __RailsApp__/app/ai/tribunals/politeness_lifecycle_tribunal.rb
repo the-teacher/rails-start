@@ -3,12 +3,12 @@
 class PolitenessLifecycleTribunal < ActiveHarness::Tribunal
   include TribunalTracing
 
-  def initialize(input:, streams: {})
+  def initialize(input:, token: nil, stream: nil)
     agents = PolitenessTribunal::MODELS.map do |model|
       PolitenessAgent.new(models: [{ provider: :openrouter, model: model }])
     end
 
-    super(input: input, agents: agents, streams: streams)
+    super(input: input, agents: agents, token: token, stream: stream)
   end
 
   verdict :majority, may_fail: 1 do |result|
@@ -16,22 +16,22 @@ class PolitenessLifecycleTribunal < ActiveHarness::Tribunal
   end
 
   on(:before_agent) do |agent, index|
-    @tribunal_event_stream&.call(:agent_start, index)
+    @stream&.call(:tribunal, :agent_start, index)
   end
 
   on(:after_agent) do |result, index|
-    @tribunal_event_stream&.call(:agent_done, result, index)
+    @stream&.call(:tribunal, :agent_done, result, index)
   end
 
   on(:agent_error) do |name, error, index|
-    @tribunal_event_stream&.call(:agent_error, name, error, index)
+    @stream&.call(:tribunal, :agent_error, name, error, index)
   end
 
   on(:after_call) do |results, _errors|
-    @tribunal_event_stream&.call(:all_done)
+    @stream&.call(:tribunal, :all_done)
   end
 
   after(:verdict) do |verdict|
-    @tribunal_event_stream&.call(:verdict, verdict)
+    @stream&.call(:tribunal, :verdict, verdict)
   end
 end

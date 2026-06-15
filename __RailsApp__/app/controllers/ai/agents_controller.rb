@@ -44,11 +44,9 @@ module Ai
       stream   = response.stream
       sse_done = ActionController::Live::SSE.new(stream, event: "completion")
 
-      token_stream = build_token_stream(sse_done)
-
       agent = SimpleAgent.call(
-        input:   input,
-        streams: { token: token_stream }
+        input:  input,
+        token:  build_token_stream(sse_done)
       )
 
       result = agent.result
@@ -78,12 +76,10 @@ module Ai
       sse      = ActionController::Live::SSE.new(stream, event: "processing")
       sse_done = ActionController::Live::SSE.new(stream, event: "completion")
 
-      token_stream = build_token_stream(sse_done)
-      event_stream = build_agent_event_stream(sse)
-
       agent = SupportAgent.call(
-        input:   input,
-        streams: { token: token_stream, agent: event_stream }
+        input:  input,
+        token:  build_token_stream(sse_done),
+        stream: build_agent_event_stream(sse)
       )
 
       result = agent.result
@@ -113,12 +109,10 @@ module Ai
       sse      = ActionController::Live::SSE.new(stream, event: "processing")
       sse_done = ActionController::Live::SSE.new(stream, event: "completion")
 
-      token_stream = build_token_stream(sse_done)
-      event_stream = build_agent_event_stream(sse)
-
       agent = SupportRubyLLMAgent.call(
-        input:   input,
-        streams: { token: token_stream, agent: event_stream }
+        input:  input,
+        token:  build_token_stream(sse_done),
+        stream: build_agent_event_stream(sse)
       )
 
       result = agent.result
@@ -150,12 +144,10 @@ module Ai
       sse      = ActionController::Live::SSE.new(stream, event: "processing")
       sse_done = ActionController::Live::SSE.new(stream, event: "completion")
 
-      token_stream = build_token_stream(sse_done)
-      event_stream = build_agent_event_stream(sse)
-
       agent = SupportRubyLLMAgent.new(
-        input:   input,
-        streams: { token: token_stream, agent: event_stream }
+        input:  input,
+        token:  build_token_stream(sse_done),
+        stream: build_agent_event_stream(sse)
       )
 
       # Prepend 2 broken models — they will fail and trigger :retry events in the sidebar.

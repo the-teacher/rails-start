@@ -26,12 +26,8 @@ module Ai
       @tribunal_agent_names = {}
 
       pipeline = FlatSupportPipeline.new(
-        input:   input,
-        streams: {
-          pipeline: flat_pipeline_stream(sse),
-          tribunal: tribunal_stream(sse),
-          agent:    agent_stream(sse)
-        }
+        input:  input,
+        stream: build_flat_pipeline_stream(sse)
       )
       pipeline.call
 
@@ -64,12 +60,8 @@ module Ai
       @tribunal_agent_names = {}
 
       pipeline = SupportPipeline.new(
-        input:   input,
-        streams: {
-          pipeline: pipeline_stream(sse),
-          tribunal: tribunal_stream(sse),
-          agent:    agent_stream(sse)
-        }
+        input:  input,
+        stream: build_support_pipeline_stream(sse)
       )
       pipeline.call
 
@@ -98,10 +90,31 @@ module Ai
       response.headers["X-Accel-Buffering"] = "no"
     end
 
-    def flat_pipeline_stream(sse)
-      lambda do |name, *args|
-        write_flat_pipeline_event(sse, name, args, @step_index)
-        @step_index += 1 if name == :before_step
+    def build_flat_pipeline_stream(sse)
+      lambda do |source, event, *args|
+        case source
+        when :pipeline
+          write_flat_pipeline_event(sse, event, args, @step_index)
+          @step_index += 1 if event == :before_step
+        when :tribunal then write_tribunal_event(sse, event, args, @tribunal_agent_names)
+        when :agent    then write_agent_event(sse, event, args)
+        end
+      rescue IOError, ActionController::Live::ClientDisconnected
+      end
+    end
+
+    def build_support_pipeline_stream(sse)
+      lambda do |source, event, *args|
+        case source
+        when :pipeline
+          @in_laundry = true  if event == :before_step && args[0]&.to_sym == :laundry
+          @in_laundry = false if event == :after_step  && args[0]&.to_sym == :laundry
+          @in_laundry = false if event == :stopped     && args[0]&.to_sym == :laundry
+          write_pipeline_event(sse, event, args, @step_index, @in_laundry)
+          @step_index += 1 if event == :before_step
+        when :tribunal then write_tribunal_event(sse, event, args, @tribunal_agent_names)
+        when :agent    then write_agent_event(sse, event, args)
+        end
       rescue IOError, ActionController::Live::ClientDisconnected
       end
     end
@@ -118,31 +131,6 @@ module Ai
       when :stopped     then pipeline_stopped_event(args[0], args[1])
       when :complete    then pipeline_complete_event(false)
       else                   pipeline_generic_event(name)
-      end
-    end
-
-    def pipeline_stream(sse)
-      lambda do |name, *args|
-        @in_laundry = true  if name == :before_step && args[0]&.to_sym == :laundry
-        @in_laundry = false if name == :after_step  && args[0]&.to_sym == :laundry
-        @in_laundry = false if name == :stopped     && args[0]&.to_sym == :laundry
-        write_pipeline_event(sse, name, args, @step_index, @in_laundry)
-        @step_index += 1 if name == :before_step
-      rescue IOError, ActionController::Live::ClientDisconnected
-      end
-    end
-
-    def tribunal_stream(sse)
-      lambda do |name, *args|
-        write_tribunal_event(sse, name, args, @tribunal_agent_names)
-      rescue IOError, ActionController::Live::ClientDisconnected
-      end
-    end
-
-    def agent_stream(sse)
-      lambda do |name, *args|
-        write_agent_event(sse, name, args)
-      rescue IOError, ActionController::Live::ClientDisconnected
       end
     end
 

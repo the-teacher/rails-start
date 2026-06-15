@@ -74,19 +74,13 @@ module Ai
     # ── stream builders ───────────────────────────────────────────────────────
 
     def build_tribunal_stream(sse)
-      lambda do |name, *args|
-        payload = tribunal_lifecycle_event(name, args)
-        sse.write(payload.merge(source: "tribunal").to_json)
-        logger.debug "[Tribunal] event=#{name} args=#{args.inspect}"
-      rescue IOError, ActionController::Live::ClientDisconnected
-      end
-    end
-
-    def build_tribunal_agent_stream(sse)
-      lambda do |name, *args|
-        payload = tribunal_agent_lifecycle_event(name, args)
-        sse.write(payload.merge(source: "agent").to_json)
-        logger.debug "[Agent] event=#{name} args=#{args.inspect}"
+      lambda do |source, event, *args|
+        payload = case source
+                  when :tribunal then tribunal_lifecycle_event(event, args).merge(source: "tribunal")
+                  when :agent    then tribunal_agent_lifecycle_event(event, args).merge(source: "agent")
+                  end
+        sse.write(payload.to_json) if payload
+        logger.debug "[#{source}] event=#{event} args=#{args.inspect}"
       rescue IOError, ActionController::Live::ClientDisconnected
       end
     end

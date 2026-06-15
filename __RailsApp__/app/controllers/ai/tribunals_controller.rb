@@ -60,14 +60,10 @@ module Ai
       sse_events = ActionController::Live::SSE.new(stream, event: "processing")
       sse_done   = ActionController::Live::SSE.new(stream, event: "completion")
 
-      tribunal_stream = build_tribunal_stream(sse_events)
-      agent_stream     = build_tribunal_agent_stream(sse_events)
+      stream = build_tribunal_stream(sse_events)
 
-      tribunal = PolitenessLifecycleTribunal.new(
-        input:   input,
-        streams: { tribunal: tribunal_stream, agent: agent_stream }
-      )
-      tribunal_stream.call(:tribunal_start, PolitenessTribunal::MODELS.size)
+      tribunal = PolitenessLifecycleTribunal.new(input: input, stream: stream)
+      stream.call(:tribunal, :tribunal_start, PolitenessTribunal::MODELS.size)
       tribunal.call
 
       sse_done.write({

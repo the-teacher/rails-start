@@ -98,14 +98,15 @@ class AiSupportController < ApplicationController
 
     token_stream = ->(token) { sse_tokens.write({ token: token }.to_json) }
 
-    event_stream = ->(name, *args) do
+    event_stream = ->(_source, name, *args) do
       sse_lifecycle.write(lifecycle_message(name, args).to_json)
     rescue IOError, ActionController::Live::ClientDisconnected
     end
 
     SupportAgent.call(
-      input:   input,
-      streams: { token: token_stream, agent: event_stream }
+      input:  input,
+      token:  token_stream,
+      stream: event_stream
     )
 
     sse_tokens.write({ done: true }.to_json)

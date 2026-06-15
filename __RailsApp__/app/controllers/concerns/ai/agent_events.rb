@@ -77,8 +77,8 @@ module Ai
     end
 
     def build_agent_event_stream(sse)
-      lambda do |name, *args|
-        payload = agent_lifecycle_event(name, args)
+      lambda do |_source, event, *args|
+        payload = agent_lifecycle_event(event, args)
         sse.write(payload.to_json)
       rescue IOError, ActionController::Live::ClientDisconnected
       end
