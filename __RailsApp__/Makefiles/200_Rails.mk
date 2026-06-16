@@ -38,6 +38,11 @@ rails-start:
 stop:
 	kill -TERM $$(cat tmp/pids/server.pid) && rm -f tmp/pids/server.pid
 
+# Restart the development server
+restart:
+	make stop
+	make start
+
 # Rails console
 console:
 	bundle exec rails console

@@ -1,0 +1,29 @@
+<div class="ah-container">
+  <aside class="ah-sidebar">
+    <p class="ah-sidebar-title">Agent Events</p>
+    <div id="ah-events" class="ah-events"></div>
+  </aside>
+
+  <div class="ah-main">
+    <div class="ah-card">
+      <div class="ah-logo">&#x26A1;</div>
+      <h1 class="ah-title">Case 05 &mdash; Fallback Chain</h1>
+      <p class="ah-subtitle">
+        Two broken models are prepended via <code>models.prepend</code>.
+        Watch the sidebar: each one fails, then the real chain takes over.
+      </p>
+
+      <%= render "form" %>
+      <%= render "result" %>
+      <%= render "nav",
+           back_label: "&larr; Case 04",
+           back_path:  ai_agents_ruby_llm_path,
+           next_label: "Cases",
+           next_path:  ai_cases_path %>
+    </div>
+  </div>
+</div>
+
+<% content_for :scripts do %>
+  <%= javascript_include_tag "ai_agent_fallback" %>
+<% end %>

@@ -1,0 +1,91 @@
+<% content_for :styles do %>
+  <%= stylesheet_link_tag "ai_tribunals" %>
+<% end %>
+
+<div class="ah-container">
+  <aside class="ah-sidebar">
+    <p class="ah-sidebar-title">Tribunal Events</p>
+    <div id="ah-events" class="ah-events"></div>
+  </aside>
+
+  <div class="ah-main">
+    <div class="ah-tribunal-page">
+
+      <div class="ah-tribunal-hero">
+        <div class="ah-cases-logo">&#x2696;&#xFE0F;</div>
+        <h1 class="ah-tribunal-title">Tribunal 02 &mdash; Lifecycle &amp; Events</h1>
+        <p class="ah-tribunal-subtitle">
+          Three models run in parallel. Watch each agent complete in the sidebar.
+        </p>
+      </div>
+
+      <%# ── Input ────────────────────────────────────────────────────────────── %>
+      <form id="ah-tribunal-form" class="ah-tribunal-form">
+        <textarea
+          id="ah-tribunal-input"
+          class="ah-tribunal-textarea"
+          placeholder="Type a message to evaluate…"
+          rows="3"
+          autocomplete="off"
+        >Please could you help me with my order?</textarea>
+        <button type="submit" id="ah-tribunal-btn" class="ah-tribunal-submit">Evaluate</button>
+      </form>
+
+      <%# ── Three verdict panels ─────────────────────────────────────────────── %>
+      <div class="ah-tribunal-panels" id="ah-tribunal-panels">
+        <div class="ah-tribunal-panel" id="ah-panel-0">
+          <div class="ah-panel-badge" id="ah-badge-0"></div>
+          <div class="ah-panel-model" id="ah-model-0">mistral-nemo</div>
+          <div class="ah-panel-result" id="ah-result-0">&mdash;</div>
+          <p class="ah-panel-reason" id="ah-reason-0"></p>
+          <div class="ah-panel-meta">
+            <span id="ah-tokens-0"></span>
+            <span id="ah-time-0"></span>
+            <span id="ah-cost-0"></span>
+          </div>
+        </div>
+
+        <div class="ah-tribunal-panel" id="ah-panel-1">
+          <div class="ah-panel-badge" id="ah-badge-1"></div>
+          <div class="ah-panel-model" id="ah-model-1">llama-3.1-8b</div>
+          <div class="ah-panel-result" id="ah-result-1">&mdash;</div>
+          <p class="ah-panel-reason" id="ah-reason-1"></p>
+          <div class="ah-panel-meta">
+            <span id="ah-tokens-1"></span>
+            <span id="ah-time-1"></span>
+            <span id="ah-cost-1"></span>
+          </div>
+        </div>
+
+        <div class="ah-tribunal-panel" id="ah-panel-2">
+          <div class="ah-panel-badge" id="ah-badge-2"></div>
+          <div class="ah-panel-model" id="ah-model-2">l3-lunaris-8b</div>
+          <div class="ah-panel-result" id="ah-result-2">&mdash;</div>
+          <p class="ah-panel-reason" id="ah-reason-2"></p>
+          <div class="ah-panel-meta">
+            <span id="ah-tokens-2"></span>
+            <span id="ah-time-2"></span>
+            <span id="ah-cost-2"></span>
+          </div>
+        </div>
+      </div>
+
+      <%# ── Final verdict ────────────────────────────────────────────────────── %>
+      <div class="ah-tribunal-verdict" id="ah-final-verdict">
+        <div class="ah-verdict-label">Verdict</div>
+        <div class="ah-verdict-value" id="ah-verdict-value">&mdash;</div>
+        <div class="ah-verdict-time" id="ah-verdict-time"></div>
+        <div class="ah-verdict-time" id="ah-verdict-cost"></div>
+      </div>
+
+      <div class="ah-tribunal-nav">
+        <%= link_to "&larr; T\u201301: Politeness".html_safe, ai_tribunals_politeness_path, class: "ah-cases-back" %>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<% content_for :scripts do %>
+  <%= javascript_include_tag "ai_tribunal_lifecycle" %>
+<% end %>

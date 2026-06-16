@@ -1,0 +1,19 @@
+<div class="ah-container ah-container--centered">
+  <div class="ah-card">
+    <div class="ah-logo">&#x26A1;</div>
+    <h1 class="ah-title">Case 02 &mdash; Streaming Agent</h1>
+    <p class="ah-subtitle">Tokens stream in real-time via SSE. Watch the response appear.</p>
+
+    <%= render "form" %>
+    <%= render "result" %>
+    <%= render "nav",
+         back_label: "&larr; Case 01",
+         back_path:  ai_agents_simple_path,
+         next_label: "Case 03: Lifecycle &rarr;",
+         next_path:  ai_agents_lifecycle_path %>
+  </div>
+</div>
+
+<% content_for :scripts do %>
+  <%= javascript_include_tag "ai_agent_streaming" %>
+<% end %>

@@ -1,0 +1,100 @@
+<% content_for :styles do %>
+  <%= stylesheet_link_tag "ai_pipelines" %>
+<% end %>
+
+<div class="ah-pl-page">
+
+  <div class="ah-pl-hero">
+    <div class="ah-cases-logo">&#x1F9F5;</div>
+    <h1 class="ah-pl-title">Pipeline 01 &mdash; Support Pipeline</h1>
+    <p class="ah-pl-subtitle">
+      Nested pipeline: <strong>Prompt Laundry</strong> (injection guard &rarr; translation &rarr; compaction)
+      &rarr; safety tribunal &rarr; relevance guard &rarr; response.
+    </p>
+  </div>
+
+  <%# ── Input form ─────────────────────────────────────────────────────────── %>
+  <form id="ah-pl-form" class="ah-pl-form">
+    <textarea
+      id="ah-pl-input"
+      class="ah-pl-textarea"
+      placeholder="Type your question…"
+      rows="3"
+      autocomplete="off"
+    >How do I configure retries in ActiveHarness?</textarea>
+    <button type="submit" id="ah-pl-btn" class="ah-pl-submit">Run pipeline</button>
+  </form>
+
+  <%# ── Step indicators ────────────────────────────────────────────────────── %>
+  <div class="ah-pl-steps" id="ah-pl-steps">
+
+    <%# Inner pipeline group %>
+    <div class="ah-pl-group" id="ah-pl-step-laundry" data-base-class="ah-pl-group">
+      <div class="ah-pl-group-header">
+        <div class="ah-pl-step-icon" id="ah-pl-icon-laundry">○</div>
+        <div class="ah-pl-group-name">Prompt Laundry</div>
+        <div class="ah-pl-group-tag">pipeline</div>
+      </div>
+      <div class="ah-pl-group-inner">
+        <div class="ah-pl-step ah-pl-step--sm" id="ah-pl-step-injection_guard" data-step="injection_guard" data-base-class="ah-pl-step ah-pl-step--sm">
+          <div class="ah-pl-step-icon" id="ah-pl-icon-injection_guard">○</div>
+          <div class="ah-pl-step-name">Injection guard</div>
+        </div>
+        <div class="ah-pl-step-arrow">›</div>
+        <div class="ah-pl-step ah-pl-step--sm" id="ah-pl-step-translate" data-step="translate" data-base-class="ah-pl-step ah-pl-step--sm">
+          <div class="ah-pl-step-icon" id="ah-pl-icon-translate">○</div>
+          <div class="ah-pl-step-name">Translation</div>
+        </div>
+        <div class="ah-pl-step-arrow">›</div>
+        <div class="ah-pl-step ah-pl-step--sm" id="ah-pl-step-compact" data-step="compact" data-base-class="ah-pl-step ah-pl-step--sm">
+          <div class="ah-pl-step-icon" id="ah-pl-icon-compact">○</div>
+          <div class="ah-pl-step-name">Compaction</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ah-pl-step-arrow ah-pl-step-arrow--lg">›</div>
+
+    <%# Outer pipeline steps %>
+    <div class="ah-pl-step" id="ah-pl-step-safety_tribunal" data-step="safety_tribunal" data-base-class="ah-pl-step">
+      <div class="ah-pl-step-icon" id="ah-pl-icon-safety_tribunal">○</div>
+      <div class="ah-pl-step-name">Safety tribunal</div>
+    </div>
+    <div class="ah-pl-step-arrow">›</div>
+    <div class="ah-pl-step" id="ah-pl-step-relevance_guard" data-step="relevance_guard" data-base-class="ah-pl-step">
+      <div class="ah-pl-step-icon" id="ah-pl-icon-relevance_guard">○</div>
+      <div class="ah-pl-step-name">Relevance guard</div>
+    </div>
+    <div class="ah-pl-step-arrow">›</div>
+    <div class="ah-pl-step" id="ah-pl-step-respond" data-step="respond" data-base-class="ah-pl-step">
+      <div class="ah-pl-step-icon" id="ah-pl-icon-respond">○</div>
+      <div class="ah-pl-step-name">Response</div>
+    </div>
+
+  </div>
+
+  <%# ── Event log ──────────────────────────────────────────────────────────── %>
+  <div class="ah-pl-log-wrap">
+    <div class="ah-pl-log-title">Pipeline events</div>
+    <div class="ah-pl-log" id="ah-pl-log">
+      <div class="ah-pl-log-empty" id="ah-pl-log-empty">Events will appear here…</div>
+    </div>
+  </div>
+
+  <%# ── Output ─────────────────────────────────────────────────────────────── %>
+  <div class="ah-pl-output-wrap" id="ah-pl-output-wrap">
+    <div class="ah-pl-output-label">Output</div>
+    <div class="ah-pl-output" id="ah-pl-output">&mdash;</div>
+    <div class="ah-pl-output-meta" id="ah-pl-output-meta"></div>
+  </div>
+
+  <%# ── Execution stats ───────────────────────────────────────────────────── %>
+  <div class="ah-pl-stats-wrap" id="ah-pl-stats" data-pipeline="SupportPipeline" style="display:none"></div>
+
+  <%= link_to "&larr; Back to examples".html_safe, ai_cases_path, class: "ah-pl-back" %>
+
+</div>
+
+<% content_for :scripts do %>
+  <%= javascript_include_tag "ai_pipeline_support" %>
+<% end %>

@@ -1,0 +1,48 @@
+<div class="ah-container ah-container--centered">
+  <div class="ah-card ah-card--chat">
+    <div class="ah-logo">&#x1F9E0;</div>
+    <h1 class="ah-title">Case 06 &mdash; Memory Agent</h1>
+    <p class="ah-subtitle">Conversation history persisted across requests via <code>JsonFile</code> memory</p>
+
+    <div id="ah-chat" class="ah-chat">
+      <% if @history.empty? %>
+        <p id="ah-chat-empty" class="ah-chat-empty">No messages yet. Say something!</p>
+      <% else %>
+        <% @history.each do |turn| %>
+          <div class="ah-chat-msg ah-chat-msg--user"><%= turn[:request] %></div>
+          <div class="ah-chat-msg ah-chat-msg--assistant"><%= turn[:response] %></div>
+        <% end %>
+      <% end %>
+    </div>
+
+    <form id="ah-form" class="ah-form">
+      <textarea
+        id="ah-input"
+        class="ah-textarea"
+        placeholder="Say something&hellip;"
+        rows="2"
+        autocomplete="off"
+      ></textarea>
+      <button type="submit" class="ah-submit" id="ah-btn">Send</button>
+    </form>
+
+    <div class="ah-chat-footer">
+      <span class="ah-session-id">Session: <code><%= @session_id[0..7] %>&hellip;</code></span>
+      <%= button_to "Clear history",
+            ai_agents_memory_clear_path,
+            method: :post,
+            class:  "ah-clear-btn",
+            form:   { "data-turbo" => "false" } %>
+    </div>
+
+    <%= render "nav",
+         back_label: "&larr; Case 05",
+         back_path:  ai_agents_fallback_path,
+         next_label: "Case 07: Image &rarr;",
+         next_path:  ai_agents_image_path %>
+  </div>
+</div>
+
+<% content_for :scripts do %>
+  <%= javascript_include_tag "ai_agent_memory" %>
+<% end %>

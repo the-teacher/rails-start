@@ -1,0 +1,19 @@
+<div class="ah-container ah-container--centered">
+  <div class="ah-card">
+    <div class="ah-logo">&#x26A1;</div>
+    <h1 class="ah-title">Case 01 &mdash; Simple Agent</h1>
+    <p class="ah-subtitle">No streaming, no hooks. Plain request &rarr; response.</p>
+
+    <%= render "form" %>
+    <%= render "result" %>
+    <%= render "nav",
+         back_label: "&larr; Cases",
+         back_path:  ai_cases_path,
+         next_label: "Case 02: Streaming &rarr;",
+         next_path:  ai_agents_streaming_path %>
+  </div>
+</div>
+
+<% content_for :scripts do %>
+  <%= javascript_include_tag "ai_agent_simple" %>
+<% end %>

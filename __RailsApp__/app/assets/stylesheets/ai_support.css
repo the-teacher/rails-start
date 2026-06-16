@@ -1,0 +1,422 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body,
+html {
+  height: 100%;
+  overflow: hidden;
+}
+
+.ah-container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: row;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.ah-container--centered {
+  align-items: center;
+  justify-content: center;
+}
+
+.ah-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  overflow: hidden;
+}
+
+.ah-card {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  border-radius: 24px;
+  box-shadow: 0 16px 48px rgba(31, 38, 135, 0.12);
+  padding: 3rem 3.5rem;
+  width: min(560px, 92vw);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.4rem;
+}
+
+.ah-logo {
+  font-size: 2.8rem;
+  line-height: 1;
+}
+
+.ah-title {
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: #2c3e50;
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+
+.ah-subtitle {
+  font-size: 1rem;
+  color: #6b7a8d;
+  text-align: center;
+  margin-top: -0.4rem;
+}
+
+.ah-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.ah-textarea {
+  width: 100%;
+  padding: 1rem 1.2rem;
+  font-size: 1rem;
+  font-family: inherit;
+  color: #2c3e50;
+  background: rgba(255, 255, 255, 0.75);
+  border: 1.5px solid rgba(200, 210, 230, 0.8);
+  border-radius: 14px;
+  resize: vertical;
+  outline: none;
+  transition:
+    border-color 0.25s,
+    box-shadow 0.25s;
+}
+
+.ah-textarea:focus {
+  border-color: rgba(100, 130, 200, 0.7);
+  box-shadow: 0 0 0 3px rgba(100, 130, 200, 0.12);
+}
+
+.ah-submit {
+  align-self: flex-end;
+  padding: 0.75rem 2.2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: inherit;
+  color: #2c3e50;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1.5px solid rgba(200, 210, 230, 0.9);
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  letter-spacing: 0.3px;
+}
+
+.ah-submit:hover {
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 6px 20px rgba(31, 38, 135, 0.15);
+  transform: translateY(-2px);
+}
+
+.ah-submit:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.ah-result {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(200, 210, 230, 0.7);
+  border-radius: 14px;
+  padding: 1.2rem 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.ah-output {
+  height: 180px;
+  overflow-y: auto;
+  font-size: 1rem;
+  color: #2c3e50;
+  line-height: 1.65;
+  white-space: pre-wrap;
+  word-break: break-word;
+  scroll-behavior: smooth;
+}
+
+.ah-output.streaming::after {
+  content: "▍";
+  display: inline-block;
+  animation: ah-blink 0.8s step-end infinite;
+  color: #7a8899;
+  font-size: 0.85em;
+  margin-left: 1px;
+}
+
+@keyframes ah-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+.ah-placeholder {
+  color: #b0bac5;
+  font-style: italic;
+}
+
+/* ── Image generation (Case 07) ── */
+.ah-image-wrap {
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ah-generated-image {
+  max-width: 256px;
+  max-height: 256px;
+  width: auto;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+}
+
+.ah-meta,
+.ah-tokens,
+.ah-cost {
+  font-size: 0.8rem;
+  color: #9aa5b1;
+  flex-shrink: 0;
+}
+
+.ah-back {
+  font-size: 0.9rem;
+  color: #7a8899;
+  text-decoration: none;
+  transition: color 0.2s;
+  margin-top: 0.2rem;
+}
+
+.ah-back:hover {
+  color: #2c3e50;
+}
+
+/* ── Sidebar ─────────────────────────────────────────────── */
+
+.ah-sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-right: 1px solid rgba(255, 255, 255, 0.7);
+  padding: 2rem 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  overflow: hidden;
+}
+
+.ah-sidebar-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #9aa5b1;
+  flex-shrink: 0;
+  margin: 0;
+}
+
+.ah-events {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.ah-event {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  animation: ah-slide-in 0.2s ease;
+}
+
+@keyframes ah-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.ah-event-icon {
+  flex-shrink: 0;
+  margin-top: 0.05rem;
+}
+
+.ah-event--info {
+  color: #7a8899;
+}
+.ah-event--success {
+  color: #2f855a;
+}
+.ah-event--warning {
+  color: #c05621;
+}
+.ah-event--error {
+  color: #c53030;
+}
+
+.ah-event-source {
+  flex-shrink: 0;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.1rem 0.35rem;
+  border-radius: 3px;
+  margin-top: 0.1rem;
+  line-height: 1.2;
+}
+
+.ah-event-source--tribunal {
+  background: #ebf4ff;
+  color: #2b6cb0;
+}
+
+.ah-event-source--agent {
+  background: #f0fff4;
+  color: #276749;
+}
+
+/* ── Memory chat (Case 06) ───────────────────────────────── */
+
+.ah-card--chat {
+  width: min(600px, 96vw);
+  padding: 2.4rem 2.8rem;
+}
+
+.ah-card--chat code {
+  font-size: 0.82rem;
+  color: #7a8899;
+  background: rgba(200, 210, 230, 0.25);
+  padding: 0.05rem 0.3rem;
+  border-radius: 4px;
+}
+
+.ah-chat {
+  width: 100%;
+  height: 280px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 0.8rem;
+  background: rgba(255, 255, 255, 0.45);
+  border: 1px solid rgba(200, 210, 230, 0.7);
+  border-radius: 14px;
+  scroll-behavior: smooth;
+}
+
+.ah-chat-empty {
+  color: #b0bac5;
+  font-style: italic;
+  font-size: 0.95rem;
+  text-align: center;
+  margin: auto;
+}
+
+.ah-chat-msg {
+  max-width: 82%;
+  padding: 0.6rem 0.9rem;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  word-break: break-word;
+  animation: ah-slide-in 0.18s ease;
+  position: relative;
+}
+
+.ah-chat-msg--user {
+  align-self: flex-end;
+  background: rgba(100, 130, 200, 0.18);
+  color: #2c3e50;
+  border-bottom-right-radius: 4px;
+}
+
+.ah-chat-msg--assistant {
+  align-self: flex-start;
+  background: rgba(255, 255, 255, 0.75);
+  color: #2c3e50;
+  border: 1px solid rgba(200, 210, 230, 0.6);
+  border-bottom-left-radius: 4px;
+}
+
+.ah-chat-msg--loading {
+  color: #9aa5b1;
+  font-size: 1.2rem;
+  letter-spacing: 2px;
+  animation: ah-blink 0.9s step-end infinite;
+}
+
+.ah-chat-msg--error {
+  background: rgba(197, 48, 48, 0.08);
+  border: 1px solid rgba(197, 48, 48, 0.2);
+  color: #c53030;
+}
+
+.ah-chat-meta {
+  display: block;
+  font-size: 0.7rem;
+  color: #9aa5b1;
+  margin-top: 0.3rem;
+}
+
+.ah-chat-footer {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+.ah-session-id {
+  font-size: 0.78rem;
+  color: #9aa5b1;
+}
+
+.ah-clear-btn {
+  font-size: 0.78rem;
+  color: #9aa5b1;
+  background: transparent;
+  border: 1px solid rgba(200, 210, 230, 0.7);
+  border-radius: 20px;
+  padding: 0.3rem 0.9rem;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+
+.ah-clear-btn:hover {
+  color: #c53030;
+  border-color: rgba(197, 48, 48, 0.4);
+  background: rgba(197, 48, 48, 0.05);
+}
+
+/* button_to wraps in a form — strip default form margins */
+.ah-chat-footer form {
+  margin: 0;
+}
