@@ -229,6 +229,77 @@ module Ai
       }
     end
 
+    # ── write helpers (take sse, build payload, write) ───────────────────────
+
+    def write_flat_pipeline_event(sse, name, args, step_index)
+      sse.write(build_flat_pipeline_event(name, args, step_index).to_json)
+    end
+
+    def write_pipeline_event(sse, name, args, step_index, in_laundry = false)
+      sse.write(build_pipeline_event(name, args, step_index, in_laundry).to_json)
+    end
+
+    def write_tribunal_event(sse, name, args, agent_names)
+      agent_names[args[1]] = args[0].class.name if name == :before_agent
+      payload = build_tribunal_event(name, args, agent_names)
+      sse.write(payload.to_json) if payload
+    end
+
+    def write_agent_event(sse, name, args)
+      payload = build_agent_event(name, args)
+      sse.write(payload.to_json) if payload
+    end
+
+    # ── event dispatchers ─────────────────────────────────────────────────────
+
+    def build_flat_pipeline_event(name, args, step_index)
+      case name
+      when :before_step then pipeline_step_start_event(args[0], step_index, "pipeline")
+      when :after_step  then pipeline_step_done_event(args[0], args[1], "pipeline")
+      when :stopped     then pipeline_stopped_event(args[0], args[1])
+      when :complete    then pipeline_complete_event(false)
+      else                   pipeline_generic_event(name)
+      end
+    end
+
+    def build_pipeline_event(name, args, step_index, in_laundry = false)
+      case name
+      when :before_step
+        source = LAUNDRY_INNER_STEPS.include?(args[0]) ? "laundry" : "pipeline"
+        pipeline_step_start_event(args[0], step_index, source)
+      when :after_step
+        source = LAUNDRY_INNER_STEPS.include?(args[0]) ? "laundry" : "pipeline"
+        pipeline_step_done_event(args[0], args[1], source)
+      when :stopped  then pipeline_stopped_event(args[0], args[1])
+      when :complete then pipeline_complete_event(in_laundry)
+      else                pipeline_generic_event(name)
+      end
+    end
+
+    def build_tribunal_event(name, args, agent_names = {})
+      case name
+      when :before_call    then tribunal_before_call_event
+      when :after_call     then tribunal_after_call_event
+      when :before_agent   then tribunal_before_agent_event(args, agent_names)
+      when :after_agent    then tribunal_after_agent_event(args, agent_names)
+      when :agent_error    then tribunal_agent_error_event(args)
+      when :before_verdict then tribunal_before_verdict_event
+      when :after_verdict  then tribunal_after_verdict_event(args[0])
+      else                      tribunal_generic_event(name)
+      end
+    end
+
+    def build_agent_event(name, args)
+      case name
+      when :setup       then nil
+      when :before_call then agent_before_call_event
+      when :after_call  then agent_after_call_event(args[0])
+      when :retry       then agent_retry_event(args)
+      when :failure     then agent_failure_event
+      else                   nil
+      end
+    end
+
     # ── helpers ───────────────────────────────────────────────────────────────
 
     def step_label(step_name)
