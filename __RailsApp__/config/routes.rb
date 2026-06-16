@@ -62,6 +62,10 @@ Rails.application.routes.draw do
       # Pipeline 2 — flat pipeline (same 6 steps, no sub-pipeline nesting)
       get "flat",        to: "pipelines#flat",        as: :flat
       get "flat/stream", to: "pipelines#flat_stream", as: :flat_stream
+
+      # Pipeline 3 — OpenAI Pricing: scrape page → extract structured JSON
+      get  "openai_pricing",      to: "pipelines#openai_pricing",      as: :openai_pricing
+      post "openai_pricing/run",  to: "pipelines#openai_pricing_run",  as: :openai_pricing_run
     end
   end
 

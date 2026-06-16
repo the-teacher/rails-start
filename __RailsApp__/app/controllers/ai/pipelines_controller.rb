@@ -14,6 +14,38 @@ module Ai
     def flat
     end
 
+    # GET /ai/pipelines/openai_pricing
+    def openai_pricing
+    end
+
+    # POST /ai/pipelines/openai_pricing/run
+    def openai_pricing_run
+      pipeline = OpenAiPricingPipeline.new(input: nil)
+      pipeline.call
+
+      fetch_result   = nil
+      extract_result = nil
+      pipeline.steps do |name, _executor, result|
+        fetch_result   = result if name == :fetch_page
+        extract_result = result if name == :extract_pricing
+      end
+
+      models = extract_result&.processed&.dig("models") || []
+
+      render json: {
+        success:      true,
+        models:       models,
+        total_time:   pipeline.execution_time,
+        fetch_time:   fetch_result&.execution_time,
+        extract_time: extract_result&.execution_time,
+        text_length:  fetch_result&.processed&.dig("text_length"),
+        model_used:   extract_result&.model&.name
+      }
+    rescue StandardError => e
+      Rails.logger.error "[OpenAiPricingPipeline] error: #{e.class}: #{e.message}"
+      render json: { success: false, error: "#{e.class.name.split('::').last}: #{e.message}" }, status: 422
+    end
+
     # GET /ai/pipelines/flat/stream?input=...
     def flat_stream
       prepare_sse_response

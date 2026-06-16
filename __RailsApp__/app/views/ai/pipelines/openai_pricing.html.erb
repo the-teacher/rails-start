@@ -1,0 +1,171 @@
+<% content_for :styles do %>
+  <%= stylesheet_link_tag "ai_pipelines" %>
+  <%= stylesheet_link_tag "ai_costs" %>
+<% end %>
+
+<div class="ah-pl-page">
+
+  <div class="ah-pl-hero">
+    <div class="ah-cases-logo">&#x1F4B8;</div>
+    <h1 class="ah-pl-title">Pipeline 03 &mdash; OpenAI Pricing Pipeline</h1>
+    <p class="ah-pl-subtitle">
+      2-step pipeline: <strong>Playwright scraper</strong> fetches the OpenAI pricing page,
+      then an <strong>LLM extraction agent</strong> parses all model prices into structured JSON.
+    </p>
+  </div>
+
+  <%# ── Step indicators ────────────────────────────────────────────────────── %>
+  <div class="ah-pl-steps" id="ah-pl-steps" style="margin-bottom:2rem;">
+    <div class="ah-pl-step" id="ah-pl-step-fetch_page" data-base-class="ah-pl-step">
+      <div class="ah-pl-step-icon" id="ah-pl-icon-fetch_page">○</div>
+      <div class="ah-pl-step-name">Fetch page</div>
+    </div>
+    <div class="ah-pl-step-arrow">›</div>
+    <div class="ah-pl-step" id="ah-pl-step-extract_pricing" data-base-class="ah-pl-step">
+      <div class="ah-pl-step-icon" id="ah-pl-icon-extract_pricing">○</div>
+      <div class="ah-pl-step-name">Extract pricing</div>
+    </div>
+  </div>
+
+  <%# ── Run button ──────────────────────────────────────────────────────────── %>
+  <div style="text-align:center; margin-bottom:2rem;">
+    <button id="ah-oap-btn" class="ah-pl-submit" style="min-width:220px;">
+      &#x25B6; Run Pipeline
+    </button>
+    <p id="ah-oap-hint" style="margin-top:0.75rem; color:#64748b; font-size:0.85rem;">
+      Playwright scraper + LLM extraction &mdash; takes ~30&ndash;60 seconds
+    </p>
+  </div>
+
+  <%# ── Status / error ─────────────────────────────────────────────────────── %>
+  <div id="ah-oap-error" style="display:none; color:#dc2626; background:#fef2f2; border:1px solid #fca5a5; border-radius:8px; padding:1rem 1.25rem; margin-bottom:1.5rem; max-width:760px; margin-left:auto; margin-right:auto;"></div>
+
+  <%# ── Results ─────────────────────────────────────────────────────────────── %>
+  <div id="ah-oap-results" style="display:none;">
+
+    <div id="ah-oap-meta" style="display:flex; gap:1.5rem; flex-wrap:wrap; margin-bottom:1.5rem; font-size:0.85rem; color:#475569;"></div>
+
+    <div class="ah-costs-table-wrap">
+      <table class="ah-costs-table" id="ah-oap-table">
+        <thead>
+          <tr>
+            <th>Model ID</th>
+            <th>Name</th>
+            <th>Modality</th>
+            <th class="ah-num">Input / 1M</th>
+            <th class="ah-num">Output / 1M</th>
+            <th class="ah-num">Cached in / 1M</th>
+            <th>Context</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody id="ah-oap-tbody"></tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <%= link_to "&larr; Back to examples".html_safe, ai_cases_path, class: "ah-pl-back" %>
+
+</div>
+
+<% content_for :scripts do %>
+<script>
+(function () {
+  const btn       = document.getElementById('ah-oap-btn');
+  const errorBox  = document.getElementById('ah-oap-error');
+  const results   = document.getElementById('ah-oap-results');
+  const tbody     = document.getElementById('ah-oap-tbody');
+  const meta      = document.getElementById('ah-oap-meta');
+
+  const fetchIcon   = document.getElementById('ah-pl-icon-fetch_page');
+  const extractIcon = document.getElementById('ah-pl-icon-extract_pricing');
+  const fetchStep   = document.getElementById('ah-pl-step-fetch_page');
+  const extractStep = document.getElementById('ah-pl-step-extract_pricing');
+
+  function setStepState(stepEl, iconEl, state) {
+    stepEl.className = stepEl.dataset.baseClass + (state ? ' ah-pl-step--' + state : '');
+    iconEl.textContent = state === 'running' ? '◉' : state === 'done' ? '●' : state === 'error' ? '✗' : '○';
+  }
+
+  function fmt(val) {
+    if (val === null || val === undefined) return '—';
+    return '$' + Number(val).toFixed(4).replace(/\.?0+$/, '');
+  }
+
+  function escape(s) {
+    if (!s) return '';
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  btn.addEventListener('click', async function () {
+    btn.disabled = true;
+    btn.textContent = '⏳ Running…';
+    errorBox.style.display = 'none';
+    results.style.display  = 'none';
+    tbody.innerHTML = '';
+
+    setStepState(fetchStep, fetchIcon, 'running');
+    setStepState(extractStep, extractIcon, null);
+
+    try {
+      const resp = await fetch('<%= ai_pipelines_openai_pricing_run_path %>', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.content || '' }
+      });
+
+      const data = await resp.json();
+
+      if (!data.success) {
+        setStepState(fetchStep, fetchIcon, 'error');
+        errorBox.textContent = data.error || 'Pipeline failed';
+        errorBox.style.display = 'block';
+        return;
+      }
+
+      setStepState(fetchStep,   fetchIcon,   'done');
+      setStepState(extractStep, extractIcon, 'done');
+
+      // Meta bar
+      const parts = [];
+      if (data.total_time)   parts.push('<span>Total: <strong>' + data.total_time + 's</strong></span>');
+      if (data.fetch_time)   parts.push('<span>Fetch: <strong>' + data.fetch_time + 's</strong></span>');
+      if (data.extract_time) parts.push('<span>Extract: <strong>' + data.extract_time + 's</strong></span>');
+      if (data.text_length)  parts.push('<span>Page text: <strong>' + data.text_length.toLocaleString() + ' chars</strong></span>');
+      if (data.model_used)   parts.push('<span>Model: <strong>' + escape(data.model_used) + '</strong></span>');
+      if (data.models)       parts.push('<span>Models found: <strong>' + data.models.length + '</strong></span>');
+      meta.innerHTML = parts.join('');
+
+      // Table rows
+      const models = data.models || [];
+      if (models.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#94a3b8;">No models extracted</td></tr>';
+      } else {
+        tbody.innerHTML = models.map(function (m) {
+          return '<tr>' +
+            '<td class="ah-model-id"><code>' + escape(m.id || '') + '</code></td>' +
+            '<td class="ah-model-name">' + escape(m.name || '') + '</td>' +
+            '<td>' + escape(m.modality || 'text') + '</td>' +
+            '<td class="ah-num">' + fmt(m.input_per_1m) + '</td>' +
+            '<td class="ah-num">' + fmt(m.output_per_1m) + '</td>' +
+            '<td class="ah-num">' + fmt(m.cached_input_per_1m) + '</td>' +
+            '<td>' + escape(m.context_window || '') + '</td>' +
+            '<td style="font-size:0.78rem;color:#64748b;">' + escape(m.notes || '') + '</td>' +
+          '</tr>';
+        }).join('');
+      }
+
+      results.style.display = 'block';
+
+    } catch (err) {
+      setStepState(fetchStep, fetchIcon, 'error');
+      errorBox.textContent = 'Request failed: ' + err.message;
+      errorBox.style.display = 'block';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '▶ Run Pipeline';
+    }
+  });
+}());
+</script>
+<% end %>
