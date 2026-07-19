@@ -37,6 +37,9 @@
     </p>
   </div>
 
+  <%# ── Cache notice ────────────────────────────────────────────────────────── %>
+  <div id="ah-oap-cache-notice" style="display:none; text-align:center; margin-bottom:1rem; font-size:0.82rem; color:#64748b;"></div>
+
   <%# ── Status / error ─────────────────────────────────────────────────────── %>
   <div id="ah-oap-error" style="display:none; color:#dc2626; background:#fef2f2; border:1px solid #fca5a5; border-radius:8px; padding:1rem 1.25rem; margin-bottom:1.5rem; max-width:760px; margin-left:auto; margin-right:auto;"></div>
 
@@ -72,11 +75,12 @@
 <% content_for :scripts do %>
 <script>
 (function () {
-  const btn       = document.getElementById('ah-oap-btn');
-  const errorBox  = document.getElementById('ah-oap-error');
-  const results   = document.getElementById('ah-oap-results');
-  const tbody     = document.getElementById('ah-oap-tbody');
-  const meta      = document.getElementById('ah-oap-meta');
+  const btn         = document.getElementById('ah-oap-btn');
+  const errorBox    = document.getElementById('ah-oap-error');
+  const results     = document.getElementById('ah-oap-results');
+  const tbody       = document.getElementById('ah-oap-tbody');
+  const meta        = document.getElementById('ah-oap-meta');
+  const cacheNotice = document.getElementById('ah-oap-cache-notice');
 
   const fetchIcon   = document.getElementById('ah-pl-icon-fetch_page');
   const extractIcon = document.getElementById('ah-pl-icon-extract_pricing');
@@ -98,15 +102,74 @@
     return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   }
 
+  function renderData(data, fromCache) {
+    const parts = [];
+    if (data.total_time)   parts.push('<span>Total: <strong>' + data.total_time + 's</strong></span>');
+    if (data.fetch_time)   parts.push('<span>Fetch: <strong>' + data.fetch_time + 's</strong></span>');
+    if (data.extract_time) parts.push('<span>Extract: <strong>' + data.extract_time + 's</strong></span>');
+    if (data.text_length)  parts.push('<span>Page text: <strong>' + data.text_length.toLocaleString() + ' chars</strong></span>');
+    if (data.model_used)    parts.push('<span>Model: <strong>' + escape(data.model_used) + '</strong></span>');
+    if (data.models)        parts.push('<span>Models found: <strong>' + data.models.length + '</strong></span>');
+    if (data.tokens_input != null) parts.push('<span>Tokens: <strong>' + data.tokens_input.toLocaleString() + '</strong> in / <strong>' + data.tokens_output.toLocaleString() + '</strong> out</span>');
+    if (data.cost_total != null)   parts.push('<span>Cost: <strong>$' + Number(data.cost_total).toFixed(4) + '</strong></span>');
+    meta.innerHTML = parts.join('');
+
+    const models = data.models || [];
+    if (models.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#94a3b8;">No models extracted</td></tr>';
+    } else {
+      tbody.innerHTML = models.map(function (m) {
+        return '<tr>' +
+          '<td class="ah-model-id"><code>' + escape(m.id || '') + '</code></td>' +
+          '<td class="ah-model-name">' + escape(m.name || '') + '</td>' +
+          '<td>' + escape(m.modality || 'text') + '</td>' +
+          '<td class="ah-num">' + fmt(m.input_per_1m) + '</td>' +
+          '<td class="ah-num">' + fmt(m.output_per_1m) + '</td>' +
+          '<td class="ah-num">' + fmt(m.cached_input_per_1m) + '</td>' +
+          '<td>' + escape(m.context_window || '') + '</td>' +
+          '<td style="font-size:0.78rem;color:#64748b;">' + escape(m.notes || '') + '</td>' +
+        '</tr>';
+      }).join('');
+    }
+
+    if (fromCache && data.cached_at) {
+      const d = new Date(data.cached_at);
+      cacheNotice.textContent = '⚡ Showing cached results from ' + d.toLocaleString() + ' (click Run Pipeline to refresh)';
+      cacheNotice.style.display = 'block';
+    } else {
+      cacheNotice.style.display = 'none';
+    }
+
+    setStepState(fetchStep,   fetchIcon,   'done');
+    setStepState(extractStep, extractIcon, 'done');
+    results.style.display = 'block';
+  }
+
+  // Load cached data on page open
+  (async function loadCached() {
+    try {
+      const resp = await fetch('<%= ai_pipelines_openai_pricing_cached_path %>');
+      const data = await resp.json();
+      if (data.success) renderData(data, true);
+    } catch (_) {}
+  }());
+
   btn.addEventListener('click', async function () {
     btn.disabled = true;
-    btn.textContent = '⏳ Running…';
-    errorBox.style.display = 'none';
-    results.style.display  = 'none';
+    errorBox.style.display    = 'none';
+    cacheNotice.style.display = 'none';
+    results.style.display     = 'none';
     tbody.innerHTML = '';
 
-    setStepState(fetchStep, fetchIcon, 'running');
-    setStepState(extractStep, extractIcon, null);
+    setStepState(fetchStep,   fetchIcon,   'running');
+    setStepState(extractStep, extractIcon, 'running');
+
+    const startedAt = Date.now();
+    btn.textContent = '⏳ Running… 0s';
+    const timer = setInterval(function () {
+      const elapsed = Math.floor((Date.now() - startedAt) / 1000);
+      btn.textContent = '⏳ Running… ' + elapsed + 's';
+    }, 1000);
 
     try {
       const resp = await fetch('<%= ai_pipelines_openai_pricing_run_path %>', {
@@ -123,45 +186,14 @@
         return;
       }
 
-      setStepState(fetchStep,   fetchIcon,   'done');
-      setStepState(extractStep, extractIcon, 'done');
-
-      // Meta bar
-      const parts = [];
-      if (data.total_time)   parts.push('<span>Total: <strong>' + data.total_time + 's</strong></span>');
-      if (data.fetch_time)   parts.push('<span>Fetch: <strong>' + data.fetch_time + 's</strong></span>');
-      if (data.extract_time) parts.push('<span>Extract: <strong>' + data.extract_time + 's</strong></span>');
-      if (data.text_length)  parts.push('<span>Page text: <strong>' + data.text_length.toLocaleString() + ' chars</strong></span>');
-      if (data.model_used)   parts.push('<span>Model: <strong>' + escape(data.model_used) + '</strong></span>');
-      if (data.models)       parts.push('<span>Models found: <strong>' + data.models.length + '</strong></span>');
-      meta.innerHTML = parts.join('');
-
-      // Table rows
-      const models = data.models || [];
-      if (models.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#94a3b8;">No models extracted</td></tr>';
-      } else {
-        tbody.innerHTML = models.map(function (m) {
-          return '<tr>' +
-            '<td class="ah-model-id"><code>' + escape(m.id || '') + '</code></td>' +
-            '<td class="ah-model-name">' + escape(m.name || '') + '</td>' +
-            '<td>' + escape(m.modality || 'text') + '</td>' +
-            '<td class="ah-num">' + fmt(m.input_per_1m) + '</td>' +
-            '<td class="ah-num">' + fmt(m.output_per_1m) + '</td>' +
-            '<td class="ah-num">' + fmt(m.cached_input_per_1m) + '</td>' +
-            '<td>' + escape(m.context_window || '') + '</td>' +
-            '<td style="font-size:0.78rem;color:#64748b;">' + escape(m.notes || '') + '</td>' +
-          '</tr>';
-        }).join('');
-      }
-
-      results.style.display = 'block';
+      renderData(data, false);
 
     } catch (err) {
       setStepState(fetchStep, fetchIcon, 'error');
       errorBox.textContent = 'Request failed: ' + err.message;
       errorBox.style.display = 'block';
     } finally {
+      clearInterval(timer);
       btn.disabled = false;
       btn.textContent = '▶ Run Pipeline';
     }

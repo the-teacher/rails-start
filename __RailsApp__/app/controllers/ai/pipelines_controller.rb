@@ -14,8 +14,21 @@ module Ai
     def flat
     end
 
+    OPENAI_PRICING_CACHE_KEY = "openai_pricing_pipeline_result"
+    OPENAI_PRICING_CACHE_TTL = 24.hours
+
     # GET /ai/pipelines/openai_pricing
     def openai_pricing
+    end
+
+    # GET /ai/pipelines/openai_pricing/cached
+    def openai_pricing_cached
+      cached = Rails.cache.read(OPENAI_PRICING_CACHE_KEY)
+      if cached
+        render json: cached
+      else
+        render json: { success: false, cached: false }
+      end
     end
 
     # POST /ai/pipelines/openai_pricing/run
@@ -32,15 +45,30 @@ module Ai
 
       models = extract_result&.processed&.dig("models") || []
 
-      render json: {
-        success:      true,
-        models:       models,
-        total_time:   pipeline.execution_time,
-        fetch_time:   fetch_result&.execution_time,
-        extract_time: extract_result&.execution_time,
-        text_length:  fetch_result&.processed&.dig("text_length"),
-        model_used:   extract_result&.model&.name
+      usage = extract_result&.usage
+
+      payload = {
+        success:        true,
+        cached:         false,
+        cached_at:      nil,
+        models:         models,
+        total_time:     pipeline.execution_time,
+        fetch_time:     fetch_result&.execution_time,
+        extract_time:   extract_result&.execution_time,
+        text_length:    fetch_result&.processed&.dig("text_length"),
+        model_used:     extract_result&.model&.name,
+        tokens_input:   usage&.tokens&.input,
+        tokens_output:  usage&.tokens&.output,
+        cost_total:     usage&.cost&.total
       }
+
+      Rails.cache.write(
+        OPENAI_PRICING_CACHE_KEY,
+        payload.merge(cached: true, cached_at: Time.current.iso8601),
+        expires_in: OPENAI_PRICING_CACHE_TTL
+      )
+
+      render json: payload
     rescue StandardError => e
       Rails.logger.error "[OpenAiPricingPipeline] error: #{e.class}: #{e.message}"
       render json: { success: false, error: "#{e.class.name.split('::').last}: #{e.message}" }, status: 422

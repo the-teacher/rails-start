@@ -90,6 +90,11 @@ rails-ruby-env-test:
 # Docker Container Management Commands (host-level only)
 # =============================================================================
 
+# Install Playwright npm package + Chromium browser inside the Rails container
+rails-playwright-install:
+	docker compose -f $(COMPOSE_FILE) exec -u root rails bash -c "npx playwright install-deps chromium"
+	docker compose -f $(COMPOSE_FILE) exec rails bash -c "cd /home/rails/RailsApp && npm install && npx playwright install chromium"
+
 # Development bash access
 rails-bash:
 	docker compose -f $(COMPOSE_FILE) exec rails bash
@@ -123,9 +128,10 @@ rails-help:
 	@echo "  make rails-log-clear         - Clear development application log"
 	@echo ""
 	@echo "Docker Container Management:"
-	@echo "  make rails-bash              - Access bash in development container"
-	@echo "  make rails-status            - Show running processes inside Rails container"
-	@echo "  make rails-ruby-env-test     - Check Ruby environment (YJIT, jemalloc, versions)"
+	@echo "  make rails-bash                 - Access bash in development container"
+	@echo "  make rails-status               - Show running processes inside Rails container"
+	@echo "  make rails-ruby-env-test        - Check Ruby environment (YJIT, jemalloc, versions)"
+	@echo "  make rails-playwright-install   - Install Playwright + Chromium browser in container"
 	@echo ""
 	@echo "Note: Most commands delegate to __RailsApp__/Makefiles/200_Rails.mk inside the container."
 	@echo "=================================================================="

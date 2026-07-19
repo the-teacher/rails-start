@@ -64,8 +64,9 @@ Rails.application.routes.draw do
       get "flat/stream", to: "pipelines#flat_stream", as: :flat_stream
 
       # Pipeline 3 — OpenAI Pricing: scrape page → extract structured JSON
-      get  "openai_pricing",      to: "pipelines#openai_pricing",      as: :openai_pricing
-      post "openai_pricing/run",  to: "pipelines#openai_pricing_run",  as: :openai_pricing_run
+      get  "openai_pricing",        to: "pipelines#openai_pricing",        as: :openai_pricing
+      get  "openai_pricing/cached", to: "pipelines#openai_pricing_cached", as: :openai_pricing_cached
+      post "openai_pricing/run",    to: "pipelines#openai_pricing_run",    as: :openai_pricing_run
     end
   end
 
