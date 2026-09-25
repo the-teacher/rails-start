@@ -1,0 +1,612 @@
+/* ── Model Pricing page ──────────────────────────────────────────── */
+
+html:has(.ah-costs-page),
+body:has(.ah-costs-page) {
+  overflow: auto;
+  height: auto;
+}
+
+.ah-costs-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 3rem 1.5rem 4rem;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* ── Hero ──────────────────────────────────────────────────────────── */
+.ah-costs-hero {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.ah-costs-icon {
+  font-size: 3rem;
+  margin-bottom: 0.6rem;
+}
+
+.ah-costs-title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #2c3e50;
+  letter-spacing: 0.5px;
+  margin: 0 0 0.4rem;
+}
+
+.ah-costs-subtitle {
+  font-size: 1rem;
+  color: #6b7a8d;
+  margin: 0;
+}
+
+/* ── Provider filter bar ───────────────────────────────────────────── */
+.ah-costs-filter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 1400px;
+  margin-bottom: 2rem;
+}
+
+.ah-filter-tag {
+  padding: 0.35rem 0.9rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  font-family: inherit;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  border-radius: 50px;
+  border: 1.5px solid rgba(200, 210, 230, 0.8);
+  background: rgba(255, 255, 255, 0.5);
+  color: #8a96a3;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.ah-filter-tag:hover {
+  background: rgba(255, 255, 255, 0.8);
+  border-color: rgba(140, 160, 200, 0.9);
+  color: #5a6878;
+}
+
+.ah-filter-tag--active {
+  background: rgba(80, 120, 200, 0.15);
+  border-color: rgba(80, 120, 200, 0.55);
+  color: #2c4a80;
+}
+
+.ah-filter-tag--active:hover {
+  background: rgba(80, 120, 200, 0.22);
+}
+
+.ah-filter-reset {
+  margin-left: auto;
+  padding: 0.35rem 1rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  font-family: inherit;
+  letter-spacing: 0.5px;
+  border-radius: 50px;
+  border: 1.5px solid rgba(220, 100, 80, 0.4);
+  background: rgba(255, 240, 238, 0.6);
+  color: #c0533a;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.ah-filter-reset:hover {
+  background: rgba(255, 220, 215, 0.8);
+  border-color: rgba(200, 80, 60, 0.6);
+}
+
+/* ── Body layout ───────────────────────────────────────────────────── */
+.ah-costs-body {
+  width: 100%;
+  max-width: 1400px;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+/* ── Provider section ──────────────────────────────────────────────── */
+.ah-costs-section {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.08);
+  overflow: hidden;
+}
+
+.ah-costs-provider-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  background: rgba(240, 245, 255, 0.7);
+  border-bottom: 1px solid rgba(200, 210, 230, 0.5);
+}
+
+.ah-costs-provider-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #2c3e50;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+.ah-costs-provider-count {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #9aa5b1;
+  letter-spacing: 0.5px;
+}
+
+/* ── Table ─────────────────────────────────────────────────────────── */
+.ah-costs-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.ah-costs-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  color: #3a4a5a;
+}
+
+.ah-costs-table thead {
+  background: rgba(230, 237, 248, 0.5);
+}
+
+.ah-costs-table th {
+  padding: 0.65rem 1rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: #8a96a3;
+  border-bottom: 1px solid rgba(200, 210, 230, 0.5);
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+}
+
+.ah-costs-table td {
+  padding: 0.55rem 1rem;
+  border-bottom: 1px solid rgba(200, 210, 230, 0.25);
+  vertical-align: middle;
+}
+
+.ah-costs-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.ah-costs-table tbody tr:hover {
+  background: rgba(240, 245, 255, 0.5);
+}
+
+.ah-model-id code {
+  font-size: 0.8rem;
+  color: #4a5a6a;
+  background: rgba(200, 210, 230, 0.25);
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.ah-model-name {
+  color: #5a6878;
+}
+
+.ah-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.ah-col-output {
+  font-weight: 600;
+  color: #2c7a4e;
+}
+
+.ah-col-cache {
+  color: #8a96a3;
+  font-size: 0.82rem;
+}
+
+.ah-filter-tag--special {
+  background: rgba(255, 248, 220, 0.6);
+  border-color: rgba(200, 160, 60, 0.5);
+  color: #7a5c10;
+}
+
+.ah-filter-tag--special:hover {
+  background: rgba(255, 243, 190, 0.8);
+  border-color: rgba(180, 140, 40, 0.7);
+}
+
+.ah-filter-tag--special--active {
+  background: rgba(255, 220, 60, 0.25);
+  border-color: rgba(180, 140, 20, 0.75);
+  color: #5a3d00;
+  font-weight: 700;
+}
+
+.ah-provider-badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  padding: 0.15rem 0.55rem;
+  border-radius: 50px;
+  background: rgba(200, 215, 240, 0.45);
+  color: #3a5080;
+  white-space: nowrap;
+}
+
+.ah-col-provider {
+  white-space: nowrap;
+}
+
+.ah-col-free {
+  font-weight: 600;
+  color: #2e7d32;
+}
+
+/* ── Capability filter ─────────────────────────────────────────────── */
+.ah-cat-filter {
+  margin-top: -1rem;
+  margin-bottom: 2rem;
+}
+
+.ah-filter-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #9aa5b1;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  margin-right: 0.25rem;
+  white-space: nowrap;
+  align-self: center;
+}
+
+.ah-cat-tag {
+  padding: 0.3rem 0.85rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  font-family: inherit;
+  letter-spacing: 0.4px;
+  border-radius: 50px;
+  border: 1.5px solid rgba(100, 180, 170, 0.45);
+  background: rgba(255, 255, 255, 0.45);
+  color: #8a96a3;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.ah-cat-tag:hover {
+  background: rgba(255, 255, 255, 0.75);
+  border-color: rgba(30, 160, 145, 0.6);
+  color: #2e7d6e;
+}
+
+.ah-cat-tag--active {
+  background: rgba(20, 160, 140, 0.12);
+  border-color: rgba(20, 160, 140, 0.55);
+  color: #0a6655;
+}
+
+.ah-cat-tag--active:hover {
+  background: rgba(20, 160, 140, 0.2);
+}
+
+/* ── Prices page switcher ───────────────────────────────────────────── */
+.ah-prices-switcher {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.ah-prices-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 1rem 2.5rem;
+  border-radius: 16px;
+  border: 2px solid rgba(200, 210, 230, 0.7);
+  background: rgba(255, 255, 255, 0.45);
+  text-decoration: none;
+  color: #8a96a3;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.ah-prices-tab:hover {
+  background: rgba(255, 255, 255, 0.8);
+  border-color: rgba(140, 160, 200, 0.8);
+  color: #4a5a70;
+  text-decoration: none;
+}
+
+.ah-prices-tab--active {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(80, 120, 200, 0.65);
+  color: #2c4a80;
+  box-shadow: 0 4px 20px rgba(80, 120, 200, 0.14);
+  pointer-events: none;
+}
+
+.ah-prices-tab-icon {
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.ah-prices-tab-name {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+.ah-prices-tab-hint {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: #9aa5b1;
+  white-space: nowrap;
+}
+
+.ah-prices-tab--active .ah-prices-tab-hint {
+  color: #6a86b8;
+}
+
+/* ── Source tab switcher ────────────────────────────────────────────── */
+.ah-source-tabs {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.ah-source-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.7rem 2rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-family: inherit;
+  letter-spacing: 0.3px;
+  border-radius: 14px;
+  border: 2px solid rgba(200, 210, 230, 0.7);
+  background: rgba(255, 255, 255, 0.45);
+  color: #8a96a3;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.ah-source-tab:hover {
+  background: rgba(255, 255, 255, 0.75);
+  border-color: rgba(140, 160, 200, 0.8);
+  color: #4a5a70;
+}
+
+.ah-source-tab--active {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: rgba(80, 120, 200, 0.6);
+  color: #2c4a80;
+  box-shadow: 0 4px 16px rgba(80, 120, 200, 0.12);
+}
+
+.ah-source-tab-hint {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: #9aa5b1;
+  letter-spacing: 0.3px;
+  text-transform: none;
+}
+
+.ah-source-tab--active .ah-source-tab-hint {
+  color: #6a86b8;
+}
+
+/* ── Source block ───────────────────────────────────────────────────── */
+.ah-source-block {
+  width: 100%;
+  max-width: 1400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.ah-source-note {
+  width: 100%;
+  max-width: 1400px;
+  font-size: 0.85rem;
+  color: #6b7a8d;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(200, 210, 230, 0.5);
+  border-radius: 10px;
+  padding: 0.65rem 1.1rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+.ah-source-note strong {
+  color: #2c3e50;
+}
+
+.ah-source-note code {
+  font-size: 0.82rem;
+  background: rgba(200, 210, 230, 0.3);
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+}
+
+/* ── Image gen column & rows ────────────────────────────────────────── */
+.ah-col-imggen {
+  font-weight: 700;
+  color: #7c3aed;
+}
+
+.ah-imggen-row {
+  background: rgba(237, 233, 254, 0.25);
+}
+
+.ah-imggen-row:hover {
+  background: rgba(237, 233, 254, 0.5) !important;
+}
+
+/* ── Capability legend ──────────────────────────────────────────────── */
+.ah-legend {
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(200, 210, 230, 0.5);
+  border-radius: 14px;
+  padding: 1rem 1.4rem 1.1rem;
+  margin-bottom: 2rem;
+  width: 100%;
+}
+
+.ah-legend-title {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #9aa5b1;
+  margin-bottom: 0.75rem;
+}
+
+.ah-legend-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 2rem;
+}
+
+.ah-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ah-legend-desc {
+  font-size: 0.82rem;
+  color: #5a6878;
+  white-space: nowrap;
+}
+
+.ah-legend-desc strong {
+  color: #2c3e50;
+}
+
+.ah-legend-desc code {
+  font-size: 0.78rem;
+  background: rgba(200, 210, 230, 0.3);
+  padding: 0.05rem 0.3rem;
+  border-radius: 3px;
+}
+
+/* ── Category badges ────────────────────────────────────────────────── */
+.ah-model-cats {
+  white-space: nowrap;
+}
+
+.ah-cat-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  min-width: 1.6rem;
+  height: 1.4rem;
+  padding: 0 0.3rem;
+  border-radius: 4px;
+  margin-right: 0.2rem;
+  background: rgba(200, 215, 240, 0.4);
+  color: #3a5080;
+  cursor: default;
+  white-space: nowrap;
+}
+
+.ah-cat-badge--imggen {
+  background: rgba(237, 233, 254, 0.7);
+  color: #6d28d9;
+}
+
+.ah-cat-badge--vision {
+  background: rgba(209, 250, 229, 0.6);
+  color: #065f46;
+}
+
+.ah-cat-badge--audio {
+  background: rgba(254, 243, 199, 0.7);
+  color: #92400e;
+}
+
+.ah-cat-badge--embed {
+  background: rgba(226, 232, 240, 0.7);
+  color: #475569;
+}
+
+.ah-cat-badge--video {
+  background: rgba(254, 226, 226, 0.6);
+  color: #991b1b;
+}
+
+.ah-cat-badge--speech {
+  background: rgba(224, 242, 254, 0.7);
+  color: #075985;
+}
+
+.ah-cat-badge--transcription {
+  background: rgba(240, 253, 244, 0.7);
+  color: #14532d;
+}
+
+.ah-cat-badge--rerank {
+  background: rgba(255, 251, 235, 0.7);
+  color: #78350f;
+}
+
+/* ── Back link ─────────────────────────────────────────────────────── */
+.ah-costs-back {
+  margin-top: 2.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #5a6878;
+  text-decoration: none;
+  padding: 0.5rem 1.2rem;
+  border: 1.5px solid rgba(200, 210, 230, 0.8);
+  border-radius: 50px;
+  background: rgba(255, 255, 255, 0.6);
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.ah-costs-back:hover {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(150, 170, 200, 0.9);
+}

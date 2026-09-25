@@ -1,0 +1,294 @@
+<% content_for :styles do %>
+  <%= stylesheet_link_tag "ai_costs" %>
+<% end %>
+
+<div class="ah-costs-page">
+
+  <div class="ah-costs-hero">
+    <div class="ah-costs-icon">&#x1F4B0;</div>
+    <h1 class="ah-costs-title">Model Pricing</h1>
+  </div>
+
+  <div class="ah-prices-switcher">
+    <%= link_to ai_prices_modelsdev_path, class: "ah-prices-tab ah-prices-tab--active" do %>
+      <span class="ah-prices-tab-icon">&#x1F4CA;</span>
+      <span class="ah-prices-tab-name">models.dev</span>
+      <span class="ah-prices-tab-hint"><%= @providers.values.sum(&:size) %> models &middot; all providers</span>
+    <% end %>
+    <%= link_to ai_prices_openrouter_path, class: "ah-prices-tab" do %>
+      <span class="ah-prices-tab-icon">&#x1F30A;</span>
+      <span class="ah-prices-tab-name">OpenRouter</span>
+      <span class="ah-prices-tab-hint">image_output rate &middot; all modalities</span>
+    <% end %>
+  </div>
+
+  <p class="ah-source-note" style="max-width:1400px; margin-bottom:2rem;">
+    Text token rates (prompt&nbsp;/ completion) in USD per million tokens.
+    Image-capable models show text-equivalent rates &mdash; no separate per-modality pricing in this dataset.
+  </p>
+
+  <%# ── Provider filter ──────────────────────────────────────────────── %>
+  <div class="ah-costs-filter" id="ah-costs-filter">
+    <button class="ah-filter-tag ah-filter-tag--active" data-provider="*" id="ah-filter-all">All</button>
+    <button class="ah-filter-tag ah-filter-tag--special" data-special="cheapest" id="ah-filter-cheapest">&#x1F4B8; 30 Cheapest</button>
+    <button class="ah-filter-tag ah-filter-tag--special" data-special="free" id="ah-filter-free">&#x1F7E2; Free (<%= @free_models.size %>)</button>
+    <% @providers.each_key do |provider| %>
+      <button class="ah-filter-tag ah-filter-tag--active" data-provider="<%= provider %>"><%= provider %></button>
+    <% end %>
+    <button class="ah-filter-reset" id="ah-filter-reset">Reset</button>
+  </div>
+
+  <%# ── Capability filter ─────────────────────────────────────────────── %>
+  <div class="ah-costs-filter ah-cat-filter" id="ah-cats-filter">
+    <span class="ah-filter-label">Capabilities:</span>
+    <button class="ah-cat-tag ah-cat-tag--active" data-cat="*" id="ah-cat-all">All types</button>
+    <button class="ah-cat-tag" data-cat="vision">&#x1F5BC; Vision</button>
+    <button class="ah-cat-tag" data-cat="pdf">&#x1F4C4; PDF</button>
+    <button class="ah-cat-tag" data-cat="audio">&#x1F3A4; Audio</button>
+    <button class="ah-cat-tag" data-cat="video">&#x1F3AC; Video</button>
+    <button class="ah-cat-tag" data-cat="imggen">&#x1F3A8; Image gen</button>
+    <button class="ah-cat-tag" data-cat="embed">&#x1F4D0; Embedding</button>
+  </div>
+
+  <%# ── Cheapest special section ─────────────────────────────────────── %>
+  <section class="ah-costs-section ah-costs-section--special" data-special="cheapest" style="display:none; width:100%; max-width:1400px;">
+    <div class="ah-costs-provider-header">
+      <span class="ah-costs-provider-name">&#x1F4B8; 30 Cheapest paid models</span>
+      <span class="ah-costs-provider-count">sorted by output price</span>
+    </div>
+    <div class="ah-costs-table-wrap">
+      <table class="ah-costs-table">
+        <thead>
+          <tr>
+            <th>Provider</th>
+            <th>Model ID</th>
+            <th>Name</th>
+            <th class="ah-num">Context</th>
+            <th class="ah-num">A4 p.</th>
+            <th class="ah-num">Input / 1M</th>
+            <th class="ah-num">Output / 1M</th>
+            <th class="ah-num">Cache read</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @cheapest.each do |m| %>
+            <tr data-cats="<%= m.categories.join(' ') %>">
+              <td class="ah-col-provider"><span class="ah-provider-badge"><%= m.provider %></span></td>
+              <td class="ah-model-id"><code><%= m.id %></code></td>
+              <td class="ah-model-name"><%= m.name %></td>
+              <td class="ah-num"><%= m.context_window ? number_to_human(m.context_window, units: { thousand: 'K', million: 'M' }, precision: 0) : '—' %></td>
+              <td class="ah-num"><%= context_to_a4(m.context_window) || '—' %></td>
+              <td class="ah-num"><%= m.input_per_million  ? "$#{'%.3g' % m.input_per_million}"  : '—' %></td>
+              <td class="ah-num ah-col-output"><%= "$#{'%.3g' % m.output_per_million}" %></td>
+              <td class="ah-num ah-col-cache"><%= m.cache_read_input_per_million ? "$#{'%.3g' % m.cache_read_input_per_million}" : '—' %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <%# ── Free special section ──────────────────────────────────────────── %>
+  <section class="ah-costs-section ah-costs-section--special" data-special="free" style="display:none; width:100%; max-width:1400px;">
+    <div class="ah-costs-provider-header">
+      <span class="ah-costs-provider-name">&#x1F7E2; Free models (<%= @free_models.size %>)</span>
+      <span class="ah-costs-provider-count">output = $0 or no pricing data</span>
+    </div>
+    <div class="ah-costs-table-wrap">
+      <table class="ah-costs-table">
+        <thead>
+          <tr>
+            <th>Provider</th>
+            <th>Model ID</th>
+            <th>Name</th>
+            <th class="ah-num">Context</th>
+            <th class="ah-num">A4 p.</th>
+            <th class="ah-num">Input / 1M</th>
+            <th class="ah-num">Output / 1M</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @free_models.each do |m| %>
+            <tr data-cats="<%= m.categories.join(' ') %>">
+              <td class="ah-col-provider"><span class="ah-provider-badge"><%= m.provider %></span></td>
+              <td class="ah-model-id"><code><%= m.id %></code></td>
+              <td class="ah-model-name"><%= m.name %></td>
+              <td class="ah-num"><%= m.context_window ? number_to_human(m.context_window, units: { thousand: 'K', million: 'M' }, precision: 0) : '—' %></td>
+              <td class="ah-num"><%= context_to_a4(m.context_window) || '—' %></td>
+              <td class="ah-num"><%= m.input_per_million ? "$#{'%.3g' % m.input_per_million}" : '—' %></td>
+              <td class="ah-num ah-col-free"><%= m.output_per_million ? '$0' : '—' %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <%# ── Provider tables ──────────────────────────────────────────────── %>
+  <div class="ah-costs-body" id="ah-costs-body">
+    <% @providers.each do |provider, models| %>
+      <section class="ah-costs-section" data-provider="<%= provider %>">
+        <div class="ah-costs-provider-header">
+          <span class="ah-costs-provider-name"><%= provider %></span>
+          <span class="ah-costs-provider-count"><%= models.size %> models</span>
+        </div>
+        <div class="ah-costs-table-wrap">
+          <table class="ah-costs-table">
+            <thead>
+              <tr>
+                <th>Model ID</th>
+                <th>Name</th>
+                <th class="ah-num">Context</th>
+                <th class="ah-num">A4 p.</th>
+                <th class="ah-num">Input / 1M</th>
+                <th class="ah-num">Output / 1M</th>
+                <th class="ah-num">Cache read</th>
+                <th class="ah-num">Cache write</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% models.each do |m| %>
+                <tr data-cats="<%= m.categories.join(' ') %>">
+                  <td class="ah-model-id"><code><%= m.id %></code></td>
+                  <td class="ah-model-name"><%= m.name %></td>
+                  <td class="ah-num"><%= m.context_window ? number_to_human(m.context_window, units: { thousand: 'K', million: 'M' }, precision: 0) : '—' %></td>
+                  <td class="ah-num"><%= context_to_a4(m.context_window) || '—' %></td>
+                  <td class="ah-num"><%= m.input_per_million  ? "$#{"%.3g" % m.input_per_million}"  : "—" %></td>
+                  <td class="ah-num ah-col-output"><%= m.output_per_million ? "$#{"%.3g" % m.output_per_million}" : "—" %></td>
+                  <td class="ah-num ah-col-cache"><%= m.cache_read_input_per_million  ? "$#{"%.3g" % m.cache_read_input_per_million}"  : "—" %></td>
+                  <td class="ah-num ah-col-cache"><%= m.cache_write_input_per_million ? "$#{"%.3g" % m.cache_write_input_per_million}" : "—" %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    <% end %>
+  </div>
+
+  <%= link_to "&larr; Back".html_safe, ai_cases_path, class: "ah-costs-back" %>
+</div>
+
+<script>
+(function () {
+  const filter       = document.getElementById('ah-costs-filter');
+  const allBtn       = document.getElementById('ah-filter-all');
+  const resetBtn     = document.getElementById('ah-filter-reset');
+  const cheapestBtn  = document.getElementById('ah-filter-cheapest');
+  const freeBtn      = document.getElementById('ah-filter-free');
+  const catAllBtn    = document.getElementById('ah-cat-all');
+  const body         = document.getElementById('ah-costs-body');
+  const providerTags = Array.from(filter.querySelectorAll('.ah-filter-tag[data-provider]:not([data-provider="*"])'));
+  const catTags      = Array.from(document.querySelectorAll('.ah-cat-tag[data-cat]:not([data-cat="*"])'));
+  const providerSecs = Array.from(document.querySelectorAll('.ah-costs-section[data-provider]'));
+  const specialSecs  = Array.from(document.querySelectorAll('.ah-costs-section[data-special]'));
+
+  let active           = new Set();
+  let special          = null;
+  let activeCategories = new Set();
+
+  function filterRows(section) {
+    const hasCat = activeCategories.size > 0;
+    let visible  = 0;
+    section.querySelectorAll('tbody tr').forEach(row => {
+      if (!hasCat) { row.style.display = ''; visible++; return; }
+      const rowCats = new Set((row.dataset.cats || '').split(' ').filter(Boolean));
+      const match   = [...activeCategories].some(c => rowCats.has(c));
+      row.style.display = match ? '' : 'none';
+      if (match) visible++;
+    });
+    return visible;
+  }
+
+  function applyFilter() {
+    const inSpecial    = special !== null;
+    const allProviders = active.size === 0;
+
+    specialSecs.forEach(s => {
+      const show = s.dataset.special === special;
+      s.style.display = show ? '' : 'none';
+      if (show) {
+        const visible = filterRows(s);
+        if (visible === 0 && activeCategories.size > 0) s.style.display = 'none';
+      }
+    });
+
+    body.style.display = inSpecial ? 'none' : '';
+
+    if (!inSpecial) {
+      providerSecs.forEach(s => {
+        const providerOk = allProviders || active.has(s.dataset.provider);
+        if (!providerOk) { s.style.display = 'none'; return; }
+        const visible = filterRows(s);
+        s.style.display = (activeCategories.size > 0 && visible === 0) ? 'none' : '';
+      });
+    }
+
+    allBtn.classList.toggle('ah-filter-tag--active', !inSpecial && allProviders);
+    cheapestBtn.classList.toggle('ah-filter-tag--special--active', special === 'cheapest');
+    freeBtn.classList.toggle('ah-filter-tag--special--active', special === 'free');
+    providerTags.forEach(t => {
+      t.classList.toggle('ah-filter-tag--active', !inSpecial && (allProviders || active.has(t.dataset.provider)));
+    });
+
+    catAllBtn.classList.toggle('ah-cat-tag--active', activeCategories.size === 0);
+    catTags.forEach(t => t.classList.toggle('ah-cat-tag--active', activeCategories.has(t.dataset.cat)));
+  }
+
+  allBtn.addEventListener('click', () => { special = null; active.clear(); applyFilter(); });
+  cheapestBtn.addEventListener('click', () => { special = special === 'cheapest' ? null : 'cheapest'; if (!special) active.clear(); applyFilter(); });
+  freeBtn.addEventListener('click',     () => { special = special === 'free'     ? null : 'free';     if (!special) active.clear(); applyFilter(); });
+
+  providerTags.forEach(tag => {
+    tag.addEventListener('click', () => {
+      special = null;
+      const p = tag.dataset.provider;
+      active.has(p) ? active.delete(p) : active.add(p);
+      applyFilter();
+    });
+  });
+
+  resetBtn.addEventListener('click', () => { special = null; active.clear(); activeCategories.clear(); applyFilter(); });
+  catAllBtn.addEventListener('click', () => { activeCategories.clear(); applyFilter(); });
+  catTags.forEach(tag => {
+    tag.addEventListener('click', () => {
+      const c = tag.dataset.cat;
+      activeCategories.has(c) ? activeCategories.delete(c) : activeCategories.add(c);
+      applyFilter();
+    });
+  });
+
+  document.querySelectorAll('.ah-costs-table').forEach(table => {
+    table.querySelectorAll('th').forEach((th, colIdx) => {
+      th.addEventListener('click', () => {
+        const asc = th.dataset.sort !== 'asc';
+        table.querySelectorAll('th').forEach(h => delete h.dataset.sort);
+        th.dataset.sort = asc ? 'asc' : 'desc';
+        const tbody = table.querySelector('tbody');
+        const rows  = Array.from(tbody.querySelectorAll('tr'));
+        rows.sort((a, b) => {
+          const va = cellVal(a.cells[colIdx], asc);
+          const vb = cellVal(b.cells[colIdx], asc);
+          if (typeof va === 'number' && typeof vb === 'number') return asc ? va - vb : vb - va;
+          return va < vb ? (asc ? -1 : 1) : va > vb ? (asc ? 1 : -1) : 0;
+        });
+        rows.forEach(r => tbody.appendChild(r));
+      });
+    });
+  });
+
+  function cellVal(cell, asc) {
+    const t = (cell ? cell.textContent : '').trim().replace(/\s+/g, ' ');
+    if (!t || t === '—') return asc ? Infinity : -Infinity;
+    const s = t.replace(/^\$/, '');
+    const m = s.match(/^([\d.]+)\s*([KMkm])?$/);
+    if (m) {
+      let n = parseFloat(m[1]);
+      if (m[2] === 'K' || m[2] === 'k') n *= 1_000;
+      if (m[2] === 'M' || m[2] === 'm') n *= 1_000_000;
+      return n;
+    }
+    return t.toLowerCase();
+  }
+}());
+</script>

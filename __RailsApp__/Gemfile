@@ -40,6 +40,26 @@ gem "thruster", require: false
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 gem "image_processing", "~> 1.2"
 
+# AI agents DSL
+gem "dotenv-rails"
+gem "ruby_llm"
+gem "opentelemetry-sdk"
+gem "opentelemetry-exporter-otlp"
+
+_active_harness_pricing_local = "/home/rails/ActiveHarnessPricing"
+if File.directory?(_active_harness_pricing_local)
+  gem "active_harness_pricing", path: _active_harness_pricing_local
+else
+  gem "active_harness_pricing"
+end
+
+_active_harness_local = "/home/rails/ActiveHarness2"
+if File.directory?(_active_harness_local)
+  gem "active_harness", path: _active_harness_local
+else
+  gem "active_harness"
+end
+
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"

@@ -1,0 +1,291 @@
+<% content_for :styles do %>
+  <%= stylesheet_link_tag "ai_costs" %>
+<% end %>
+
+<div class="ah-costs-page">
+
+  <div class="ah-costs-hero">
+    <div class="ah-costs-icon">&#x1F4B0;</div>
+    <h1 class="ah-costs-title">Model Pricing</h1>
+  </div>
+
+  <div class="ah-prices-switcher">
+    <%= link_to ai_prices_modelsdev_path, class: "ah-prices-tab" do %>
+      <span class="ah-prices-tab-icon">&#x1F4CA;</span>
+      <span class="ah-prices-tab-name">models.dev</span>
+      <span class="ah-prices-tab-hint">text tokens &middot; all providers</span>
+    <% end %>
+    <%= link_to ai_prices_openrouter_path, class: "ah-prices-tab ah-prices-tab--active" do %>
+      <span class="ah-prices-tab-icon">&#x1F30A;</span>
+      <span class="ah-prices-tab-name">OpenRouter</span>
+      <span class="ah-prices-tab-hint">
+        <%= @or_image_models.size %> imggen &middot;
+        <%= @or_special_models.size %> special &middot;
+        <%= @or_text_models.size %> text
+      </span>
+    <% end %>
+  </div>
+
+  <%# ── Capability filter ─────────────────────────────────────────────── %>
+  <div class="ah-costs-filter ah-cat-filter" id="ah-or-cat-filter" style="max-width:1400px;">
+    <span class="ah-filter-label">Capabilities:</span>
+    <button class="ah-cat-tag ah-cat-tag--active" data-cat="*" id="ah-or-cat-all">All types</button>
+    <button class="ah-cat-tag" data-cat="imggen">&#x1F3A8; Image gen</button>
+    <button class="ah-cat-tag" data-cat="vision">&#x1F5BC; Vision</button>
+    <button class="ah-cat-tag" data-cat="audio">&#x1F3A4; Audio</button>
+    <button class="ah-cat-tag" data-cat="video">&#x1F3AC; Video</button>
+    <button class="ah-cat-tag" data-cat="embed">&#x1F4D0; Embedding</button>
+    <button class="ah-cat-tag" data-cat="speech">&#x1F50A; Speech</button>
+    <button class="ah-cat-tag" data-cat="transcription">&#x1F399; Transcription</button>
+    <button class="ah-cat-tag" data-cat="rerank">&#x1F504; Rerank</button>
+  </div>
+
+  <div class="ah-legend" style="max-width:1400px;">
+    <div class="ah-legend-title">Capability badges</div>
+    <div class="ah-legend-items">
+      <div class="ah-legend-item">
+        <span class="ah-cat-badge ah-cat-badge--imggen">imggen</span>
+        <span class="ah-legend-desc">Generates images from text &mdash; <strong>Img out / 1M</strong> shows the <code>image_output</code> rate</span>
+      </div>
+      <div class="ah-legend-item">
+        <span class="ah-cat-badge ah-cat-badge--vision">vision</span>
+        <span class="ah-legend-desc">Accepts images as input &mdash; <strong>Img in / 1M</strong> shows the per-image-token rate</span>
+      </div>
+      <div class="ah-legend-item">
+        <span class="ah-cat-badge ah-cat-badge--audio">audio</span>
+        <span class="ah-legend-desc">Accepts audio as input &mdash; <strong>Audio in / 1M</strong> shows the per-audio-token rate</span>
+      </div>
+      <div class="ah-legend-item">
+        <span class="ah-cat-badge ah-cat-badge--video">video</span>
+        <span class="ah-legend-desc">Accepts video as input (pricing currently $0 in OpenRouter API)</span>
+      </div>
+      <div class="ah-legend-item">
+        <span class="ah-cat-badge ah-cat-badge--embed">embed</span>
+        <span class="ah-legend-desc">Embedding model &mdash; returns vectors; <strong>Input / 1M</strong> shows token rate, no output cost</span>
+      </div>
+      <div class="ah-legend-item">
+        <span class="ah-cat-badge ah-cat-badge--speech">speech</span>
+        <span class="ah-legend-desc">Text-to-speech model &mdash; <strong>Audio out / 1M</strong> shows output audio token rate</span>
+      </div>
+      <div class="ah-legend-item">
+        <span class="ah-cat-badge ah-cat-badge--transcription">transcription</span>
+        <span class="ah-legend-desc">Speech-to-text &mdash; <strong>Audio in</strong>: per <em>minute</em> for Whisper/Chirp/Parakeet etc.; per <em>1M audio tokens</em> for gpt-4o-transcribe and similar token-based models</span>
+      </div>
+      <div class="ah-legend-item">
+        <span class="ah-cat-badge ah-cat-badge--rerank">rerank</span>
+        <span class="ah-legend-desc">Reranking model &mdash; pricing $0 in OpenRouter API</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="ah-costs-body" id="ah-or-body" style="width:100%; max-width:1400px;">
+
+    <%# ── Image generation models ───────────────────────────────────── %>
+    <% if @or_image_models.any? %>
+      <section class="ah-costs-section" id="ah-or-section-image" data-section="imggen">
+        <div class="ah-costs-provider-header">
+          <span class="ah-costs-provider-name">&#x1F3A8; Image Generation</span>
+          <span class="ah-costs-provider-count">
+            <span class="ah-or-count"><%= @or_image_models.size %></span> models &middot;
+            <code style="font-size:0.75rem; color:#6d28d9;">image_output</code> rate from /endpoints
+          </span>
+        </div>
+        <div class="ah-costs-table-wrap">
+          <table class="ah-costs-table">
+            <thead>
+              <tr>
+                <th>Model ID</th>
+                <th>Name</th>
+                <th class="ah-num">Text in / 1M</th>
+                <th class="ah-num">Img in / 1M</th>
+                <th class="ah-num ah-col-imggen">Img out / 1M</th>
+                <th class="ah-num">Cache read</th>
+                <th>Capabilities</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @or_image_models.each do |m| %>
+                <tr class="ah-imggen-row" data-cats="<%= m.categories.join(' ') %>">
+                  <td class="ah-model-id"><code><%= m.id %></code></td>
+                  <td class="ah-model-name"><%= m.name %></td>
+                  <td class="ah-num"><%= m.input_per_million            ? "$#{"%.3g" % m.input_per_million}"            : "—" %></td>
+                  <td class="ah-num"><%= m.image_input_per_million      ? "$#{"%.3g" % m.image_input_per_million}"      : "—" %></td>
+                  <td class="ah-num ah-col-imggen"><%= m.image_output_per_million ? "$#{"%.3g" % m.image_output_per_million}" : "—" %></td>
+                  <td class="ah-num ah-col-cache"><%= m.cache_read_input_per_million ? "$#{"%.3g" % m.cache_read_input_per_million}" : "—" %></td>
+                  <td class="ah-model-cats"><%= cat_badges(m) %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    <% end %>
+
+    <%# ── Special models: embed / speech / transcription / video / rerank ── %>
+    <% if @or_special_models.any? %>
+      <section class="ah-costs-section" id="ah-or-section-special" data-section="special">
+        <div class="ah-costs-provider-header">
+          <span class="ah-costs-provider-name">&#x2728; Specialized Models</span>
+          <span class="ah-costs-provider-count">
+            <span class="ah-or-count"><%= @or_special_models.size %></span> models &middot;
+            embed &middot; speech &middot; transcription &middot; video &middot; rerank
+          </span>
+        </div>
+        <div class="ah-costs-table-wrap">
+          <table class="ah-costs-table">
+            <thead>
+              <tr>
+                <th>Model ID</th>
+                <th>Name</th>
+                <th class="ah-num">Text in / 1M</th>
+                <th class="ah-num">Img in / 1M</th>
+                <th class="ah-num ah-col-audio">Audio in</th>
+                <th class="ah-num ah-col-audio">Audio out / 1M</th>
+                <th class="ah-num">Cache read</th>
+                <th>Capabilities</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @or_special_models.each do |m| %>
+                <tr data-cats="<%= m.categories.join(' ') %>">
+                  <td class="ah-model-id"><code><%= m.id %></code></td>
+                  <td class="ah-model-name"><%= m.name %></td>
+                  <td class="ah-num"><%= m.input_per_million           ? "$#{"%.3g" % m.input_per_million}"           : "—" %></td>
+                  <td class="ah-num"><%= m.image_input_per_million     ? "$#{"%.3g" % m.image_input_per_million}"     : "—" %></td>
+                  <td class="ah-num"><%= m.audio_input_per_million     ? "$#{"%.3g" % m.audio_input_per_million}"     : "—" %></td>
+                  <td class="ah-num"><%= m.audio_output_per_million    ? "$#{"%.3g" % m.audio_output_per_million}"    : "—" %></td>
+                  <td class="ah-num ah-col-cache"><%= m.cache_read_input_per_million ? "$#{"%.3g" % m.cache_read_input_per_million}" : "—" %></td>
+                  <td class="ah-model-cats"><%= cat_badges(m) %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    <% end %>
+
+    <%# ── Text & multimodal models ────────────────────────────────────── %>
+    <section class="ah-costs-section" id="ah-or-section-text" data-section="text">
+      <div class="ah-costs-provider-header">
+        <span class="ah-costs-provider-name">&#x1F4AC; Text &amp; Multimodal Models</span>
+        <span class="ah-costs-provider-count">
+          <span class="ah-or-count"><%= @or_text_models.size %></span> models &middot;
+          <code style="font-size:0.75rem; color:#2c7a4e;">prompt / completion</code> rates
+        </span>
+      </div>
+      <div class="ah-costs-table-wrap">
+        <table class="ah-costs-table">
+          <thead>
+            <tr>
+              <th>Model ID</th>
+              <th>Name</th>
+              <th class="ah-num">Text in / 1M</th>
+              <th class="ah-num">Text out / 1M</th>
+              <th class="ah-num">Img in / 1M</th>
+              <th class="ah-num">Audio in / 1M</th>
+              <th class="ah-num">Cache read</th>
+              <th>Capabilities</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @or_text_models.each do |m| %>
+              <tr data-cats="<%= m.categories.join(' ') %>">
+                <td class="ah-model-id"><code><%= m.id %></code></td>
+                <td class="ah-model-name"><%= m.name %></td>
+                <td class="ah-num"><%= m.input_per_million           ? "$#{"%.3g" % m.input_per_million}"           : "—" %></td>
+                <td class="ah-num ah-col-output"><%= m.output_per_million        ? "$#{"%.3g" % m.output_per_million}"        : "—" %></td>
+                <td class="ah-num"><%= m.image_input_per_million     ? "$#{"%.3g" % m.image_input_per_million}"     : "—" %></td>
+                <td class="ah-num"><%= m.audio_input_per_million     ? "$#{"%.3g" % m.audio_input_per_million}"     : "—" %></td>
+                <td class="ah-num ah-col-cache"><%= m.cache_read_input_per_million ? "$#{"%.3g" % m.cache_read_input_per_million}" : "—" %></td>
+                <td class="ah-model-cats">
+                  <% m.categories.each do |cat| %>
+                    <span class="ah-cat-badge ah-cat-badge--<%= cat %>"><%= cat %></span>
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </div>
+
+  <%= link_to "&larr; Back".html_safe, ai_cases_path, class: "ah-costs-back" %>
+</div>
+
+<script>
+(function () {
+  const catAllBtn = document.getElementById('ah-or-cat-all');
+  const catTags   = Array.from(document.querySelectorAll('#ah-or-cat-filter .ah-cat-tag[data-cat]:not([data-cat="*"])'));
+  const sections  = Array.from(document.querySelectorAll('#ah-or-body .ah-costs-section'));
+
+  let activeCategories = new Set();
+
+  function applyFilter() {
+    const hasCat = activeCategories.size > 0;
+
+    sections.forEach(section => {
+      let visible = 0;
+      section.querySelectorAll('tbody tr').forEach(row => {
+        if (!hasCat) { row.style.display = ''; visible++; return; }
+        const rowCats = new Set((row.dataset.cats || '').split(' ').filter(Boolean));
+        const match   = [...activeCategories].some(c => rowCats.has(c));
+        row.style.display = match ? '' : 'none';
+        if (match) visible++;
+      });
+      section.style.display = visible === 0 ? 'none' : '';
+
+      const counter = section.querySelector('.ah-or-count');
+      if (counter) counter.textContent = visible;
+    });
+
+    catAllBtn.classList.toggle('ah-cat-tag--active', !hasCat);
+    catTags.forEach(t => t.classList.toggle('ah-cat-tag--active', activeCategories.has(t.dataset.cat)));
+  }
+
+  catAllBtn.addEventListener('click', () => { activeCategories.clear(); applyFilter(); });
+
+  catTags.forEach(tag => {
+    tag.addEventListener('click', () => {
+      const c = tag.dataset.cat;
+      activeCategories.has(c) ? activeCategories.delete(c) : activeCategories.add(c);
+      applyFilter();
+    });
+  });
+
+  // ── Sortable headers ───────────────────────────────────────────────
+  function cellVal(cell, asc) {
+    const t = (cell ? cell.textContent : '').trim().replace(/\s+/g, ' ');
+    if (!t || t === '—') return asc ? Infinity : -Infinity;
+    const s = t.replace(/^\$/, '');
+    const m = s.match(/^([\d.]+)\s*([KMkm])?$/);
+    if (m) {
+      let n = parseFloat(m[1]);
+      if (m[2] === 'K' || m[2] === 'k') n *= 1_000;
+      if (m[2] === 'M' || m[2] === 'm') n *= 1_000_000;
+      return n;
+    }
+    return t.toLowerCase();
+  }
+
+  document.querySelectorAll('.ah-costs-table').forEach(table => {
+    table.querySelectorAll('th').forEach((th, colIdx) => {
+      th.addEventListener('click', () => {
+        const asc = th.dataset.sort !== 'asc';
+        table.querySelectorAll('th').forEach(h => delete h.dataset.sort);
+        th.dataset.sort = asc ? 'asc' : 'desc';
+        const tbody = table.querySelector('tbody');
+        const rows  = Array.from(tbody.querySelectorAll('tr'));
+        rows.sort((a, b) => {
+          const va = cellVal(a.cells[colIdx], asc);
+          const vb = cellVal(b.cells[colIdx], asc);
+          if (typeof va === 'number' && typeof vb === 'number') return asc ? va - vb : vb - va;
+          return va < vb ? (asc ? -1 : 1) : va > vb ? (asc ? 1 : -1) : 0;
+        });
+        rows.forEach(r => tbody.appendChild(r));
+      });
+    });
+  });
+}());
+</script>

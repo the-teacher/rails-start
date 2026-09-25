@@ -1,0 +1,183 @@
+<div class="ah-container ah-container--centered">
+  <div class="ah-card ah-jev-card">
+    <div class="ah-logo">&#x1F9E9;</div>
+    <h1 class="ah-title">Case 09 &mdash; Jev (TypeSafe AI)</h1>
+    <p class="ah-subtitle">
+      Not a chat model &mdash; Jev evaluates whatever you type against 4 fixed
+      questions in one call and returns typed, probabilistic answers.
+    </p>
+
+    <div class="ah-jev-layout">
+      <div class="ah-jev-main">
+        <%= render "form" %>
+
+        <div class="ah-jev-section-label">Final result</div>
+        <div id="ah-jev-summary" class="ah-result ah-jev-summary">
+          <span class="ah-placeholder">Summary will appear here&hellip;</span>
+        </div>
+
+        <div class="ah-jev-section-label">Full response structure</div>
+        <%= render "result" %>
+      </div>
+
+      <div class="ah-jev-aside">
+        <p class="ah-jev-hint">
+          <strong>What to type:</strong> any piece of text you'd want a system to
+          triage automatically &mdash; a support ticket, a product review, a forum
+          comment, a chat message. Try something clearly positive, something
+          angry/urgent, and something with hostile language to see all four
+          scores move.
+        </p>
+
+        <div class="ah-jev-section-label">Questions asked</div>
+        <ul class="ah-jev-questions">
+          <li><strong>sentiment</strong> (score, 5 levels) &mdash; how positive the tone is</li>
+          <li><strong>topic</strong> (choice) &mdash; support / feedback / spam</li>
+          <li><strong>urgent</strong> (noul) &mdash; does this need a fast response</li>
+          <li><strong>harmful</strong> (noul) &mdash; hate speech, threats, harassment, or other dangerous content</li>
+        </ul>
+
+        <div class="ah-jev-section-label">Question format sent to Jev</div>
+        <pre class="ah-jev-code"><code><%= JSON.pretty_generate(JevRequest::QUESTIONS) %></code></pre>
+
+        <p class="ah-jev-hint">
+          <strong>Moderation, specifically:</strong> yes &mdash; a plain
+          <code>noul</code> question with instructions like "does this contain
+          hate speech, threats, or dangerous content?" is exactly how you'd use
+          Jev for comment/content moderation. The <code>harmful</code> row
+          demonstrates it directly; swap the wording in
+          <code>JevRequest::QUESTIONS</code> to target whatever policy you're
+          enforcing.
+        </p>
+      </div>
+    </div>
+
+    <%= render "nav",
+         back_label: "&larr; Case 08",
+         back_path:  ai_requests_transcribe_path,
+         next_label: "Cases &rarr;",
+         next_path:  ai_cases_path %>
+  </div>
+</div>
+
+<% content_for :styles do %>
+  <style>
+    .ah-jev-section-label {
+      width: 100%;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: #8b98ac;
+      margin: 0.9rem 0 0.4rem;
+    }
+    .ah-jev-summary {
+      min-height: 0;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.5rem;
+    }
+    .ah-jev-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 0.6rem;
+      padding: 0.3rem 0;
+      border-bottom: 1px solid rgba(200, 210, 230, 0.5);
+    }
+    .ah-jev-row:last-child { border-bottom: none; }
+    .ah-jev-row-label {
+      font-weight: 600;
+      color: #4a5a70;
+      text-transform: capitalize;
+    }
+    .ah-jev-row-value {
+      color: #2c3e50;
+      text-align: right;
+    }
+    .ah-jev-hint {
+      text-align: left;
+      font-size: 0.85rem;
+      background: rgba(240, 244, 255, 0.6);
+      border: 1px solid rgba(200, 210, 230, 0.6);
+      border-radius: 10px;
+      padding: 0.7rem 0.9rem;
+      margin: 0 0 0.2rem;
+    }
+    .ah-jev-questions {
+      width: 100%;
+      text-align: left;
+      font-size: 0.85rem;
+      color: #4a5a70;
+      margin: 0;
+      padding-left: 1.2rem;
+    }
+    .ah-jev-questions li { margin: 0.2rem 0; }
+    .ah-jev-code {
+      width: 100%;
+      max-height: 260px;
+      overflow: auto;
+      text-align: left;
+      font-size: 0.72rem;
+      line-height: 1.5;
+      background: rgba(44, 62, 80, 0.92);
+      color: #d9e6f5;
+      border-radius: 10px;
+      padding: 0.8rem 0.9rem;
+      margin: 0;
+      box-sizing: border-box;
+    }
+
+    /* This page has a lot more content than the other cases (a two-column
+       layout with explainer text + 2 result sections). The shared layout
+       fixes html/body/.ah-container to exactly 100vh with overflow:hidden
+       and .ah-card to a narrow fixed width, which is fine for short forms
+       but clips this page and disables scrolling. Override for this page
+       only — don't touch the shared CSS, every other case still relies on
+       the fixed-viewport behavior. */
+    html, body {
+      height: auto;
+      min-height: 100%;
+      overflow-y: auto;
+    }
+    .ah-container {
+      height: auto;
+      min-height: 100vh;
+      padding: 2.5rem 0;
+    }
+    .ah-jev-card {
+      width: min(1280px, 97vw);
+    }
+
+    .ah-jev-layout {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 2rem;
+      width: 100%;
+    }
+    .ah-jev-main {
+      flex: 1 1 55%;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.4rem;
+    }
+    .ah-jev-aside {
+      flex: 1 1 45%;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.4rem;
+    }
+    @media (max-width: 760px) {
+      .ah-jev-layout { flex-direction: column; }
+    }
+  </style>
+<% end %>
+
+<% content_for :scripts do %>
+  <%= javascript_include_tag "ai_request_jev" %>
+<% end %>

@@ -5,6 +5,7 @@
 #   git config --global core.excludesfile '~/.gitignore_global'
 .DS_Store
 /.idea
+node_modules
 
 /db/PGSQL
 !/db/PGSQL/.keep

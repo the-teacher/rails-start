@@ -1,0 +1,50 @@
+<div class="ah-container ah-container--centered">
+  <div class="ah-card">
+    <div class="ah-logo">&#x1F3A4;</div>
+    <h1 class="ah-title">Case 08 &mdash; Audio Transcription</h1>
+    <p class="ah-subtitle">
+      Upload an audio file and pick a model to transcribe it via OpenRouter.
+      Synchronous call &mdash; no job id / polling, response comes back directly.
+    </p>
+
+    <form id="ah-form" class="ah-form">
+      <select id="ah-model" name="model" class="ah-select">
+        <% @models.each do |value, label| %>
+          <option value="<%= value %>" <%= "selected" if value == AudioTranscriptionRequest::DEFAULT_MODEL %>><%= label %></option>
+        <% end %>
+      </select>
+
+      <label for="ah-input" class="ah-file-label" id="ah-file-label">
+        <span class="ah-file-icon">&#x1F4C1;</span>
+        <span class="ah-file-name" id="ah-file-name">Choose an audio file&hellip;</span>
+      </label>
+      <input
+        id="ah-input"
+        class="ah-file-input"
+        type="file"
+        accept="audio/*,.mp3,.wav,.m4a,.flac,.ogg,.webm,.aac"
+      >
+
+      <button type="submit" class="ah-submit" id="ah-btn">Transcribe</button>
+    </form>
+
+    <div id="ah-result" class="ah-result">
+      <div id="ah-text-wrap" class="ah-text-wrap">
+        <span class="ah-placeholder">Transcript will appear here&hellip;</span>
+      </div>
+      <div id="ah-meta" class="ah-meta"></div>
+      <div id="ah-tokens" class="ah-tokens"></div>
+      <div id="ah-cost" class="ah-cost"></div>
+    </div>
+
+    <%= render "nav",
+         back_label: "&larr; Case 07",
+         back_path:  ai_requests_image_path,
+         next_label: "Case 09: Jev &rarr;",
+         next_path:  ai_requests_jev_path %>
+  </div>
+</div>
+
+<% content_for :scripts do %>
+  <%= javascript_include_tag "ai_request_audio" %>
+<% end %>
