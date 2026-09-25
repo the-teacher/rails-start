@@ -220,6 +220,40 @@ module Ai
       render json: { error: "#{e.class.name.split('::').last}: #{e.message}" }, status: :unprocessable_entity
     end
 
+    # ---------------------------------------------------------------------------
+    # GET /ai/agents/transcribe
+    # Case 8: Audio transcription — upload a file, get back the transcript text.
+    # Synchronous call, no job id / polling — OpenRouter's transcription endpoint
+    # returns the transcript directly (upstream providers time out after ~60s,
+    # so long recordings should be split before uploading).
+    # ---------------------------------------------------------------------------
+    def transcribe
+      @models = AudioTranscriptionAgent::MODELS
+    end
+
+    # POST /ai/agents/transcribe/call
+    def transcribe_call
+      file  = params.require(:audio)
+      model = params[:model].presence
+
+      raise ArgumentError, "Unknown model: #{model.inspect}" if model && !AudioTranscriptionAgent::MODELS.key?(model)
+
+      agent = AudioTranscriptionAgent.new(input: file.tempfile.path)
+      agent.models.replace([{ provider: :openrouter, model: model }]) if model
+      agent.call
+
+      result = agent.result
+      render json: {
+        text:  result.output,
+        model: result.model&.name,
+        time:  result.execution_time,
+        usage: usage_json(result.usage),
+        cost:  result.usage&.cost&.total
+      }
+    rescue StandardError => e
+      render json: { error: "#{e.class.name.split('::').last}: #{e.message}" }, status: :unprocessable_entity
+    end
+
     # POST /ai/agents/memory/clear
     def memory_clear
       sid = session[:ai_memory_id]

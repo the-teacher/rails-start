@@ -195,6 +195,99 @@ html {
   flex-shrink: 0;
 }
 
+/* ── Audio transcription (Case 08) ── */
+.ah-select {
+  width: 100%;
+  padding: 0.85rem 2.6rem 0.85rem 1.2rem;
+  font-size: 0.95rem;
+  font-family: inherit;
+  color: #2c3e50;
+  background-color: rgba(255, 255, 255, 0.75);
+  border: 1.5px solid rgba(200, 210, 230, 0.8);
+  border-radius: 14px;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7a8d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1rem;
+  transition:
+    border-color 0.25s,
+    box-shadow 0.25s;
+}
+
+.ah-select:focus {
+  border-color: rgba(100, 130, 200, 0.7);
+  box-shadow: 0 0 0 3px rgba(100, 130, 200, 0.12);
+}
+
+.ah-file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.ah-file-label {
+  width: 100%;
+  padding: 0.85rem 1.2rem;
+  font-size: 0.95rem;
+  font-family: inherit;
+  color: #8a95a3;
+  background: rgba(255, 255, 255, 0.75);
+  border: 1.5px dashed rgba(200, 210, 230, 0.9);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ah-file-label:hover {
+  border-color: rgba(100, 130, 200, 0.7);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 6px 20px rgba(31, 38, 135, 0.1);
+}
+
+.ah-file-label.has-file {
+  color: #2c3e50;
+  font-weight: 600;
+  border-style: solid;
+  border-color: rgba(100, 130, 200, 0.55);
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.ah-file-icon {
+  font-size: 1.15rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.ah-file-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ah-text-wrap {
+  min-height: 80px;
+  font-size: 1rem;
+  color: #2c3e50;
+  line-height: 1.65;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
 .ah-back {
   font-size: 0.9rem;
   color: #7a8899;

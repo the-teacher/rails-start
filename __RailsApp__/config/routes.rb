@@ -34,6 +34,10 @@ Rails.application.routes.draw do
       # Case 7 — image generation: OpenAI Images API (dall-e-2, 256x256)
       get  "image",      to: "agents#image",      as: :image
       post "image/call", to: "agents#image_call", as: :image_call
+
+      # Case 8 — audio transcription: upload a file, get back the transcript text
+      get  "transcribe",      to: "agents#transcribe",      as: :transcribe
+      post "transcribe/call", to: "agents#transcribe_call", as: :transcribe_call
     end
 
     # Prices — per-source pricing pages

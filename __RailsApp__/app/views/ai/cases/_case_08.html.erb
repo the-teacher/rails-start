@@ -1,0 +1,14 @@
+<div class="ah-case-card">
+  <div class="ah-case-number">08</div>
+  <h2 class="ah-case-name">Audio Transcription</h2>
+  <p class="ah-case-desc">
+    Upload an audio file and <code>openai/whisper-1</code> transcribes it via OpenRouter.
+    Synchronous call, no job id / polling &mdash; returns the text directly. ~$0.006/min.
+  </p>
+  <ul class="ah-case-tags">
+    <li>whisper-1</li>
+    <li>Transcription API</li>
+    <li>file upload</li>
+  </ul>
+  <%= link_to "Try it →", ai_agents_transcribe_path, class: "ah-case-btn" %>
+</div>
