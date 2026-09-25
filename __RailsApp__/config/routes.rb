@@ -38,6 +38,10 @@ Rails.application.routes.draw do
       # Case 8 — audio transcription: upload a file, get back the transcript text
       get  "transcribe",      to: "requests#transcribe",      as: :transcribe
       post "transcribe/call", to: "requests#transcribe_call", as: :transcribe_call
+
+      # Case 9 — Jev (TypeSafe AI) via Vercel AI Gateway: evaluation, not chat
+      get  "jev",      to: "requests#jev",      as: :jev
+      post "jev/call", to: "requests#jev_call", as: :jev_call
     end
 
     # Prices — per-source pricing pages

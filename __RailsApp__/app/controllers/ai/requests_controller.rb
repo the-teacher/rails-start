@@ -254,6 +254,30 @@ module Ai
       render json: { error: "#{e.class.name.split('::').last}: #{e.message}" }, status: :unprocessable_entity
     end
 
+    # ---------------------------------------------------------------------------
+    # GET /ai/requests/jev
+    # Case 9: Jev (TypeSafe AI) via Vercel AI Gateway — an evaluation model, not a
+    # chat model. Returns a typed score, not free text. Shown as raw JSON — no
+    # response processing.
+    # ---------------------------------------------------------------------------
+    def jev
+    end
+
+    # POST /ai/requests/jev/call
+    def jev_call
+      req    = JevRequest.call(input: params.require(:input))
+      result = req.result
+
+      render json: {
+        output: result.processed, # format :json => parsed Hash, not the raw string
+        model:  result.model&.name,
+        time:   result.execution_time,
+        usage:  usage_json(result.usage)
+      }
+    rescue StandardError => e
+      render json: { error: "#{e.class.name.split('::').last}: #{e.message}" }, status: :unprocessable_entity
+    end
+
     # POST /ai/requests/memory/clear
     def memory_clear
       sid = session[:ai_memory_id]
