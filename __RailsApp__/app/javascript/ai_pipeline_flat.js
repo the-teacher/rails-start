@@ -5,12 +5,12 @@ var LOG_ICONS  = { info: "●", success: "✓", error: "✗", warning: "⚠" };
 var SOURCE_LABELS = {
   pipeline: "pipeline",
   tribunal: "tribunal",
-  agent:    "agent",
+  request:  "request",
 };
 var SOURCE_COLORS = {
   pipeline: "ah-pl-badge--pipeline",
   tribunal: "ah-pl-badge--tribunal",
-  agent:    "ah-pl-badge--agent",
+  request:  "ah-pl-badge--request",
 };
 
 var FLAT_STEPS = [
@@ -266,18 +266,18 @@ function plRenderStats(totalTime) {
       } else if (p.event === "complete") {
         plAppendLog(p.text, "success", src);
 
-      } else if (p.event === "tribunal_before_agent") {
+      } else if (p.event === "tribunal_before_request") {
         var group = plFindStep(plCurrentGroup);
         if (group) {
-          group.children.push({ label: p.agent, index: p.index, time: null, cost: null, model: null });
+          group.children.push({ label: p.request, index: p.index, time: null, cost: null, model: null });
         }
         plAppendLog(p.text || p.event, lvl, src);
 
-      } else if (p.event === "tribunal_after_agent") {
+      } else if (p.event === "tribunal_after_request") {
         var group = plFindStep(plCurrentGroup);
         if (group && p.index != null) {
-          var agent = group.children.find(function(a) { return a.index === p.index; });
-          if (agent) { agent.time = p.time; agent.cost = p.cost; agent.model = p.model; }
+          var request = group.children.find(function(a) { return a.index === p.index; });
+          if (request) { request.time = p.time; request.cost = p.cost; request.model = p.model; }
         }
         plAppendLog(p.text || p.event, lvl, src);
 

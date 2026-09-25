@@ -119,44 +119,44 @@ module Ai
       }
     end
 
-    def tribunal_before_agent_event(args, agent_names)
-      _agent, index = args
-      label = agent_names[index] || "agent #{(index || 0) + 1}"
+    def tribunal_before_request_event(args, request_names)
+      _request, index = args
+      label = request_names[index] || "request #{(index || 0) + 1}"
       {
-        event:  "tribunal_before_agent",
-        text:   "Tribunal: launching #{label}…",
-        level:  "info",
-        source: "tribunal",
-        agent:  label,
-        index:  index
+        event:   "tribunal_before_request",
+        text:    "Tribunal: launching #{label}…",
+        level:   "info",
+        source:  "tribunal",
+        request: label,
+        index:   index
       }
     end
 
-    def tribunal_after_agent_event(args, agent_names)
+    def tribunal_after_request_event(args, request_names)
       result, index = args
       time         = result.respond_to?(:execution_time) ? result.execution_time : "?"
       cost         = result.respond_to?(:usage)          ? result.usage&.cost&.total : nil
       model        = result.respond_to?(:model)          ? result.model&.name : nil
-      detail, lvl  = tribunal_agent_detail(result.respond_to?(:processed) ? result.processed : nil)
-      label        = agent_names[index] || "agent #{(index || 0) + 1}"
+      detail, lvl  = tribunal_request_detail(result.respond_to?(:processed) ? result.processed : nil)
+      label        = request_names[index] || "request #{(index || 0) + 1}"
       {
-        event:  "tribunal_after_agent",
-        text:   "Tribunal: #{label} done (#{time}s) — #{detail}",
-        level:  lvl,
-        source: "tribunal",
-        agent:  label,
-        index:  index,
-        time:   time,
-        cost:   cost,
-        model:  model
+        event:   "tribunal_after_request",
+        text:    "Tribunal: #{label} done (#{time}s) — #{detail}",
+        level:   lvl,
+        source:  "tribunal",
+        request: label,
+        index:   index,
+        time:    time,
+        cost:    cost,
+        model:   model
       }
     end
 
-    def tribunal_agent_error_event(args)
+    def tribunal_request_error_event(args)
       _name_str, err, index = args
       {
-        event:  "tribunal_agent_error",
-        text:   "Tribunal: agent #{(index || 0) + 1} error — #{err&.message}",
+        event:  "tribunal_request_error",
+        text:   "Tribunal: request #{(index || 0) + 1} error — #{err&.message}",
         level:  "error",
         source: "tribunal"
       }
@@ -189,43 +189,43 @@ module Ai
       }
     end
 
-    # ── agent ─────────────────────────────────────────────────────────────────
+    # ── request ─────────────────────────────────────────────────────────────────
 
-    def agent_before_call_event
+    def request_before_call_event
       {
-        event:  "agent_before_call",
-        text:   "Agent: sending request…",
+        event:  "request_before_call",
+        text:   "Request: sending…",
         level:  "info",
-        source: "agent"
+        source: "request"
       }
     end
 
-    def agent_after_call_event(result)
+    def request_after_call_event(result)
       time = result.respond_to?(:execution_time) ? result.execution_time : nil
       {
-        event:  "agent_after_call",
-        text:   "Agent: response received#{time ? " (#{time}s)" : ""}",
+        event:  "request_after_call",
+        text:   "Request: response received#{time ? " (#{time}s)" : ""}",
         level:  "success",
-        source: "agent"
+        source: "request"
       }
     end
 
-    def agent_retry_event(args)
+    def request_retry_event(args)
       entry, err = args
       {
-        event:  "agent_retry",
-        text:   "Agent: retrying #{entry&.dig(:model)} — #{err&.message}",
+        event:  "request_retry",
+        text:   "Request: retrying #{entry&.dig(:model)} — #{err&.message}",
         level:  "warning",
-        source: "agent"
+        source: "request"
       }
     end
 
-    def agent_failure_event
+    def request_failure_event
       {
-        event:  "agent_failure",
-        text:   "Agent: all models failed",
+        event:  "request_failure",
+        text:   "Request: all models failed",
         level:  "error",
-        source: "agent"
+        source: "request"
       }
     end
 
@@ -239,14 +239,14 @@ module Ai
       sse.write(build_pipeline_event(name, args, step_index, in_laundry).to_json)
     end
 
-    def write_tribunal_event(sse, name, args, agent_names)
-      agent_names[args[1]] = args[0].class.name if name == :before_agent
-      payload = build_tribunal_event(name, args, agent_names)
+    def write_tribunal_event(sse, name, args, request_names)
+      request_names[args[1]] = args[0].class.name if name == :before_request
+      payload = build_tribunal_event(name, args, request_names)
       sse.write(payload.to_json) if payload
     end
 
-    def write_agent_event(sse, name, args)
-      payload = build_agent_event(name, args)
+    def write_request_event(sse, name, args)
+      payload = build_request_event(name, args)
       sse.write(payload.to_json) if payload
     end
 
@@ -276,26 +276,26 @@ module Ai
       end
     end
 
-    def build_tribunal_event(name, args, agent_names = {})
+    def build_tribunal_event(name, args, request_names = {})
       case name
       when :before_call    then tribunal_before_call_event
       when :after_call     then tribunal_after_call_event
-      when :before_agent   then tribunal_before_agent_event(args, agent_names)
-      when :after_agent    then tribunal_after_agent_event(args, agent_names)
-      when :agent_error    then tribunal_agent_error_event(args)
+      when :before_request then tribunal_before_request_event(args, request_names)
+      when :after_request  then tribunal_after_request_event(args, request_names)
+      when :request_error  then tribunal_request_error_event(args)
       when :before_verdict then tribunal_before_verdict_event
       when :after_verdict  then tribunal_after_verdict_event(args[0])
       else                      tribunal_generic_event(name)
       end
     end
 
-    def build_agent_event(name, args)
+    def build_request_event(name, args)
       case name
       when :setup       then nil
-      when :before_call then agent_before_call_event
-      when :after_call  then agent_after_call_event(args[0])
-      when :retry       then agent_retry_event(args)
-      when :failure     then agent_failure_event
+      when :before_call then request_before_call_event
+      when :after_call  then request_after_call_event(args[0])
+      when :retry       then request_retry_event(args)
+      when :failure     then request_failure_event
       else                   nil
       end
     end
@@ -342,7 +342,7 @@ module Ai
       end
     end
 
-    def tribunal_agent_detail(parsed)
+    def tribunal_request_detail(parsed)
       return ["no data", "info"] unless parsed.is_a?(Hash)
 
       flag_key, flag_val = parsed.find { |k, v| v == true || v == false }

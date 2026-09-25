@@ -1,4 +1,4 @@
-# Runs the same PolitenessAgent with three different models in parallel.
+# Runs the same PolitenessRequest with three different models in parallel.
 # Verdict is true (polite) when all three agree.
 class PolitenessTribunal < ActiveHarness::Tribunal
   include TribunalTracing
@@ -10,11 +10,11 @@ class PolitenessTribunal < ActiveHarness::Tribunal
   ].freeze
 
   def initialize(input:)
-    agents = MODELS.map do |model|
-      PolitenessAgent.new(models: [{ provider: :openrouter, model: model }])
+    requests = MODELS.map do |model|
+      PolitenessRequest.new(models: [{ provider: :openrouter, model: model }])
     end
 
-    super(input: input, agents: agents)
+    super(input: input, requests: requests)
   end
 
   verdict :unanimous do |result|

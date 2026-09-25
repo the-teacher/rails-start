@@ -23,12 +23,12 @@ class SupportPipeline < ActiveHarness::Pipeline
 
   # Step 3 — GUARD: topic relevance check
   step :relevance_guard do
-    use RelevanceAgent
+    use RelevanceRequest
     stop_if ->(result) { result.processed["relevant"] == false }
   end
 
   # Step 4 — RESPOND: final answer on a clean, safe, on-topic, compact request
-  step :respond, SupportAgent
+  step :respond, SupportRequest
 
   before :step do |step_name, payload|
     Rails.logger.info "[Pipeline] ▶ before_step :#{step_name} | payload: #{payload.to_s.truncate(120)}"

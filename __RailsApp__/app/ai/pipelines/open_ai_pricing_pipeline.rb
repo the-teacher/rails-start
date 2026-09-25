@@ -1,13 +1,13 @@
 class OpenAiPricingPipeline < ActiveHarness::Pipeline
   FETCH_STEP = lambda do |_payload|
-    t0    = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-    agent = OpenAiPriceDownloaderAgent.call
+    t0       = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+    download = OpenAiPriceDownloaderRequest.call
     elapsed = (Process.clock_gettime(Process::CLOCK_MONOTONIC) - t0).round(3)
 
     ActiveHarness::Result.new(
       input:          _payload,
-      output:         agent.text,
-      processed:      { "html_length" => agent.html&.length, "text_length" => agent.text&.length },
+      output:         download.text,
+      processed:      { "html_length" => download.html&.length, "text_length" => download.text&.length },
       execution_time: elapsed
     )
   end
@@ -16,7 +16,7 @@ class OpenAiPricingPipeline < ActiveHarness::Pipeline
   step :fetch_page, FETCH_STEP
 
   # Step 2 — extract structured JSON pricing via LLM
-  step :extract_pricing, OpenAiPricingExtractAgent
+  step :extract_pricing, OpenAiPricingExtractRequest
 
   before :step do |step_name, _payload|
     Rails.logger.info "[OpenAiPricingPipeline] ▶ :#{step_name}"

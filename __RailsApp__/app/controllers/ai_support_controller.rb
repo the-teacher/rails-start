@@ -12,33 +12,39 @@ class AiSupportController < ApplicationController
 
   # ---------------------------------------------------------------------------
   # POST /ai/agent
+  #
+  # NOTE: this action and route are intentionally NOT renamed to "request" —
+  # defining `def request` on a Rails controller would override
+  # ActionController::Base#request (the HTTP request object accessor) for
+  # this entire controller, breaking request.env / CSRF / etc. Keep as-is.
+  #
   # body: { input: "What is your return policy?" }
   # ---------------------------------------------------------------------------
   def agent
-    agent = SupportAgent.call(input: params.require(:input))
+    req = SupportRequest.call(input: params.require(:input))
 
     render json: {
-      output: agent.result.output,
-      model:  agent.result.model&.name,
-      time:   agent.result.execution_time
+      output: req.result.output,
+      model:  req.result.model&.name,
+      time:   req.result.execution_time
     }
   end
 
   # ---------------------------------------------------------------------------
-  # POST /ai/agent_memory
+  # POST /ai/request_memory
   # body: { input: "Does that apply to accessories?", session_id: "user_42" }
   #
   # Uses AppMemory so the same session keeps conversational context
   # across multiple requests.
   # ---------------------------------------------------------------------------
-  def agent_memory
+  def request_memory
     memory = AppMemory.new(session_id: params.require(:session_id))
-    agent  = SupportAgent.call(input: params.require(:input), memory: memory)
+    req    = SupportRequest.call(input: params.require(:input), memory: memory)
 
     render json: {
-      output: agent.result.output,
-      model:  agent.result.model&.name,
-      time:   agent.result.execution_time,
+      output: req.result.output,
+      model:  req.result.model&.name,
+      time:   req.result.execution_time,
       turns:  memory.size
     }
   end
@@ -78,16 +84,16 @@ class AiSupportController < ApplicationController
   end
 
   # ---------------------------------------------------------------------------
-  # GET /ai/agent_stream?input=What+is+your+return+policy%3F
+  # GET /ai/request_stream?input=What+is+your+return+policy%3F
   #
-  # Streams response tokens (event: message) AND agent lifecycle events
+  # Streams response tokens (event: message) AND request lifecycle events
   # (event: lifecycle) over a single SSE connection.
   #
   # Token frame:     event: message  /  data: {"token":"..."}
   # Done frame:      event: message  /  data: {"done":true}
   # Lifecycle frame: event: lifecycle / data: {"event":"setup","text":"...","level":"info"}
   # ---------------------------------------------------------------------------
-  def agent_stream
+  def request_stream
     prepare_sse_response
 
     input = params.require(:input)
@@ -103,7 +109,7 @@ class AiSupportController < ApplicationController
     rescue IOError, ActionController::Live::ClientDisconnected
     end
 
-    SupportAgent.call(
+    SupportRequest.call(
       input:  input,
       token:  token_stream,
       stream: event_stream
@@ -141,7 +147,7 @@ class AiSupportController < ApplicationController
     case event
     when :setup
       { event: "setup",
-        text:  "Agent initialized",
+        text:  "Request initialized",
         level: "info" }
     when :before_system_prompt
       { event: "before_system_prompt",

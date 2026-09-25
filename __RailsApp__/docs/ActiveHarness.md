@@ -27,7 +27,7 @@ The generator creates:
 
 ```
 app/ai/
-  agents/      # AI agent classes (+ example: SupportAgent, SupportGuardAgent)
+  requests/    # AI request classes (+ example: SupportRequest, SupportGuardRequest)
   prompts/     # Prompt templates
   tribunals/   # Guard/moderation tribunals
   pipelines/   # Multi-step pipelines
@@ -39,11 +39,11 @@ app/ai/
 **Routes** added to `config/routes.rb`:
 
 ```
-POST /ai/agent          — single agent call
-POST /ai/agent_memory   — agent call with session memory
-POST /ai/tribunal       — content moderation check
-POST /ai/pipeline       — full pipeline run
-GET  /ai/agent_stream   — streaming response (SSE)
+POST /ai/agent            — single request call (kept as "agent" — see AiSupportController#agent comment)
+POST /ai/request_memory   — request call with session memory
+POST /ai/tribunal         — content moderation check
+POST /ai/pipeline         — full pipeline run
+GET  /ai/request_stream   — streaming response (SSE)
 ```
 
 ## 4. Configure API keys
@@ -103,7 +103,7 @@ ENV["OPENROUTER_API_KEY"] ||= Rails.application.credentials.openrouter_api_key
 ## 5. Try it
 
 ```bash
-# Single agent call
+# Single request call
 curl -X POST http://localhost:3000/ai/agent \
   -H "Content-Type: application/json" \
   -d '{"input": "Hello!"}'
@@ -111,9 +111,9 @@ curl -X POST http://localhost:3000/ai/agent \
 # {"output":"Hi, how can I assist you today?","model":"mistralai/mistral-nemo","time":2.862}
 
 # With memory (keeps context across requests)
-curl -X POST http://localhost:3000/ai/agent_memory \
+curl -X POST http://localhost:3000/ai/request_memory \
   -H "Content-Type: application/json" \
   -d '{"input": "Hello!", "session_id": "user_42"}'
 
-# File: `storage/ai/memory/user_42.json` is created with the conversation history, and the agent can reference it in future calls.
+# File: `storage/ai/memory/user_42.json` is created with the conversation history, and the request can reference it in future calls.
 ```

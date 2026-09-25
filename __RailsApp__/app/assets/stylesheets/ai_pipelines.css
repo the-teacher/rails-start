@@ -146,6 +146,10 @@ body:has(.ah-pl-page) {
 .ah-pl-group--done    .ah-pl-group-name { color: #34c759; }
 .ah-pl-group--stopped .ah-pl-group-name { color: #ff3b30; }
 
+.ah-pl-group--running .ah-pl-step-icon { color: #667eea; }
+.ah-pl-group--done    .ah-pl-step-icon { color: #34c759; }
+.ah-pl-group--stopped .ah-pl-step-icon { color: #ff3b30; }
+
 .ah-pl-group-tag {
   font-size: 0.58rem;
   font-weight: 700;
@@ -366,7 +370,7 @@ body:has(.ah-pl-page) {
   color: #6b21a8;
 }
 
-.ah-pl-badge--agent {
+.ah-pl-badge--request {
   background: #f0fff4;
   color: #276749;
 }

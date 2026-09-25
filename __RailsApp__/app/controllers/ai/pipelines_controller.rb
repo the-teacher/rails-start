@@ -82,8 +82,8 @@ module Ai
       sse      = ActionController::Live::SSE.new(response.stream, event: "processing")
       sse_done = ActionController::Live::SSE.new(response.stream, event: "completion")
 
-      @step_index           = 0
-      @tribunal_agent_names = {}
+      @step_index             = 0
+      @tribunal_request_names = {}
 
       pipeline = FlatSupportPipeline.new(
         input:  input,
@@ -115,9 +115,9 @@ module Ai
       sse      = ActionController::Live::SSE.new(response.stream, event: "processing")
       sse_done = ActionController::Live::SSE.new(response.stream, event: "completion")
 
-      @step_index           = 0
-      @in_laundry           = false
-      @tribunal_agent_names = {}
+      @step_index             = 0
+      @in_laundry             = false
+      @tribunal_request_names = {}
 
       pipeline = SupportPipeline.new(
         input:  input,
@@ -156,8 +156,8 @@ module Ai
         when :pipeline
           write_flat_pipeline_event(sse, event, args, @step_index)
           @step_index += 1 if event == :before_step
-        when :tribunal then write_tribunal_event(sse, event, args, @tribunal_agent_names)
-        when :agent    then write_agent_event(sse, event, args)
+        when :tribunal then write_tribunal_event(sse, event, args, @tribunal_request_names)
+        when :request  then write_request_event(sse, event, args)
         end
       rescue IOError, ActionController::Live::ClientDisconnected
       end
@@ -172,8 +172,8 @@ module Ai
           @in_laundry = false if event == :stopped     && args[0]&.to_sym == :laundry
           write_pipeline_event(sse, event, args, @step_index, @in_laundry)
           @step_index += 1 if event == :before_step
-        when :tribunal then write_tribunal_event(sse, event, args, @tribunal_agent_names)
-        when :agent    then write_agent_event(sse, event, args)
+        when :tribunal then write_tribunal_event(sse, event, args, @tribunal_request_names)
+        when :request  then write_request_event(sse, event, args)
         end
       rescue IOError, ActionController::Live::ClientDisconnected
       end

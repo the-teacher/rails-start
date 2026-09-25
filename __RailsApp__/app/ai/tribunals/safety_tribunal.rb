@@ -1,9 +1,9 @@
 # Runs toxicity + aggression checks in parallel.
-# Verdict is true (safe) when both agents report no issues.
+# Verdict is true (safe) when both requests report no issues.
 class SafetyTribunal < ActiveHarness::Tribunal
   include TribunalTracing
 
-  agents ToxicityAgent, AggressionAgent
+  requests ToxicityRequest, AggressionRequest
 
   verdict :unanimous do |result|
     toxic      = result.processed&.dig("toxic")
@@ -15,11 +15,11 @@ class SafetyTribunal < ActiveHarness::Tribunal
     Rails.logger.info "[SafetyTribunal] ▶ starting parallel checks…"
   end
 
-  on(:after_agent) do |result, index|
-    Rails.logger.info "[SafetyTribunal] ✓ agent #{index + 1} done (#{result.execution_time}s) — #{result.processed}"
+  on(:after_request) do |result, index|
+    Rails.logger.info "[SafetyTribunal] ✓ request #{index + 1} done (#{result.execution_time}s) — #{result.processed}"
   end
 
-  on(:agent_error) do |name, error, _index|
+  on(:request_error) do |name, error, _index|
     Rails.logger.warn "[SafetyTribunal] ✗ #{name} error — #{error&.message}"
   end
 

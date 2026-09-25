@@ -15,7 +15,7 @@
 #   inflect.acronym "RESTful"
 # end
 
-# LLM must stay all-caps so Zeitwerk maps support_ruby_llm_agent.rb → SupportRubyLLMAgent.
+# LLM must stay all-caps so Zeitwerk maps support_ruby_llm_request.rb → SupportRubyLLMRequest.
 ActiveSupport::Inflector.inflections(:en) do |inflect|
   inflect.acronym "LLM"
 end

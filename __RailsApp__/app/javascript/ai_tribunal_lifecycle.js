@@ -3,7 +3,7 @@ function appendTribunalEvent(p) {
   var sdb = document.getElementById("ah-events");
   if (!sdb) return;
   var icons = { info: "●", success: "✓", warning: "⚠", error: "✗" };
-  var sourceLabels = { tribunal: "tribunal", agent: "agent" };
+  var sourceLabels = { tribunal: "tribunal", request: "request" };
   var el = document.createElement("div");
   el.className = "ah-event ah-event--" + (p.level || "info");
   var sourceBadge = p.source
@@ -134,13 +134,13 @@ function populatePanel(i, p) {
           document.getElementById("ah-verdict-value").textContent =
             "Error: " + p.error;
         }
-        // Show any agent errors that weren't surfaced via lifecycle events
+        // Show any request errors that weren't surfaced via lifecycle events
         if (p.errors && p.errors.length > 0) {
           p.errors.forEach(function (e) {
             appendTribunalEvent({
               level: "error",
-              text: "Failed: " + e.agent.split("::").pop() + " — " + e.error,
-              event: "agent_error_summary",
+              text: "Failed: " + e.request.split("::").pop() + " — " + e.error,
+              event: "request_error_summary",
             });
           });
         }
@@ -153,7 +153,7 @@ function populatePanel(i, p) {
       var p = JSON.parse(ev.data);
       appendTribunalEvent(p);
 
-      if (p.event === "agent_done" && p.index != null) {
+      if (p.event === "request_done" && p.index != null) {
         populatePanel(p.index, p);
       }
 

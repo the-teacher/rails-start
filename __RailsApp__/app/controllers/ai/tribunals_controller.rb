@@ -8,7 +8,7 @@ module Ai
 
     # ---------------------------------------------------------------------------
     # GET /ai/tribunals/politeness
-    # Tribunal 1: Politeness — 1 agent × 3 models run in parallel.
+    # Tribunal 1: Politeness — 1 request class × 3 models run in parallel.
     # ---------------------------------------------------------------------------
     def politeness
     end
@@ -36,7 +36,7 @@ module Ai
       render json: {
         verdict: tribunal.verdict,
         time:    tribunal.execution_time,
-        errors:  tribunal.errors.map { |e| { agent: e[:agent], error: e[:error].message } },
+        errors:  tribunal.errors.map { |e| { request: e[:request], error: e[:error].message } },
         results: results
       }
     rescue StandardError => e
@@ -69,7 +69,7 @@ module Ai
       sse_done.write({
         done:   true,
         time:   tribunal.execution_time,
-        errors: tribunal.errors.map { |e| { agent: e[:agent], error: e[:error].message } }
+        errors: tribunal.errors.map { |e| { request: e[:request], error: e[:error].message } }
       }.to_json)
     rescue ActionController::Live::ClientDisconnected
     rescue StandardError => e

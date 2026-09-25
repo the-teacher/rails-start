@@ -13,13 +13,13 @@ class PromptLaundryPipeline < ActiveHarness::Pipeline
   include PipelineTracing
 
   step :injection_guard do
-    use InjectionGuardAgent
+    use InjectionGuardRequest
     stop_if ->(result) { result.processed["detected"] == true }
   end
 
-  step :translate, TranslationAgent
+  step :translate, TranslationRequest
 
-  step :compact, CompactionAgent
+  step :compact, CompactionRequest
 
   before :step do |step_name, payload|
     Rails.logger.info "[PromptLaundry] ▶ #{step_name} | #{payload.to_s.truncate(80)}"

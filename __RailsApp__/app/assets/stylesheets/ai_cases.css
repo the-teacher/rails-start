@@ -163,7 +163,7 @@ body:has(.ah-cases-page) {
   justify-content: center;
 }
 
-/* ── Nav row (back / next) inside agent cards ────────────────── */
+/* ── Nav row (back / next) inside request cards ────────────────── */
 
 .ah-nav {
   display: flex;

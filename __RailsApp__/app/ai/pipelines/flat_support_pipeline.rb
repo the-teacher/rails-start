@@ -9,13 +9,13 @@ class FlatSupportPipeline < ActiveHarness::Pipeline
   include PipelineTracing
 
   step :injection_guard do
-    use InjectionGuardAgent
+    use InjectionGuardRequest
     stop_if ->(result) { result.processed["detected"] == true }
   end
 
-  step :translate, TranslationAgent
+  step :translate, TranslationRequest
 
-  step :compact, CompactionAgent
+  step :compact, CompactionRequest
 
   step :safety_tribunal do
     use SafetyTribunal
@@ -23,11 +23,11 @@ class FlatSupportPipeline < ActiveHarness::Pipeline
   end
 
   step :relevance_guard do
-    use RelevanceAgent
+    use RelevanceRequest
     stop_if ->(result) { result.processed["relevant"] == false }
   end
 
-  step :respond, SupportAgent
+  step :respond, SupportRequest
 
   before :step do |step_name, payload|
     Rails.logger.info "[FlatPipeline] ▶ before_step :#{step_name} | payload: #{payload.to_s.truncate(120)}"

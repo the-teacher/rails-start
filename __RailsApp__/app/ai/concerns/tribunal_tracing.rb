@@ -5,22 +5,22 @@ module TribunalTracing
         attributes: { "tribunal.class" => self.class.name },
         parent_ctx: @params[:tracer_ctx]
       )
-      # Propagate tribunal span as parent for all agents running inside this tribunal.
-      # @params is shared by reference with all agents instantiated in resolve_agents,
-      # so updating it here (before futures start) makes agent spans children of the tribunal.
+      # Propagate tribunal span as parent for all requests running inside this tribunal.
+      # @params is shared by reference with all requests instantiated in resolve_requests,
+      # so updating it here (before futures start) makes request spans children of the tribunal.
       @params[:tracer_ctx] = AiTracer.span_context(@tracer_span)
     end
 
-    base.on(:after_agent) do |result, index|
-      @tracer_span&.event("agent_done",
-        agent: { index: index },
+    base.on(:after_request) do |result, index|
+      @tracer_span&.event("request_done",
+        request: { index: index },
         llm: { model: result.model&.name, time_s: result.execution_time }
       )
     end
 
-    base.on(:agent_error) do |name, error, _index|
-      @tracer_span&.event("agent_error",
-        agent: { class: name },
+    base.on(:request_error) do |name, error, _index|
+      @tracer_span&.event("request_error",
+        request: { class: name },
         error: error&.message
       )
     end
