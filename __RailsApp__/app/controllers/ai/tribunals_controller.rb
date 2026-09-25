@@ -78,6 +78,55 @@ module Ai
       sse_done.close
     end
 
+    # ---------------------------------------------------------------------------
+    # GET /ai/tribunals/safety
+    # Tribunal 3: Content Safety — ToxicityRequest (classic prompted LLM) vs
+    # JevRequest (Jev evaluation model via Vercel AI Gateway), run in parallel.
+    # ---------------------------------------------------------------------------
+    def safety
+    end
+
+    # POST /ai/tribunals/safety/call
+    # body: { input: "..." }
+    def safety_call
+      input    = params.require(:input)
+      tribunal = ContentSafetyTribunal.new(input: input)
+      tribunal.call
+
+      results = tribunal.results.map do |r|
+        row = {
+          model: r.model&.name,
+          time:  r.execution_time,
+          usage: r.usage ? { input: r.usage.tokens.input, output: r.usage.tokens.output, total: r.usage.tokens.total } : nil,
+          cost:  r.usage&.cost&.total
+        }
+
+        if r.processed&.key?("toxic")
+          row.merge(
+            kind:    "text",
+            flagged: r.processed["toxic"] == true,
+            reason:  r.processed["reason"]
+          )
+        else
+          noul = r.processed&.dig("harmful", "noul").to_f
+          row.merge(
+            kind:    "jev",
+            flagged: noul >= 0.5,
+            reason:  "harmful probability: #{(noul * 100).round}%"
+          )
+        end
+      end
+
+      render json: {
+        verdict: tribunal.verdict,
+        time:    tribunal.execution_time,
+        errors:  tribunal.errors.map { |e| { request: e[:request], error: e[:error].message } },
+        results: results
+      }
+    rescue StandardError => e
+      render json: { error: "#{e.class.name.split('::').last}: #{e.message}" }, status: :unprocessable_entity
+    end
+
     private
 
     def prepare_sse_response

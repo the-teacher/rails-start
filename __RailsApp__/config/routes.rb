@@ -59,6 +59,10 @@ Rails.application.routes.draw do
       # Tribunal 2 — politeness with live lifecycle event sidebar
       get "politeness/lifecycle",        to: "tribunals#politeness_lifecycle",        as: :politeness_lifecycle
       get "politeness/lifecycle/stream", to: "tribunals#politeness_lifecycle_stream", as: :politeness_lifecycle_stream
+
+      # Tribunal 3 — content safety: classic prompted-LLM check vs Jev evaluation model
+      get  "safety",      to: "tribunals#safety",      as: :safety
+      post "safety/call", to: "tribunals#safety_call", as: :safety_call
     end
 
     # Pipeline examples
